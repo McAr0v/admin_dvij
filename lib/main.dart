@@ -1,11 +1,25 @@
+import 'package:admin_dvij/auth_class.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'constants/system_constants.dart';
+import 'firebase_options.dart';
+
+Future<void> main() async {
+
+  runApp(
+      const MyApp()
+  );
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+
+
 
   // This widget is the root of your application.
   @override
@@ -55,6 +69,16 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
+  AuthClass authClass = AuthClass();
+
+  bool _isObscured = true;
+
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+
+  String uidUser = '';
+
   int _counter = 0;
 
   void _incrementCounter() {
@@ -66,6 +90,26 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+  }
+
+  void _singIn(String email, String password) async {
+    String? uid = await authClass.signInWithEmailAndPassword(email, password);
+    if (uid != null && uid.isNotEmpty){
+      setState(() {
+        uidUser = uid;
+      });
+    }
+
+  }
+
+  void _singOut() async {
+    String? signOut = await authClass.signOut();
+    if (signOut != null && signOut == SystemConstants.successConst){
+      setState(() {
+        uidUser = '';
+      });
+    }
+
   }
 
   @override
@@ -104,15 +148,73 @@ class _MyHomePageState extends State<MyHomePage> {
           // action in the IDE, or press "p" in the console), to see the
           // wireframe for each widget.
           mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times: 123 123',
+          children: [
+
+            Text(uidUser.isEmpty ? 'Пусто' : uidUser),
+
+            TextField(
+              style: Theme.of(context).textTheme.bodyMedium,
+              controller: emailController,
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                prefixIcon: Icon(Icons.email),
+              ),
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+            const SizedBox(height: 16.0),
+
+            // ---- ПОЛЕ ПАРОЛЬ -----
+
+            TextField(
+              style: Theme.of(context).textTheme.bodyMedium,
+              controller: passwordController,
+              decoration: InputDecoration(
+                  prefixIcon: const Icon(Icons.key),
+                  labelText: 'Пароль',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _isObscured ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: (){
+                      setState(() {
+                        _isObscured = !_isObscured;
+                      });
+                    },
+                  )
+              ),
+              // Отобразить / скрыть пароль
+              obscureText: _isObscured,
             ),
-          ],
+
+            if (uidUser.isEmpty) TextButton(
+                onPressed: () async {
+                  if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty){
+
+                    setState(() {
+                      uidUser = 'go';
+                    });
+
+                    String? uid = await authClass.signInWithEmailAndPassword(emailController.text, passwordController.text);
+                    if (uid != null && uid.isNotEmpty){
+                      setState(() {
+                        uidUser = uid;
+                      });
+                    }
+                    //_singIn(emailController.text, passwordController.text);
+                  }
+                },
+                child: Text('Войти')
+            ),
+
+            if (uidUser.isNotEmpty) TextButton(
+                onPressed: (){
+                  _singOut();
+                },
+                child: Text('Выйти')
+            )
+          ]
+
+
+
         ),
       ),
       floatingActionButton: FloatingActionButton(
