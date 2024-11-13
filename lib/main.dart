@@ -1,6 +1,9 @@
 import 'dart:io';
 
-import 'package:admin_dvij/auth_class.dart';
+import 'package:admin_dvij/auth/auth_class.dart';
+import 'package:admin_dvij/auth/log_in_screen.dart';
+import 'package:admin_dvij/auth/profile_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
@@ -10,11 +13,21 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
 
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  AuthClass authClass = AuthClass();
+
+  var currentUser = authClass.auth.currentUser;
+
   // Если Windows или MacOs, устанавливаем ограничение
   // минимального размера экрана приложения
 
   if (Platform.isWindows || Platform.isMacOS){
-    WidgetsFlutterBinding.ensureInitialized();
+
     await windowManager.ensureInitialized();
 
     windowManager.setMinimumSize(const Size(1024, 768));
@@ -23,18 +36,25 @@ Future<void> main() async {
 
 
   runApp(
-      const MyApp()
+      MyApp(currentUser: currentUser,)
   );
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
 
+  final User? currentUser;
 
+  const MyApp({this.currentUser, super.key});
+
+  Widget _swapScreen(User? user){
+    if (user == null) {
+      return const LogInScreen();
+    } else {
+      return const ProfileScreen();
+    }
+  }
 
   // This widget is the root of your application.
   @override
@@ -60,7 +80,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: _swapScreen(currentUser),
     );
   }
 }
@@ -119,7 +139,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void _singOut() async {
     String? signOut = await authClass.signOut();
-    if (signOut != null && signOut == SystemConstants.successConst){
+    if (signOut == SystemConstants.successConst){
       setState(() {
         uidUser = '';
       });
