@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:admin_dvij/auth/profile_screen.dart';
+import 'package:admin_dvij/design_elements/logo_view.dart';
 import 'package:flutter/material.dart';
 import '../constants/system_constants.dart';
 import 'auth_class.dart';
@@ -57,6 +58,10 @@ class _LogInScreenState extends State<LogInScreen> {
           child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+
+                const LogoView(width: 70, height: 70,),
+
+                const SizedBox(height: 50,),
 
                 TextField(
                   style: Theme.of(context).textTheme.bodyMedium,
