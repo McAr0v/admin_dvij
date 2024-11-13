@@ -1,11 +1,26 @@
+import 'dart:io';
+
 import 'package:admin_dvij/auth_class.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'constants/system_constants.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {
+
+  // Если Windows или MacOs, устанавливаем ограничение
+  // минимального размера экрана приложения
+
+  if (Platform.isWindows || Platform.isMacOS){
+    WidgetsFlutterBinding.ensureInitialized();
+    await windowManager.ensureInitialized();
+
+    windowManager.setMinimumSize(const Size(1024, 768));
+  }
+
+
 
   runApp(
       const MyApp()
@@ -114,6 +129,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+
+    bool isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+    double maxWidth = isDesktop ? 600 : double.infinity; // Ограничение ширины на настольных платформах
+
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -133,88 +152,92 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+        child: Container(
+          width: maxWidth,
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            // Column is also a layout widget. It takes a list of children and
+            // arranges them vertically. By default, it sizes itself to fit its
+            // children horizontally, and tries to be as tall as its parent.
+            //
+            // Column has various properties to control how it sizes itself and
+            // how it positions its children. Here we use mainAxisAlignment to
+            // center the children vertically; the main axis here is the vertical
+            // axis because Columns are vertical (the cross axis would be
+            // horizontal).
+            //
+            // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
+            // action in the IDE, or press "p" in the console), to see the
+            // wireframe for each widget.
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
 
-            Text(uidUser.isEmpty ? 'Пусто' : uidUser),
+              Text(uidUser.isEmpty ? 'Пусто' : uidUser),
 
-            TextField(
-              style: Theme.of(context).textTheme.bodyMedium,
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: 'Email',
-                prefixIcon: Icon(Icons.email),
+              TextField(
+                style: Theme.of(context).textTheme.bodyMedium,
+                controller: emailController,
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: Icon(Icons.email),
+                ),
               ),
-            ),
-            const SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
 
-            // ---- ПОЛЕ ПАРОЛЬ -----
+              // ---- ПОЛЕ ПАРОЛЬ -----
 
-            TextField(
-              style: Theme.of(context).textTheme.bodyMedium,
-              controller: passwordController,
-              decoration: InputDecoration(
-                  prefixIcon: const Icon(Icons.key),
-                  labelText: 'Пароль',
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isObscured ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: (){
-                      setState(() {
-                        _isObscured = !_isObscured;
-                      });
-                    },
-                  )
+              TextField(
+                style: Theme.of(context).textTheme.bodyMedium,
+                controller: passwordController,
+                decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.key),
+                    labelText: 'Пароль',
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _isObscured ? Icons.visibility : Icons.visibility_off,
+                      ),
+                      onPressed: (){
+                        setState(() {
+                          _isObscured = !_isObscured;
+                        });
+                      },
+                    )
+                ),
+                // Отобразить / скрыть пароль
+                obscureText: _isObscured,
               ),
-              // Отобразить / скрыть пароль
-              obscureText: _isObscured,
-            ),
 
-            if (uidUser.isEmpty) TextButton(
-                onPressed: () async {
-                  if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty){
+              if (uidUser.isEmpty) TextButton(
+                  onPressed: () async {
+                    if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty){
 
-                    setState(() {
-                      uidUser = 'go';
-                    });
-
-                    String? uid = await authClass.signInWithEmailAndPassword(emailController.text, passwordController.text);
-                    if (uid != null && uid.isNotEmpty){
                       setState(() {
-                        uidUser = uid;
+                        uidUser = 'go';
                       });
+
+                      String? uid = await authClass.signInWithEmailAndPassword(emailController.text, passwordController.text);
+                      if (uid != null && uid.isNotEmpty){
+                        setState(() {
+                          uidUser = uid;
+                        });
+                      }
+                      //_singIn(emailController.text, passwordController.text);
                     }
-                    //_singIn(emailController.text, passwordController.text);
-                  }
-                },
-                child: Text('Войти')
-            ),
+                  },
+                  child: Text('Войти')
+              ),
 
-            if (uidUser.isNotEmpty) TextButton(
-                onPressed: (){
-                  _singOut();
-                },
-                child: Text('Выйти')
-            )
-          ]
+              if (uidUser.isNotEmpty) TextButton(
+                  onPressed: (){
+                    _singOut();
+                  },
+                  child: Text('Выйти')
+              )
+            ]
 
 
 
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
