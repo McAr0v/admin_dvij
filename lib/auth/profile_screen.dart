@@ -30,19 +30,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ваш профиль', style: TextStyle(fontSize: 15),),
-        backgroundColor: Colors.black,
-        surfaceTintColor: Colors.white,
-        foregroundColor: Colors.white,
+        title: Text('Ваш профиль'),
       ),
       body: Container(
         padding: EdgeInsets.all(20),
-        color: Colors.white,
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(currentUser != null ? currentUser!.uid : 'Нет UID', style: TextStyle(fontSize: 15),),
+              Text(currentUser != null ? currentUser!.uid : 'Нет UID', style: Theme.of(context).textTheme.bodyMedium),
+
+              SizedBox(height: 50,),
 
               TextButton(
                   onPressed: (){

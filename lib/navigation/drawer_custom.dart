@@ -18,7 +18,7 @@ class CustomDrawer extends StatefulWidget {
 class _CustomDrawerState extends State<CustomDrawer> {
 
   double switchDrawerSize () {
-    if (Platform.isWindows) {
+    if (Platform.isWindows || Platform.isMacOS) {
       return MediaQuery.of(context).size.width * 0.3;
     } else {
       return MediaQuery.of(context).size.width * 0.8;
@@ -26,7 +26,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
   }
 
   EdgeInsetsGeometry switchDrawerPadding(){
-    if (Platform.isWindows) {
+    if (Platform.isWindows || Platform.isMacOS) {
       return EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0);
     } else {
       return EdgeInsets.fromLTRB(5.0, 50.0, 5.0, 5.0);
