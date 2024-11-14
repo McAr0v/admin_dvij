@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../design/app_colors.dart';
+
 class LogoView extends StatelessWidget {
   final double width;
   final double height;
@@ -19,7 +21,7 @@ class LogoView extends StatelessWidget {
               'assets/logo.svg',
             width: width,
             height: height,
-            color: Colors.black,
+            color: AppColors.brandColor,
           ),
         ],
       ),

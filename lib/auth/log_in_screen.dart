@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:admin_dvij/auth/profile_screen.dart';
+import 'package:admin_dvij/design/app_colors.dart';
 import 'package:admin_dvij/design_elements/logo_view.dart';
+import 'package:admin_dvij/main_page/main_screen.dart';
 import 'package:flutter/material.dart';
-import '../constants/system_constants.dart';
 import 'auth_class.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -33,7 +33,7 @@ class _LogInScreenState extends State<LogInScreen> {
     await Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(
-          builder: (context) => const ProfileScreen()
+          builder: (context) => const MainPageCustom()
         ),
             (_) => false
     );
@@ -47,10 +47,6 @@ class _LogInScreenState extends State<LogInScreen> {
     double maxWidth = isDesktop ? 600 : double.infinity; // Ограничение ширины на настольных платформах
     
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text('Экран входа'),
-      ),
       body: Center(
         child: Container(
           width: maxWidth,
@@ -60,6 +56,8 @@ class _LogInScreenState extends State<LogInScreen> {
               children: [
 
                 const LogoView(width: 70, height: 70,),
+                
+                Text('Административное приложение', style: Theme.of(context).textTheme.bodySmall,),
 
                 const SizedBox(height: 50,),
 
@@ -96,6 +94,8 @@ class _LogInScreenState extends State<LogInScreen> {
                   obscureText: _isObscured,
                 ),
 
+                const SizedBox(height: 16.0),
+
                 TextButton(
                     onPressed: () async {
                       if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty){
@@ -107,7 +107,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         //_singIn(emailController.text, passwordController.text);
                       }
                     },
-                    child: Text('Войти')
+                    child: Text('Войти', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.greyOnBackground),)
                 ),
 
               ]

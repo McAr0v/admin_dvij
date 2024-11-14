@@ -1,5 +1,6 @@
 import 'package:admin_dvij/auth/auth_class.dart';
 import 'package:admin_dvij/auth/log_in_screen.dart';
+import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,25 +28,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(20),
-      color: Colors.white,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(currentUser != null ? currentUser!.uid : 'Нет UID', style: TextStyle(fontSize: 15),),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Ваш профиль', style: TextStyle(fontSize: 15),),
+        backgroundColor: Colors.black,
+        surfaceTintColor: Colors.white,
+        foregroundColor: Colors.white,
+      ),
+      body: Container(
+        padding: EdgeInsets.all(20),
+        color: Colors.white,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(currentUser != null ? currentUser!.uid : 'Нет UID', style: TextStyle(fontSize: 15),),
 
-            TextButton(
-                onPressed: (){
-                  _singOut();
-                },
-                child: Text('Выйти', style: TextStyle(fontSize: 15),)
-            )
+              TextButton(
+                  onPressed: (){
+                    _singOut();
+                  },
+                  child: Text('Выйти', style: TextStyle(fontSize: 15),)
+              )
 
-          ],
+            ],
+          ),
         ),
       ),
+      drawer: CustomDrawer(),
     );
   }
 

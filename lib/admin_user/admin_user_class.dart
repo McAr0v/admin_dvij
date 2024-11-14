@@ -69,5 +69,4 @@ class AdminUserClass {
     _currentUser = user;
   }
 
-  
 }

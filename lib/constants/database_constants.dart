@@ -1,7 +1,7 @@
 class DatabaseConstants {
   static const String uid = 'uid';
   static const String name = 'name';
-  static const String lastName = 'lastName';
+  static const String lastName = 'lastname';
   static const String phone = 'phone';
   static const String email = 'email';
   static const String birthDate = 'birthDate';
