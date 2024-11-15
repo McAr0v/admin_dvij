@@ -1,0 +1,4 @@
+enum ButtonStateEnum {
+  primary,
+  secondary
+}

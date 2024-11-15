@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:admin_dvij/auth/profile_screen.dart';
 import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/main_page/main_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -57,30 +58,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
             // Дополнительные страницы - О приложении, написать разработчику и тд.
 
-            ListTile(
-              title: Text(ScreenConstants.mainPage, style: Theme.of(context).textTheme.bodyMedium,),
-              leading: const Icon(FontAwesomeIcons.house, size: 15,),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MainPageCustom()),
-                );
-              },
+            ElementsOfDesign.drawerListElement(
+                ScreenConstants.mainPage,
+                FontAwesomeIcons.house,
+                const MainPageCustom(),
+                context
             ),
 
-            ListTile(
-              leading: const Icon(FontAwesomeIcons.user, size: 15,),
-              title: Text(ScreenConstants.profilePage, style: Theme.of(context).textTheme.bodyMedium),
-              onTap: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfileScreen()),
-                );
-              },
+            ElementsOfDesign.drawerListElement(
+                ScreenConstants.profilePage,
+                FontAwesomeIcons.user,
+                const ProfileScreen(),
+                context
             ),
-
+            
           ],
         ),
       ),
