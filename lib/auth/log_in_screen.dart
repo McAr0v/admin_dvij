@@ -20,24 +20,36 @@ class _LogInScreenState extends State<LogInScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  void _singIn(String email, String password) async {
+  /*void _singIn(String email, String password) async {
     String? uid = await authClass.signInWithEmailAndPassword(email, password);
     if (uid!.isNotEmpty){
       await navigateToProfile();
     }
 
-  }
+  }*/
 
-  Future<void> navigateToProfile()async {
+  Future<void> navigateToProfile(String message)async {
 
-    await Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const MainPageCustom()
+    // Если в возвращенном сообщении от Firebase ошибка
+
+    if (!authClass.checkAnswerOnError(message)){
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authClass.getErrorTranslation(message)),
+          duration: Duration(seconds: 2),
         ),
-            (_) => false
-    );
+      );
+    } else {
 
+      // Если в сообщении не ошибка, то переходим на главную страницу
+      await Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => const MainPageCustom()
+          ),
+              (_) => false
+      );
+    }
   }
 
   @override
@@ -102,7 +114,8 @@ class _LogInScreenState extends State<LogInScreen> {
 
                         String? uid = await authClass.signInWithEmailAndPassword(emailController.text, passwordController.text);
                         if (uid != null && uid.isNotEmpty){
-                          await navigateToProfile();
+                          await navigateToProfile(uid);
+
                         }
                         //_singIn(emailController.text, passwordController.text);
                       }
