@@ -1,11 +1,10 @@
 import 'dart:io';
-
 import 'package:admin_dvij/auth/profile_screen.dart';
+import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
 import 'package:admin_dvij/main_page/main_screen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../design_elements/logo_view.dart';
 
 class CustomDrawer extends StatefulWidget {
@@ -27,9 +26,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
   EdgeInsetsGeometry switchDrawerPadding(){
     if (Platform.isWindows || Platform.isMacOS) {
-      return EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0);
+      return const EdgeInsets.fromLTRB(15.0, 15.0, 15.0, 15.0);
     } else {
-      return EdgeInsets.fromLTRB(5.0, 50.0, 5.0, 5.0);
+      return const EdgeInsets.fromLTRB(5.0, 50.0, 5.0, 5.0);
     }
   }
 
@@ -59,20 +58,20 @@ class _CustomDrawerState extends State<CustomDrawer> {
             // Дополнительные страницы - О приложении, написать разработчику и тд.
 
             ListTile(
-              title: const Text('Главный экран'),
-              leading: const Icon(Icons.feedback),
+              title: Text(ScreenConstants.mainPage, style: Theme.of(context).textTheme.bodyMedium,),
+              leading: const Icon(FontAwesomeIcons.house, size: 15,),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MainPageCustom()),
+                  MaterialPageRoute(builder: (context) => const MainPageCustom()),
                 );
               },
             ),
 
             ListTile(
-              leading: const Icon(Icons.info),
-              title: const Text('Профиль'),
+              leading: const Icon(FontAwesomeIcons.user, size: 15,),
+              title: Text(ScreenConstants.profilePage, style: Theme.of(context).textTheme.bodyMedium),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -82,31 +81,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
               },
             ),
 
-
-            ListTile(
-              leading: const Icon(Icons.ad_units),
-              title: const Text('Реклама в приложении'),
-              onTap: () {
-                /*Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const AboutAdPage()),
-                );*/
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.privacy_tip),
-              title: const Text('Политика конфиденциальности'),
-              onTap: () {
-                /*Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const PrivacyPolicyPage()),
-                );*/
-              },
-            ),
           ],
         ),
       ),
