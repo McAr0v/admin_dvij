@@ -108,6 +108,9 @@ class _LogInScreenState extends State<LogInScreen> {
     });
 
     String? uid = await authClass.signInWithEmailAndPassword(emailController.text, passwordController.text);
+
+    print(uid ?? 'null');
+
     if (uid != null && uid.isNotEmpty){
       await navigateToProfile(uid);
 

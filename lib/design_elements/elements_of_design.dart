@@ -36,7 +36,7 @@ class ElementsOfDesign {
 
     return TextButton(
         onPressed: method,
-        style: ButtonStyle(backgroundColor: ),
+        //style: ButtonStyle(backgroundColor: ),
         child: Text(textOnButton, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.greyOnBackground),)
     );
   }

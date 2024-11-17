@@ -1,3 +1,4 @@
+import 'package:admin_dvij/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -46,6 +47,10 @@ class AuthClass{
     } catch (e) {
       return null;
     }
+  }
+
+  String getUserId(){
+    return auth.currentUser!.uid;
   }
 
   bool checkAnswerOnError(String message) {
