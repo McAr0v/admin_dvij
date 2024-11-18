@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:admin_dvij/constants/system_constants.dart';
-import 'package:admin_dvij/design/app_colors.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
+import 'package:admin_dvij/design_elements/button_state_enum.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/design_elements/logo_view.dart';
 import 'package:admin_dvij/main_page/main_screen.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +59,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         prefixIcon: Icon(Icons.email),
                       ),
                     ),
+
                     const SizedBox(height: 16.0),
 
                     // ---- ПОЛЕ ПАРОЛЬ -----
@@ -85,11 +87,13 @@ class _LogInScreenState extends State<LogInScreen> {
 
                     const SizedBox(height: 16.0),
 
-                    TextButton(
-                        onPressed: () async {
+                    ElementsOfDesign.customButton(
+                        method: () async {
                           _singIn(emailController.text, passwordController.text);
                         },
-                        child: Text('Войти', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.greyOnBackground),)
+                        textOnButton: 'Войти',
+                        context: context,
+                      buttonState: ButtonStateEnum.primary
                     ),
                   ]
               ),
@@ -109,11 +113,8 @@ class _LogInScreenState extends State<LogInScreen> {
 
     String? uid = await authClass.signInWithEmailAndPassword(emailController.text, passwordController.text);
 
-    print(uid ?? 'null');
-
     if (uid != null && uid.isNotEmpty){
       await navigateToProfile(uid);
-
     }
 
     setState(() {

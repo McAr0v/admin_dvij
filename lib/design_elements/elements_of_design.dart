@@ -31,20 +31,41 @@ class ElementsOfDesign {
       ButtonStateEnum buttonState = ButtonStateEnum.primary
       }){
 
-    Color buttonColor = AppColors.brandColor;
-    Color textColor = AppColors.greyOnBackground;
+    ElementsOfDesign elements = ElementsOfDesign();
 
     return TextButton(
         onPressed: method,
-        //style: ButtonStyle(backgroundColor: ),
-        child: Text(textOnButton, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.greyOnBackground),)
+        style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+                  (Set<WidgetState> states) {
+                    return elements._switchColorButton(buttonState);
+                    },
+            ),
+            side: WidgetStateProperty.resolveWith<BorderSide?>(
+                  (Set<WidgetState> states) {
+                    return BorderSide(color: elements._switchColorButton(buttonState));
+                    },
+            ),
+        ),
+
+        child: Text(
+          textOnButton,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: elements._switchTextOnButtonColor(buttonState)),
+        )
     );
   }
 
   Color _switchColorButton(ButtonStateEnum state){
     switch (state) {
       case ButtonStateEnum.primary: return AppColors.brandColor;
-      case ButtonStateEnum.secondary: return AppColors.greyText;
+      case ButtonStateEnum.secondary: return AppColors.white;
+    }
+  }
+
+  Color _switchTextOnButtonColor(ButtonStateEnum state){
+    switch (state) {
+      case ButtonStateEnum.primary: return AppColors.greyOnBackground;
+      case ButtonStateEnum.secondary: return AppColors.greyOnBackground;
     }
   }
 

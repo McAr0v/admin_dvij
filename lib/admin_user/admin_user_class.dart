@@ -58,6 +58,9 @@ class AdminUserClass {
 
   Future<String> signOut() async {
     AuthClass authClass = AuthClass();
+
+    _currentUser = null;
+
     return await authClass.signOut();
   }
 

@@ -6,7 +6,9 @@ class DatabaseClass{
 
   Future<DataSnapshot?> getInfoFromDb(String path) async {
     try{
-      final DatabaseReference ref = _reference.child(path);
+      //final DatabaseReference ref = _reference.child(path);
+      print('jr');
+      final DatabaseReference ref = FirebaseDatabase.instance.ref().child(path);
       return await ref.get();
     } catch (e){
       return null;

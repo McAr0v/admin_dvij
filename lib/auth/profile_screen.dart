@@ -1,7 +1,11 @@
+import 'package:admin_dvij/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/auth/auth_class.dart';
 import 'package:admin_dvij/auth/log_in_screen.dart';
+import 'package:admin_dvij/database/database_class.dart';
+import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -17,13 +21,46 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
 
   AuthClass authClass = AuthClass();
+  DatabaseClass database = DatabaseClass();
 
   User? currentUser;
+
+  AdminUserClass currentUserAdmin = AdminUserClass.empty();
+
+  bool loading = false;
 
   @override
   void initState() {
     currentUser = authClass.auth.currentUser;
+
+    getAdmin();
+
     super.initState();
+  }
+
+  Future<void> getAdmin() async{
+    setState(() {
+
+      loading = true;
+
+    });
+
+    if (currentUser != null) {
+      print(currentUser!.uid);
+      DataSnapshot? snapshot = await database.getInfoFromDb('users/${currentUser!.uid}/user_info');
+
+      if (snapshot != null && snapshot.exists) {
+        print('ko');
+        currentUserAdmin = AdminUserClass.fromSnapshot(snapshot);
+      }
+
+    }
+
+    setState(() {
+
+      loading = false;
+
+    });
   }
 
   @override
@@ -34,23 +71,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Container(
         padding: EdgeInsets.all(20),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(currentUser != null ? currentUser!.uid : 'Нет UID', style: Theme.of(context).textTheme.bodyMedium),
+        child: Stack(
+          children: [
+            if (loading) const LoadingScreen(loadingText: 'Идет загрузка данных'),
+            if (!loading) Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
 
-              SizedBox(height: 50,),
+                  if (currentUserAdmin.name.isNotEmpty) Text(currentUserAdmin.name),
 
-              TextButton(
-                  onPressed: (){
-                    _singOut();
-                  },
-                  child: Text('Выйти', style: TextStyle(fontSize: 15),)
-              )
+                  Text(currentUser != null ? currentUser!.uid : 'Нет UID', style: Theme.of(context).textTheme.bodyMedium),
 
-            ],
-          ),
+                  SizedBox(height: 50,),
+
+                  TextButton(
+                      onPressed: (){
+                        _singOut();
+                      },
+                      child: Text('Выйти', style: TextStyle(fontSize: 15),)
+                  )
+
+                ],
+              ),
+            ),
+          ],
         ),
       ),
       drawer: CustomDrawer(),
