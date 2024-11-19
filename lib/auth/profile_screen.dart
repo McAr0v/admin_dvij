@@ -46,11 +46,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     if (currentUser != null) {
-      print(currentUser!.uid);
       DataSnapshot? snapshot = await database.getInfoFromDb('users/${currentUser!.uid}/user_info');
 
       if (snapshot != null && snapshot.exists) {
-        print('ko');
         currentUserAdmin = AdminUserClass.fromSnapshot(snapshot);
       }
 
@@ -69,34 +67,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
       appBar: AppBar(
         title: Text('Ваш профиль'),
       ),
-      body: Container(
-        padding: EdgeInsets.all(20),
-        child: Stack(
-          children: [
-            if (loading) const LoadingScreen(loadingText: 'Идет загрузка данных'),
-            if (!loading) Center(
+      body: Stack(
+        
+        children: [
+          if (loading) const LoadingScreen(loadingText: 'Идет загрузка данных'),
+          if (!loading) Container(
+            padding: EdgeInsets.all(50),
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-
-                  if (currentUserAdmin.name.isNotEmpty) Text(currentUserAdmin.name),
-
+            
+                  if (currentUserAdmin.name.isNotEmpty) Text(currentUserAdmin.getFullName()),
+            
+                  if (currentUserAdmin.email.isNotEmpty) Text(currentUserAdmin.email),
+                  if (currentUserAdmin.avatar.isNotEmpty) CircleAvatar(
+                    radius: 50,
+                    backgroundColor: Colors.grey, // Цвет фона, который будет виден во время загрузки
+                    child: ClipOval(
+                      child: FadeInImage(
+                        placeholder: const AssetImage('assets/u_user.png'),
+                        image: NetworkImage(currentUserAdmin.avatar),
+                        fit: BoxFit.cover,
+                        width: 100,
+                        height: 100,
+                        imageErrorBuilder: (context, error, stackTrace) {
+                          return Image.asset('assets/error_image.png'); // Изображение ошибки, если загрузка не удалась
+                        },
+                      ),
+                    ),
+                  ),
+            
+                  if (currentUserAdmin.registrationDate != DateTime(2100)) Text(currentUserAdmin.registrationDate.toString()),
+            
                   Text(currentUser != null ? currentUser!.uid : 'Нет UID', style: Theme.of(context).textTheme.bodyMedium),
-
+            
                   SizedBox(height: 50,),
-
+            
                   TextButton(
                       onPressed: (){
                         _singOut();
                       },
                       child: Text('Выйти', style: TextStyle(fontSize: 15),)
+                  ),
+                  TextButton(
+                      onPressed: () async{
+                        await getAdmin();
+                      },
+                      child: Text('загрузить данные', style: TextStyle(fontSize: 15),)
                   )
-
+            
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       drawer: CustomDrawer(),
     );

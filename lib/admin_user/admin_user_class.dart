@@ -72,4 +72,14 @@ class AdminUserClass {
     _currentUser = user;
   }
 
+  String getFullName (){
+    if (name.isNotEmpty && lastName.isNotEmpty){
+      return '$name $lastName';
+    } else if (name.isNotEmpty && lastName.isEmpty){
+      return name;
+    } else {
+      return lastName;
+    }
+  }
+
 }

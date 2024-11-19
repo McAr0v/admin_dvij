@@ -1,11 +1,14 @@
 import 'dart:io';
+import 'package:admin_dvij/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/design_elements/logo_view.dart';
 import 'package:admin_dvij/main_page/main_screen.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import '../database/database_class.dart';
 import 'auth_class.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -24,6 +27,9 @@ class _LogInScreenState extends State<LogInScreen> {
   final TextEditingController passwordController = TextEditingController();
 
   bool loading = false;
+
+  DatabaseClass database = DatabaseClass();
+  AdminUserClass adminUser = AdminUserClass.empty();
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +120,7 @@ class _LogInScreenState extends State<LogInScreen> {
     String? uid = await authClass.signInWithEmailAndPassword(emailController.text, passwordController.text);
 
     if (uid != null && uid.isNotEmpty){
+
       await navigateToProfile(uid);
     }
 
@@ -145,7 +152,6 @@ class _LogInScreenState extends State<LogInScreen> {
 
       } else {
 
-        // Если в сообщении не ошибка, то переходим на главную страницу
         await Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
@@ -153,6 +159,7 @@ class _LogInScreenState extends State<LogInScreen> {
             ),
                 (_) => false
         );
+
       }
 
     } else {

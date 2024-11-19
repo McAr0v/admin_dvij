@@ -1,18 +1,25 @@
+import 'dart:io';
+
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/services.dart';
+
 
 class DatabaseClass{
   final DatabaseReference _reference = FirebaseDatabase.instance.ref();
 
   Future<DataSnapshot?> getInfoFromDb(String path) async {
+
     try{
-      //final DatabaseReference ref = _reference.child(path);
       print('jr');
-      final DatabaseReference ref = FirebaseDatabase.instance.ref().child(path);
-      return await ref.get();
+      final DatabaseReference ref = _reference.child(path);
+      DataSnapshot snapshot = await ref.get();
+      return snapshot;
     } catch (e){
       return null;
     }
+
+
   }
 
   Future<String> publishToDB(String path, Map<String, dynamic> data) async {
