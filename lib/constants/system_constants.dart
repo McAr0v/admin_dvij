@@ -1,7 +1,7 @@
 class SystemConstants {
 
   // Работа с данными
-
+  static const String pathToDb = 'https://dvij-flutter-default-rtdb.firebaseio.com';
   static const String successConst = 'ok';
   static const String noDataConst = 'Данные не найдены';
 

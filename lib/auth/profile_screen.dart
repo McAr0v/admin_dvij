@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:admin_dvij/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/auth/auth_class.dart';
 import 'package:admin_dvij/auth/log_in_screen.dart';
@@ -33,7 +35,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     currentUser = authClass.auth.currentUser;
 
-    getAdmin();
+    currentUserAdmin = currentUserAdmin.getCurrentUser();
+
+    if (currentUserAdmin.uid.isEmpty){
+      getAdmin();
+    }
+
+
 
     super.initState();
   }
@@ -46,12 +54,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
 
     if (currentUser != null) {
-      DataSnapshot? snapshot = await database.getInfoFromDb('users/${currentUser!.uid}/user_info');
+      if (!Platform.isWindows){
+        DataSnapshot? snapshot = await database.getInfoFromDb('users/${currentUser!.uid}/user_info');
 
-      if (snapshot != null && snapshot.exists) {
-        currentUserAdmin = AdminUserClass.fromSnapshot(snapshot);
+        if (snapshot != null && snapshot.exists) {
+          currentUserAdmin = AdminUserClass.fromSnapshot(snapshot);
+        }
+      } else {
+
+        dynamic data = await database.getInfoFromDbForWindows('users/${currentUser!.uid}/user_info');
+
+        AdminUserClass tempAdmin = AdminUserClass.fromJson(data);
+        currentUserAdmin = tempAdmin;
+
       }
-
     }
 
     setState(() {

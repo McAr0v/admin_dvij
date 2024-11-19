@@ -56,6 +56,19 @@ class AdminUserClass {
     );
   }
 
+  factory AdminUserClass.fromJson(Map<String, dynamic> json) {
+    return AdminUserClass(
+      uid: json['uid'] ?? '',
+      name: json['name'] ?? '',
+      lastName: json['lastname'] ?? '',
+      phone: json['phone'] ?? '',
+      email: json['email'] ?? '',
+      birthDate: DateTime.parse(json['birthDate'] ?? '1900-01-01'),
+      avatar: json['avatar'] ?? '',
+      registrationDate: DateTime.parse(json['registrationDate'] ?? '1900-01-01'),
+    );
+  }
+
   Future<String> signOut() async {
     AuthClass authClass = AuthClass();
 
