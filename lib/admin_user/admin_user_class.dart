@@ -58,14 +58,14 @@ class AdminUserClass {
 
   factory AdminUserClass.fromJson(Map<String, dynamic> json) {
     return AdminUserClass(
-      uid: json['uid'] ?? '',
-      name: json['name'] ?? '',
-      lastName: json['lastname'] ?? '',
-      phone: json['phone'] ?? '',
-      email: json['email'] ?? '',
-      birthDate: DateTime.parse(json['birthDate'] ?? '1900-01-01'),
-      avatar: json['avatar'] ?? '',
-      registrationDate: DateTime.parse(json['registrationDate'] ?? '1900-01-01'),
+      uid: json[DatabaseConstants.uid] ?? '',
+      name: json[DatabaseConstants.name] ?? '',
+      lastName: json[DatabaseConstants.lastName] ?? '',
+      phone: json[DatabaseConstants.phone] ?? '',
+      email: json[DatabaseConstants.email] ?? '',
+      birthDate: DateTime.parse(json[DatabaseConstants.birthDate] ?? '2100-01-01'),
+      avatar: json[DatabaseConstants.avatar] ?? '',
+      registrationDate: DateTime.parse(json[DatabaseConstants.registrationDate] ?? '2100-01-01'),
     );
   }
 

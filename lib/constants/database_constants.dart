@@ -7,4 +7,5 @@ class DatabaseConstants {
   static const String birthDate = 'birthDate';
   static const String avatar = 'avatar';
   static const String registrationDate = 'registrationDate';
+  static const String id = 'id';
 }

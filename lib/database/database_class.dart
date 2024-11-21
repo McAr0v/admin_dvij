@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:admin_dvij/admin_user/admin_user_class.dart';
+import 'package:admin_dvij/constants/database_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/services.dart';
@@ -86,6 +87,18 @@ class DatabaseClass{
     } catch (error) {
       return 'Ошибка при удалении: $error';
     }
+  }
+
+  Future<String> deleteFromDbForWindows(String path) async {
+    final url = Uri.parse('${SystemConstants.pathToDb}/$path.json}');
+    final response = await http.delete(url);
+
+    if (response.statusCode == 200) {
+      return SystemConstants.successConst;
+    } else {
+      return response.statusCode.toString();
+    }
+
   }
 
   String? generateKey() {
