@@ -8,6 +8,7 @@ class SystemConstants {
   // Уведомления о состоянии экрана
 
   static const String logIn = 'Вход в аккаунт...';
+  static const String citiesLoading = 'Идет загрузка городов';
 
   // Изображения по умолчанию
   static const String defaultAvatar = 'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg';
