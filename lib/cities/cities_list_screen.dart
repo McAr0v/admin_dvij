@@ -1,12 +1,15 @@
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/city_class.dart';
+import 'package:admin_dvij/cities/city_element_in_list.dart';
 import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../constants/system_constants.dart';
+import '../design/app_colors.dart';
 
 class CitiesListScreen extends StatefulWidget {
   const CitiesListScreen({Key? key}) : super(key: key);
@@ -21,14 +24,14 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
 
   bool loading = false;
 
+  bool upSorting = false;
+
   CitiesList citiesListManager = CitiesList();
 
   @override
   void initState() {
     initData();
     super.initState();
-
-
   }
 
   Future<void>initData() async{
@@ -44,12 +47,44 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
 
   }
 
+  void sorting () {
+    setState(() {
+      upSorting = !upSorting;
+      citiesList.sortCities(upSorting);
+    });
+
+
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 
       appBar: AppBar(
         title: const Text(ScreenConstants.citiesPage),
+        actions: [
+
+          IconButton(
+            onPressed: (){},
+            icon: const Icon(FontAwesomeIcons.magnifyingGlass, size: 15, color: AppColors.white,),
+          ),
+
+          IconButton(
+            onPressed: (){
+              sorting();
+            },
+            icon: Icon(upSorting ? FontAwesomeIcons.sortUp : FontAwesomeIcons.sortDown, size: 15, color: AppColors.white,),
+          ),
+
+
+
+          IconButton(
+            onPressed: (){},
+            icon: const Icon(FontAwesomeIcons.plus, size: 15, color: AppColors.white,),
+          ),
+
+        ],
       ),
 
       drawer: const CustomDrawer(),
@@ -68,18 +103,11 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
 
               if (citiesList.isNotEmpty) Expanded(
                   child: ListView.builder(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                       itemCount: citiesList.length,
                       itemBuilder: (context, index) {
 
-                      return Row(
-                        children: [
-                          Text(citiesList[index].name, style: Theme.of(context).textTheme.bodyMedium,),
-                          SizedBox(width: 20,),
-                          Text(citiesList[index].id, style: Theme.of(context).textTheme.bodyMedium,),
-
-                        ],
-                      );
+                      return CityElementInList(city: citiesList[index]);
 
                       }
                   )
