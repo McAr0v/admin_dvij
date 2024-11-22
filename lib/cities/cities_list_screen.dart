@@ -1,8 +1,10 @@
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/city_class.dart';
+import 'package:admin_dvij/cities/city_create_or_edit_screen.dart';
 import 'package:admin_dvij/cities/city_element_in_list.dart';
 import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -34,12 +36,13 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
     super.initState();
   }
 
-  Future<void>initData() async{
+  Future<void>initData({bool fromDb = false}) async{
     setState(() {
       loading = true;
+
     });
 
-    citiesList = await citiesListManager.getCitiesList();
+    citiesList = await citiesListManager.getCitiesList(fromDb: fromDb);
 
     setState(() {
       loading = false;
@@ -53,8 +56,6 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
       citiesList.sortCities(upSorting);
     });
 
-
-
   }
 
   @override
@@ -64,6 +65,13 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
       appBar: AppBar(
         title: const Text(ScreenConstants.citiesPage),
         actions: [
+
+          IconButton(
+            onPressed: () async {
+              await initData(fromDb: true);
+            },
+            icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
+          ),
 
           IconButton(
             onPressed: (){},
@@ -80,7 +88,9 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
 
 
           IconButton(
-            onPressed: (){},
+            onPressed: () async {
+              await saveCity(null);
+            },
             icon: const Icon(FontAwesomeIcons.plus, size: 15, color: AppColors.white,),
           ),
 
@@ -107,7 +117,15 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
                       itemCount: citiesList.length,
                       itemBuilder: (context, index) {
 
-                      return CityElementInList(city: citiesList[index]);
+                      return CityElementInList(
+                          city: citiesList[index],
+                        onDelete: () async {
+                            await deleteCity(citiesList[index]);
+                        },
+                        onEdit: () async {
+                          await saveCity(citiesList[index]);
+                        },
+                      );
 
                       }
                   )
@@ -118,6 +136,59 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> saveCity(City? city) async{
+    final results = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CityCreateOrEditScreen(city: city),
+      ),
+    );
+
+    if (results != null) {
+
+      setState(() {
+        loading = true;
+      });
+
+      await initData();
+
+      // Заменяем мероприятие на обновленное
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  Future<void> deleteCity(City city) async{
+    bool? confirmed = await ElementsOfDesign.exitDialog(
+        context,
+        'Удаленный элемент нельзя будет восстановить.',
+        'Ок',
+        'Отмена',
+        'Удалить город'
+    );
+
+    if (confirmed != null && confirmed) {
+
+      setState(() {
+        loading = true;
+      });
+
+      String result = await city.deleteFromDb();
+
+      print(result);
+
+      if (result == SystemConstants.successConst) {
+        await initData();
+      }
+
+      setState(() {
+        loading = false;
+      });
+
+    }
   }
 }
 

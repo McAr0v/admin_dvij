@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:admin_dvij/admin_user/admin_user_class.dart';
+import 'package:admin_dvij/auth/auth_class.dart';
 import 'package:admin_dvij/constants/database_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -51,22 +52,24 @@ class DatabaseClass{
 
   Future<String> publishToDBForWindows(String path, Map<String, dynamic> data) async {
 
-    try {
-      final url = Uri.parse('${SystemConstants.pathToDb}/$path.json');
-      final response = await http.post(
+    AuthClass auth = AuthClass();
+
+    String? idToken = await auth.getIdToken();
+
+    if (idToken != null) {
+      final url = Uri.parse('${SystemConstants.pathToDb}/$path.json?auth=$idToken}');
+      final response = await http.put(
         url,
         body: json.encode(data),
       );
 
       if (response.statusCode == 200) {
-        print('Данные успешно добавлены!');
         return SystemConstants.successConst;
       } else {
-        print('Ошибка: ${response.statusCode}');
-        return 'Ошибка: ${response.statusCode}';
+        return response.statusCode.toString();
       }
-    } catch (e) {
-      return 'Ошибка при публикации данных: $e';
+    } else {
+      return SystemConstants.noIdToken;
     }
   }
 
@@ -90,15 +93,22 @@ class DatabaseClass{
   }
 
   Future<String> deleteFromDbForWindows(String path) async {
-    final url = Uri.parse('${SystemConstants.pathToDb}/$path.json}');
-    final response = await http.delete(url);
+    AuthClass auth = AuthClass();
 
-    if (response.statusCode == 200) {
-      return SystemConstants.successConst;
+    String? idToken = await auth.getIdToken();
+
+    if (idToken != null) {
+      final url = Uri.parse('${SystemConstants.pathToDb}/$path.json?auth=$idToken}');
+      final response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        return SystemConstants.successConst;
+      } else {
+        return response.statusCode.toString();
+      }
     } else {
-      return response.statusCode.toString();
+      return SystemConstants.noIdToken;
     }
-
   }
 
   String? generateKey() {

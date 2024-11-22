@@ -69,4 +69,48 @@ class ElementsOfDesign {
     }
   }
 
+  static Future<bool?> exitDialog(BuildContext context, String message, String confirmText, String cancelText, String headline) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          buttonPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
+          contentPadding: const EdgeInsets.fromLTRB(30, 10, 30, 15),
+          backgroundColor: AppColors.greyOnBackground,
+          actionsPadding: const EdgeInsets.fromLTRB(30, 10, 30, 30),
+          titlePadding: const EdgeInsets.fromLTRB(30, 30, 30, 10),
+          title: Text(
+            headline,
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
+          content: Text(
+            message,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+
+          actionsAlignment: MainAxisAlignment.end,
+
+          actions: [
+
+            GestureDetector(
+              onTap: (){
+                Navigator.of(context).pop(false);
+              },
+              child: Text(cancelText, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.attentionRed),),
+            ),
+
+            GestureDetector(
+              onTap: (){
+                Navigator.of(context).pop(true);
+              },
+              child: Text(confirmText, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.green)),
+            )
+          ],
+        );
+      },
+    );
+  }
+
+
+
 }

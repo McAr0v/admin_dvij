@@ -9,7 +9,7 @@ class CitiesList {
 
   CitiesList();
 
-  List<City> _allCitiesList = [];
+  static List<City> _allCitiesList = [];
 
   void setCitiesList (List<City> cities) {
     _allCitiesList = [];
@@ -56,6 +56,34 @@ class CitiesList {
 
     return _allCitiesList;
 
+  }
+
+  bool checkCityNameInList(String cityName){
+
+    if (_allCitiesList.any((element) => element.name.toLowerCase() == cityName.toLowerCase())) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  void addToCurrentList(City city){
+    // Проверяем, есть ли город с таким id
+    int index = _allCitiesList.indexWhere((c) => c.id == city.id);
+
+    if (index != -1) {
+      // Если город с таким id уже существует, заменяем его
+      _allCitiesList[index] = city;
+    } else {
+      // Если город с таким id не найден, добавляем новый
+      _allCitiesList.add(city);
+    }
+  }
+
+  void deleteCityFromCurrentList(String id) {
+    if (_allCitiesList.isNotEmpty){
+      _allCitiesList.removeWhere((city) => city.id == id);
+    }
   }
 
 

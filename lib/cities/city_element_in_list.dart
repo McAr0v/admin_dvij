@@ -5,7 +5,11 @@ import 'city_class.dart';
 
 class CityElementInList extends StatelessWidget {
   final City city;
-  const CityElementInList({required this.city, Key? key}) : super(key: key);
+  final VoidCallback onDelete;
+  final VoidCallback onEdit;
+
+
+  const CityElementInList({required this.city, required this.onEdit, required this.onDelete, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +23,7 @@ class CityElementInList extends StatelessWidget {
           children: [
 
             IconButton(
-              onPressed: (){},
+              onPressed: onEdit,
               icon: const Icon(FontAwesomeIcons.penToSquare, size: 15, color: AppColors.brandColor),
             ),
 
@@ -38,7 +42,7 @@ class CityElementInList extends StatelessWidget {
             ),
 
             IconButton(
-              onPressed: (){},
+              onPressed: onDelete,
               icon: const Icon(FontAwesomeIcons.trash, size: 15, color: AppColors.attentionRed,),
             ),
 

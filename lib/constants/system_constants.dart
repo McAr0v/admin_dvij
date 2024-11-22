@@ -4,6 +4,7 @@ class SystemConstants {
   static const String pathToDb = 'https://dvij-flutter-default-rtdb.firebaseio.com';
   static const String successConst = 'ok';
   static const String noDataConst = 'Данные не найдены';
+  static const String noIdToken = 'Токен не найден';
 
   // Уведомления о состоянии экрана
 

@@ -19,6 +19,15 @@ class AuthClass{
     }
   }
 
+  Future<String?> getIdToken() async {
+    if (auth.currentUser != null) {
+      return await auth.currentUser!.getIdToken();
+    } else {
+      return null;
+    }
+
+  }
+
   Future<String> signOut() async{
     try {
       await auth.signOut();
