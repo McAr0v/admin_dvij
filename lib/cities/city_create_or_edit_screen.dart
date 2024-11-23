@@ -1,14 +1,11 @@
 import 'dart:io';
-
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/cities_list_screen.dart';
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
-import 'package:admin_dvij/database/database_class.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class CityCreateOrEditScreen extends StatefulWidget {
@@ -74,17 +71,34 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
         ),
       ),
 
-      body: Center(
-        child: Stack(
-          children: [
-            if (saving) LoadingScreen(loadingText: widget.city == null ? 'Идет публикация города' : 'Идет сохранение города',),
-            if (!saving) Container(
+      body: Stack(
+        children: [
+          if (saving) LoadingScreen(loadingText: widget.city == null ? 'Идет публикация города' : 'Идет сохранение города',),
+          if (!saving) Container(
+            alignment: Alignment.center,
+            child: Container(
               width: maxWidth,
               padding: const EdgeInsets.all(20),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.start,
                 children: [
+
+                  Text(
+                    widget.city == null ? 'Создание города' : 'Редактирование города ${widget.city!.name}',
+                    style: Theme.of(context).textTheme.titleLarge,
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 5,),
+
+                  Text(
+                    widget.city == null ? 'Введи название города и нажми кнопку "Сохранить"' : 'Измени название города и нажми кнопку "Сохранить"',
+                    style: Theme.of(context).textTheme.labelMedium,
+                    textAlign: TextAlign.center,
+                  ),
+
+                  const SizedBox(height: 20,),
+
                   TextField(
                     style: Theme.of(context).textTheme.bodyMedium,
                     keyboardType: TextInputType.text,
@@ -139,8 +153,8 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

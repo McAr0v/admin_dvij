@@ -16,6 +16,17 @@ class CitiesList {
     _allCitiesList = cities;
   }
 
+  List<City> getListFromSearch(String query){
+    List<City> citiesToReturn = _allCitiesList;
+
+
+    citiesToReturn = citiesToReturn
+        .where((client) =>
+    client.name.toLowerCase().contains(query.toLowerCase())).toList();
+
+    return citiesToReturn;
+  }
+
   Future<List<City>> getCitiesList ({bool fromDb = false}) async{
 
     if (_allCitiesList.isEmpty || fromDb) {
@@ -54,6 +65,8 @@ class CitiesList {
 
     setCitiesList(tempCities);
 
+    _allCitiesList.sortCities(true);
+
     return _allCitiesList;
 
   }
@@ -78,6 +91,8 @@ class CitiesList {
       // Если город с таким id не найден, добавляем новый
       _allCitiesList.add(city);
     }
+
+    _allCitiesList.sortCities(true);
   }
 
   void deleteCityFromCurrentList(String id) {
