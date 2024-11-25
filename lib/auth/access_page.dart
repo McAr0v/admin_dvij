@@ -1,12 +1,13 @@
+import 'dart:io';
 import 'package:admin_dvij/auth/log_in_screen.dart';
+import 'package:admin_dvij/constants/admins_constants.dart';
+import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import '../design_elements/logo_view.dart';
 import '../main_page/main_screen.dart';
 
 class AccessPage extends StatefulWidget {
@@ -24,7 +25,6 @@ class _AccessPageState extends State<AccessPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     init();
   }
@@ -71,26 +71,41 @@ class _AccessPageState extends State<AccessPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    // Ограничение ширины на настольных платформах
+    bool isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+    double maxWidth = isDesktop ? 600 : double.infinity;
+
     return Scaffold(
       body: Stack(
         children: [
-          if (loading) LoadingScreen(loadingText: 'Проверка пользователя')
+          if (loading) const LoadingScreen(loadingText: AdminConstants.checkingAdmin)
           else Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+            child: Container(
+              width: maxWidth,
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
 
-              children: [
-                Text('Вы не можете просматривать админ. панель. У вас нет доступа.'),
+                children: [
+                  const LogoView(width: 70, height: 70,),
 
-                ElementsOfDesign.customButton(
-                    method: () async {
-                      await currentAdmin.signOut();
-                      await navigateToLogIn();
-                    },
-                    textOnButton: 'Выйти',
-                    context: context
-                )
-              ],
+                  const SizedBox(height: 50,),
+
+                  const Text(AdminConstants.noAccess, textAlign: TextAlign.center,),
+
+                  const SizedBox(height: 50,),
+
+                  ElementsOfDesign.customButton(
+                      method: () async {
+                        await currentAdmin.signOut();
+                        await navigateToLogIn();
+                      },
+                      textOnButton: ButtonsConstants.logOut,
+                      context: context
+                  )
+                ],
+              ),
             ),
           ),
         ],

@@ -5,5 +5,6 @@ class ButtonsConstants {
   static const String cancel = 'Отменить';
   static const String delete = 'Удалить';
   static const String logIn = 'Войти';
+  static const String logOut = 'Выйти';
 
 }
