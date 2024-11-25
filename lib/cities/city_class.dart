@@ -3,11 +3,12 @@ import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/database/database_class.dart';
+import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../constants/database_constants.dart';
 
 
-class City {
+class City implements IEntity<City>{
   String id;
   String name;
   
@@ -31,6 +32,7 @@ class City {
     return City(id: '', name: '');
   }
 
+  @override
   Future<String> publishToDb() async{
 
     DatabaseClass db = DatabaseClass();
@@ -64,13 +66,14 @@ class City {
     if (result == SystemConstants.successConst) {
       // Если результат успешный, добавляем в общий сохраненный список
       CitiesList citiesList = CitiesList();
-      citiesList.addToCurrentList(this);
+      citiesList.addToCurrentDownloadedList(this);
     }
 
     return result;
 
   }
 
+  @override
   Future<String> deleteFromDb() async {
     DatabaseClass db = DatabaseClass();
 
@@ -87,13 +90,14 @@ class City {
     if (result == SystemConstants.successConst) {
       // Если удаление прошло успешно, удаляем из общего списка
       CitiesList citiesList = CitiesList();
-      citiesList.deleteCityFromCurrentList(id);
+      citiesList.deleteEntityFromDownloadedList(id);
     }
 
     return result;
 
   }
 
+  @override
   Map<String, dynamic> getMap (){
     return <String, dynamic> {
       DatabaseConstants.id: id,

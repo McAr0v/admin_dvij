@@ -125,7 +125,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
                           // Если не ввели название
                           _showSnackBar(CityConstants.noCityName);
 
-                        } else if (!citiesList.checkCityNameInList(_cityNameController.text)){
+                        } else if (!citiesList.checkEntityNameInList(_cityNameController.text)){
                           // Если такое название уже есть
                           _showSnackBar(CityConstants.cityAlreadyExists);
 

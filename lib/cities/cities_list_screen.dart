@@ -44,7 +44,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
     });
 
     // Подгружаем список
-    citiesList = await citiesListManager.getCitiesList(fromDb: fromDb);
+    citiesList = await citiesListManager.getDownloadedList(fromDb: fromDb);
 
     if (fromDb) {
       //  Если обновляли с БД, выводим оповещение
@@ -141,7 +141,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
                     // Кнопка сброса
                     if (_cityNameController.text.isNotEmpty) IconButton(
                         onPressed: () async {
-                          citiesList = await citiesListManager.getCitiesList(fromDb: false);
+                          citiesList = await citiesListManager.getDownloadedList(fromDb: false);
                           setState(() {
                             _cityNameController.text = '';
                           });
