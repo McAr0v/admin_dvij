@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:admin_dvij/cities/cities_list_class.dart';
-import 'package:admin_dvij/constants/path_constants.dart';
+import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/database/database_class.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -35,12 +35,17 @@ class City {
 
     DatabaseClass db = DatabaseClass();
 
+    // Если Id не задан
     if (id == '') {
+      // Генерируем ID
       String? idCity = db.generateKey();
+
+      // Если ID по какой то причине не сгенерировался
+      // генерируем вручную
       id = idCity ?? 'noId_$name';
     }
 
-    String path = '${PathConstants.citiesPath}/$id';
+    String path = '${CityConstants.citiesPath}/$id';
 
     Map <String, dynamic> cityData = getMap();
 
@@ -57,6 +62,7 @@ class City {
     }
 
     if (result == SystemConstants.successConst) {
+      // Если результат успешный, добавляем в общий сохраненный список
       CitiesList citiesList = CitiesList();
       citiesList.addToCurrentList(this);
     }
@@ -68,7 +74,7 @@ class City {
   Future<String> deleteFromDb() async {
     DatabaseClass db = DatabaseClass();
 
-    String path = '${PathConstants.citiesPath}/$id/';
+    String path = '${CityConstants.citiesPath}/$id/';
 
     String result = '';
 
@@ -79,6 +85,7 @@ class City {
     }
 
     if (result == SystemConstants.successConst) {
+      // Если удаление прошло успешно, удаляем из общего списка
       CitiesList citiesList = CitiesList();
       citiesList.deleteCityFromCurrentList(id);
     }

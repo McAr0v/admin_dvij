@@ -15,7 +15,6 @@ class CityElementInList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: AppColors.greyOnBackground,
-      //padding: const EdgeInsets.all(20),
       margin: const EdgeInsets.symmetric(vertical: 5),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),

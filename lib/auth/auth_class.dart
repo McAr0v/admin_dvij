@@ -1,11 +1,9 @@
-import 'package:admin_dvij/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthClass{
 
   FirebaseAuth auth = FirebaseAuth.instance;
-
 
   Future<String?> createUserWithEmailAndPassword(String email, String password) async {
     try{
@@ -31,6 +29,8 @@ class AuthClass{
   Future<String> signOut() async{
     try {
       await auth.signOut();
+
+      // TODO Сделать автоматическое обнуление переменной с инфой о текущем пользователе
 
       return SystemConstants.successConst;
 
@@ -62,6 +62,7 @@ class AuthClass{
     return auth.currentUser!.uid;
   }
 
+  // Метод проверки на ошибки при авторизации
   bool checkAnswerOnError(String message) {
     // Убираем префикс 'auth/' (если он есть)
     String errorCode = message.startsWith('auth/') ? message.substring(5) : message;
@@ -175,6 +176,8 @@ class AuthClass{
         return true;
     }
   }
+
+  // Метод расшифровки ошибки при авторизации
 
   String getErrorTranslation(String message) {
     // Убираем префикс 'auth/' (если он есть)

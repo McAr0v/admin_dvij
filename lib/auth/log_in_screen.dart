@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:admin_dvij/admin_user/admin_user_class.dart';
+import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/design_elements/logo_view.dart';
 import 'package:admin_dvij/main_page/main_screen.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../database/database_class.dart';
 import 'auth_class.dart';
@@ -34,8 +34,10 @@ class _LogInScreenState extends State<LogInScreen> {
   @override
   Widget build(BuildContext context) {
 
+    // Ограничение ширины на настольных платформах
+
     bool isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
-    double maxWidth = isDesktop ? 600 : double.infinity; // Ограничение ширины на настольных платформах
+    double maxWidth = isDesktop ? 600 : double.infinity;
     
     return Scaffold(
       body: Center(
@@ -53,7 +55,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
                     const LogoView(width: 70, height: 70,),
 
-                    Text('Административное приложение', style: Theme.of(context).textTheme.bodySmall,),
+                    Text(SystemConstants.appDesc, style: Theme.of(context).textTheme.bodySmall,),
 
                     const SizedBox(height: 50,),
 
@@ -97,7 +99,7 @@ class _LogInScreenState extends State<LogInScreen> {
                         method: () async {
                           _singIn(emailController.text, passwordController.text);
                         },
-                        textOnButton: 'Войти',
+                        textOnButton: ButtonsConstants.logIn,
                         context: context,
                       buttonState: ButtonStateEnum.primary
                     ),
@@ -152,6 +154,8 @@ class _LogInScreenState extends State<LogInScreen> {
 
       } else {
 
+        // Если ошибок нет, переходи на главную страницу
+
         await Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
@@ -165,10 +169,13 @@ class _LogInScreenState extends State<LogInScreen> {
     } else {
 
       if (emailController.text.isEmpty && passwordController.text.isEmpty){
+        // Если все поля пустые выводим оповещение
         _showSnackBar(SystemConstants.fillAllFields);
       } else if (emailController.text.isEmpty){
+        // Если Email не заполнен выводим оповещение
         _showSnackBar(SystemConstants.noEmail);
       } else if (passwordController.text.isEmpty){
+        // Если пароль не заполнен выводим оповещение
         _showSnackBar(SystemConstants.noPassword);
       }
     }

@@ -1,7 +1,6 @@
 import 'dart:io';
-
 import 'package:admin_dvij/cities/city_class.dart';
-import 'package:admin_dvij/constants/path_constants.dart';
+import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/database/database_class.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -9,16 +8,20 @@ class CitiesList {
 
   CitiesList();
 
+  // Переменная для сохранения с БД и предоставления доступа во
+  // всем приложении
   static List<City> _allCitiesList = [];
 
+  // Метод обновления списка из БД
   void setCitiesList (List<City> cities) {
     _allCitiesList = [];
     _allCitiesList = cities;
   }
 
-  List<City> getListFromSearch(String query){
-    List<City> citiesToReturn = _allCitiesList;
 
+  // Метод поиска сущностей по параметру
+  List<City> searchElementInList(String query){
+    List<City> citiesToReturn = _allCitiesList;
 
     citiesToReturn = citiesToReturn
         .where((client) =>
@@ -27,6 +30,7 @@ class CitiesList {
     return citiesToReturn;
   }
 
+  // Метод получения уже загруженного списка или подгрузки из БД
   Future<List<City>> getCitiesList ({bool fromDb = false}) async{
 
     if (_allCitiesList.isEmpty || fromDb) {
@@ -35,14 +39,16 @@ class CitiesList {
     return _allCitiesList;
   }
 
+  // Метод подгрузки списка из БД
   Future<List<City>> getCitiesFromDb () async {
 
     DatabaseClass database = DatabaseClass();
 
-    const String path = PathConstants.citiesPath;
+    const String path = CityConstants.citiesPath;
 
     List<City> tempCities = [];
 
+    // Подгрузка если платформа не Windows
     if (!Platform.isWindows){
       DataSnapshot? snapshot = await database.getInfoFromDb(path);
 
@@ -55,22 +61,29 @@ class CitiesList {
 
     } else {
 
+      // Подгрузка если Windows
       dynamic data = await database.getInfoFromDbForWindows(path);
 
       data.forEach((key, value) {
-        tempCities.add(City(id: value['id'], name: value['name']));
+
+        tempCities.add(
+          City.fromJson(json: value)
+        );
       });
 
     }
 
+    // Устанавливаем подгруженный список в нашу доступную переменную
     setCitiesList(tempCities);
 
+    // Сортируем список
     _allCitiesList.sortCities(true);
 
     return _allCitiesList;
 
   }
 
+  // Проверка по имени, есть ли такое имя элемента в списке
   bool checkCityNameInList(String cityName){
 
     if (_allCitiesList.any((element) => element.name.toLowerCase() == cityName.toLowerCase())) {
@@ -80,32 +93,34 @@ class CitiesList {
     }
   }
 
+  // Добавление или редактирование в сохраненный общий список элемента
   void addToCurrentList(City city){
-    // Проверяем, есть ли город с таким id
+
+    // Проверяем, есть ли элемент с таким id
     int index = _allCitiesList.indexWhere((c) => c.id == city.id);
 
     if (index != -1) {
-      // Если город с таким id уже существует, заменяем его
+      // Если элемент с таким id уже существует, заменяем его
       _allCitiesList[index] = city;
     } else {
-      // Если город с таким id не найден, добавляем новый
+      // Если элемет с таким id не найден, добавляем новый
       _allCitiesList.add(city);
     }
 
+    // Сортируем список
     _allCitiesList.sortCities(true);
   }
 
+  // Удаление элемента из общего списка
   void deleteCityFromCurrentList(String id) {
     if (_allCitiesList.isNotEmpty){
       _allCitiesList.removeWhere((city) => city.id == id);
     }
   }
-
-
-
 }
 
 extension SortCityListExtension on List<City> {
+
   void sortCities(bool order) {
     if (order) {
       sort((a, b) => a.name.compareTo(b.name));

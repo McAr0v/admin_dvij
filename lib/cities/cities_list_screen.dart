@@ -2,12 +2,14 @@ import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/cities/city_create_or_edit_screen.dart';
 import 'package:admin_dvij/cities/city_element_in_list.dart';
+import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../constants/buttons_constants.dart';
 import '../constants/system_constants.dart';
 import '../design/app_colors.dart';
 
@@ -39,13 +41,14 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
   Future<void>initData({bool fromDb = false}) async{
     setState(() {
       loading = true;
-
     });
 
+    // Подгружаем список
     citiesList = await citiesListManager.getCitiesList(fromDb: fromDb);
 
     if (fromDb) {
-      _showSnackBar('Список обновлен');
+      //  Если обновляли с БД, выводим оповещение
+      _showSnackBar(SystemConstants.refreshSuccess);
     }
 
     setState(() {
@@ -70,6 +73,9 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
         title: const Text(ScreenConstants.citiesPage),
         actions: [
 
+          // КНОПКИ В APPBAR'е
+
+          // Кнопка "Обновить"
           IconButton(
             onPressed: () async {
               await initData(fromDb: true);
@@ -77,6 +83,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
             icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
           ),
 
+          // Кнопка "Сорировать"
           IconButton(
             onPressed: (){
               sorting();
@@ -84,6 +91,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
             icon: Icon(upSorting ? FontAwesomeIcons.sortUp : FontAwesomeIcons.sortDown, size: 15, color: AppColors.white,),
           ),
 
+          // Кнопка "Создать"
           IconButton(
             onPressed: () async {
               await saveCity(null);
@@ -98,27 +106,31 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
 
       body: Stack(
         children: [
-          if (loading) const LoadingScreen(loadingText: SystemConstants.citiesLoading),
+          if (loading) const LoadingScreen(loadingText: CityConstants.citiesLoading),
           if (!loading) Column(
             children: [
+
+              // ПОЛЕ ПОИСКА
+
               Container(
                 padding: const EdgeInsets.all(10),
                 child: Row(
                   children: [
 
+                    // Форма ввода названия
                     Expanded(
                       child: TextField(
                         style: Theme.of(context).textTheme.bodyMedium,
                         keyboardType: TextInputType.text,
                         controller: _cityNameController,
                         decoration: const InputDecoration(
-                          labelText: 'Название города',
+                          labelText: CityConstants.cityNameForField,
                           prefixIcon: Icon(Icons.place),
                         ),
                         onChanged: (value){
                           setState(() {
                             _cityNameController.text = value;
-                            citiesList = CitiesList().getListFromSearch(_cityNameController.text);
+                            citiesList = CitiesList().searchElementInList(_cityNameController.text);
                           });
                         },
                       ),
@@ -126,6 +138,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
 
                     if (_cityNameController.text.isNotEmpty) const SizedBox(width: 20,),
 
+                    // Кнопка сброса
                     if (_cityNameController.text.isNotEmpty) IconButton(
                         onPressed: () async {
                           citiesList = await citiesListManager.getCitiesList(fromDb: false);
@@ -142,13 +155,15 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
                 ),
               ),
 
+              // СПИСОК
+
               Expanded(
                 child: Column(
                   children: [
 
                     if (citiesList.isEmpty) const Expanded(
                         child: Center(
-                          child: Text(SystemConstants.noDataConst),
+                          child: Text(SystemConstants.emptyList),
                         )
                     ),
 
@@ -184,6 +199,10 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
 
 
   Future<void> saveCity(City? city) async{
+
+    // Уходим на страницу создания / редактирования
+    // Ждем результат с нее
+
     final results = await Navigator.push(
       context,
       MaterialPageRoute(
@@ -191,20 +210,21 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
       ),
     );
 
+    // Если результат есть
     if (results != null) {
 
       setState(() {
         loading = true;
       });
 
+      // Обновляем список
       await initData();
 
-      // Заменяем мероприятие на обновленное
       setState(() {
         loading = false;
       });
 
-      _showSnackBar('Город успешно сохранен');
+      _showSnackBar(CityConstants.citySaveSuccess);
     }
   }
 
@@ -220,10 +240,10 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
   Future<void> deleteCity(City city) async{
     bool? confirmed = await ElementsOfDesign.exitDialog(
         context,
-        'Удаленный элемент нельзя будет восстановить.',
-        'Ок',
-        'Отмена',
-        'Удалить город'
+        CityConstants.deleteCityDesc,
+        ButtonsConstants.delete,
+        ButtonsConstants.cancel,
+        CityConstants.deleteCityHeadline
     );
 
     if (confirmed != null && confirmed) {
@@ -234,9 +254,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
 
       String result = await city.deleteFromDb();
 
-      print(result);
-
-      String message = 'Город успешно удален';
+      String message = CityConstants.cityDeleteSuccess;
 
       if (result == SystemConstants.successConst) {
         await initData();

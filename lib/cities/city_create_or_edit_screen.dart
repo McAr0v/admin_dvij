@@ -3,6 +3,7 @@ import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/cities_list_screen.dart';
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/constants/buttons_constants.dart';
+import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
@@ -23,6 +24,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
   CitiesList citiesList = CitiesList();
 
   final TextEditingController _cityNameController = TextEditingController();
+
   bool saving = false;
 
   @override
@@ -31,6 +33,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
     saving = false;
 
     if (widget.city != null) {
+      // Если это страница редактирования, то заполняем поле имени
       _cityNameController.text = widget.city!.name;
     }
 
@@ -46,6 +49,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
   }
 
   void navigateToCitiesListScreen() {
+    // Метод возвращения на экран списка без результата
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const CitiesListScreen()),
@@ -55,15 +59,16 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
   @override
   Widget build(BuildContext context) {
 
+    // Ограничение ширины на настольных платформах
     bool isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
-    double maxWidth = isDesktop ? 600 : double.infinity; // Ограничение ширины на настольных платформах
+    double maxWidth = isDesktop ? 600 : double.infinity;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.city != null ? 'Редактирование города' : 'Создание города'),
+        title: Text(widget.city != null ? CityConstants.editCity : CityConstants.createCity),
 
         // Задаем особый выход на кнопку назад
-        // Чтобы не плодились экраны назад с разным списком городов
+        // Чтобы не плодились экраны назад с разным списком сущностей
 
         leading: IconButton(
           icon: const Icon(Icons.chevron_left),
@@ -73,7 +78,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
 
       body: Stack(
         children: [
-          if (saving) LoadingScreen(loadingText: widget.city == null ? 'Идет публикация города' : 'Идет сохранение города',),
+          if (saving) LoadingScreen(loadingText: widget.city == null ? CityConstants.citiesEditProcess : CityConstants.citiesCreateProcess,),
           if (!saving) Container(
             alignment: Alignment.center,
             child: Container(
@@ -84,7 +89,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
                 children: [
 
                   Text(
-                    widget.city == null ? 'Создание города' : 'Редактирование города ${widget.city!.name}',
+                    widget.city == null ? CityConstants.createCity : '${CityConstants.editCity} ${widget.city!.name}',
                     style: Theme.of(context).textTheme.titleLarge,
                     textAlign: TextAlign.center,
                   ),
@@ -92,7 +97,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
                   const SizedBox(height: 5,),
 
                   Text(
-                    widget.city == null ? 'Введи название города и нажми кнопку "Сохранить"' : 'Измени название города и нажми кнопку "Сохранить"',
+                    widget.city == null ? CityConstants.inputCreateCityDesc : CityConstants.inputEditCityDesc,
                     style: Theme.of(context).textTheme.labelMedium,
                     textAlign: TextAlign.center,
                   ),
@@ -104,7 +109,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
                     keyboardType: TextInputType.text,
                     controller: _cityNameController,
                     decoration: const InputDecoration(
-                      labelText: 'Название города',
+                      labelText: CityConstants.cityNameForField,
                       prefixIcon: Icon(Icons.place),
                     ),
                   ),
@@ -114,11 +119,15 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
                   ElementsOfDesign.customButton(
                       method: () async {
 
-                        if (_cityNameController.text.isEmpty){
-                          _showSnackBar('Введите название города!');
-                        } else if (!citiesList.checkCityNameInList(_cityNameController.text)){
+                        // Проверки на заполнение полей
 
-                          _showSnackBar('Такой город уже есть!');
+                        if (_cityNameController.text.isEmpty){
+                          // Если не ввели название
+                          _showSnackBar(CityConstants.noCityName);
+
+                        } else if (!citiesList.checkCityNameInList(_cityNameController.text)){
+                          // Если такое название уже есть
+                          _showSnackBar(CityConstants.cityAlreadyExists);
 
                         } else {
 
@@ -131,13 +140,16 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
                               name: _cityNameController.text
                           );
 
+                          // Публикуем
                           String result = await publishCity.publishToDb();
 
                           if (result == SystemConstants.successConst){
 
+                            // Если успешно, возвращаемся на экран списка с результатом
                             navigateToPreviousScreen();
 
                           } else {
+                            // Если не успешно, выводим причину
                             _showSnackBar(result);
                           }
 
@@ -159,6 +171,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
     );
   }
 
+  // Возвращение на экран списка с результатом
   void navigateToPreviousScreen(){
     List<dynamic> result = [true];
     Navigator.of(context).pop(result);
