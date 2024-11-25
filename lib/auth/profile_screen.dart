@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:admin_dvij/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/auth/auth_class.dart';
 import 'package:admin_dvij/auth/log_in_screen.dart';
 import 'package:admin_dvij/database/database_class.dart';
@@ -8,10 +6,10 @@ import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/system_constants.dart';
+import '../users/admin_user/admin_user_class.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
@@ -22,26 +20,14 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
 
-  AuthClass authClass = AuthClass();
-  DatabaseClass database = DatabaseClass();
-
-  User? currentUser;
-
   AdminUserClass currentUserAdmin = AdminUserClass.empty();
 
   bool loading = false;
 
   @override
   void initState() {
-    currentUser = authClass.auth.currentUser;
 
-    currentUserAdmin = currentUserAdmin.getCurrentUser();
-
-    if (currentUserAdmin.uid.isEmpty){
-      getAdmin();
-    }
-
-
+    getAdmin();
 
     super.initState();
   }
@@ -53,22 +39,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     });
 
-    if (currentUser != null) {
-      if (!Platform.isWindows){
-        DataSnapshot? snapshot = await database.getInfoFromDb('users/${currentUser!.uid}/user_info');
-
-        if (snapshot != null && snapshot.exists) {
-          currentUserAdmin = AdminUserClass.fromSnapshot(snapshot);
-        }
-      } else {
-
-        dynamic data = await database.getInfoFromDbForWindows('users/${currentUser!.uid}/user_info');
-
-        AdminUserClass tempAdmin = AdminUserClass.fromJson(data);
-        currentUserAdmin = tempAdmin;
-
-      }
-    }
+    currentUserAdmin = await currentUserAdmin.getCurrentUser();
 
     setState(() {
 
@@ -97,6 +68,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   if (currentUserAdmin.name.isNotEmpty) Text(currentUserAdmin.getFullName()),
             
                   if (currentUserAdmin.email.isNotEmpty) Text(currentUserAdmin.email),
+                  if (currentUserAdmin.email.isNotEmpty) Text(currentUserAdmin.adminRole.getNameOrDescOfRole(true)),
+                  if (currentUserAdmin.email.isNotEmpty) Text(currentUserAdmin.adminRole.getNameOrDescOfRole(false)),
+                  if (currentUserAdmin.email.isNotEmpty) Text(currentUserAdmin.city.name),
                   if (currentUserAdmin.avatar.isNotEmpty) CircleAvatar(
                     radius: 50,
                     backgroundColor: Colors.grey, // Цвет фона, который будет виден во время загрузки
@@ -115,14 +89,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
             
                   if (currentUserAdmin.registrationDate != DateTime(2100)) Text(currentUserAdmin.registrationDate.toString()),
-            
-                  Text(currentUser != null ? currentUser!.uid : 'Нет UID', style: Theme.of(context).textTheme.bodyMedium),
+                  if (currentUserAdmin.registrationDate != DateTime(2100)) Text(currentUserAdmin.birthDate.toString()),
+
+                  //Text(currentUser != null ? currentUser!.uid : 'Нет UID', style: Theme.of(context).textTheme.bodyMedium),
             
                   SizedBox(height: 50,),
             
                   TextButton(
                       onPressed: (){
                         _singOut();
+
                       },
                       child: Text('Выйти', style: TextStyle(fontSize: 15),)
                   ),
@@ -144,7 +120,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _singOut() async {
-    String? signOut = await authClass.signOut();
+    String? signOut = await currentUserAdmin.signOut();
     if (signOut == SystemConstants.successConst){
       await navigateToLogIn();
     }

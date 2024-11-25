@@ -29,6 +29,7 @@ class DatabaseClass{
         return data;
 
       } else {
+        return null;
         print('Ошибка при получении данных: ${response.statusCode}');
       }
     } catch (e){

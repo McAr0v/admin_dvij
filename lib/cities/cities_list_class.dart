@@ -112,6 +112,22 @@ class CitiesList implements IEntitiesList<City>{
       _allCitiesList.removeWhere((city) => city.id == id);
     }
   }
+
+  @override
+  City getEntityFromList(String id){
+    City returnedCity = City.empty();
+
+    if (_allCitiesList.isNotEmpty){
+      for (City city in _allCitiesList) {
+        if (city.id == id) {
+          returnedCity = city;
+          break;
+        }
+      }
+    }
+    return returnedCity;
+  }
+
 }
 
 extension SortCityListExtension on List<City> {

@@ -8,4 +8,6 @@ class DatabaseConstants {
   static const String avatar = 'avatar';
   static const String registrationDate = 'registrationDate';
   static const String id = 'id';
+  static const String adminRole = 'adminRole';
+  static const String city = 'city';
 }

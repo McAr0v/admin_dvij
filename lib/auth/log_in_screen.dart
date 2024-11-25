@@ -1,5 +1,5 @@
 import 'dart:io';
-import 'package:admin_dvij/admin_user/admin_user_class.dart';
+import 'package:admin_dvij/auth/access_page.dart';
 import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
@@ -9,6 +9,7 @@ import 'package:admin_dvij/design_elements/logo_view.dart';
 import 'package:admin_dvij/main_page/main_screen.dart';
 import 'package:flutter/material.dart';
 import '../database/database_class.dart';
+import '../users/admin_user/admin_user_class.dart';
 import 'auth_class.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -159,7 +160,7 @@ class _LogInScreenState extends State<LogInScreen> {
         await Navigator.pushAndRemoveUntil(
             context,
             MaterialPageRoute(
-                builder: (context) => const MainPageCustom()
+                builder: (context) => const AccessPage()
             ),
                 (_) => false
         );

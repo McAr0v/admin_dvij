@@ -31,6 +31,9 @@ abstract class IEntitiesList<T> {
   /// Метод удаления сущности из скачанного списка
   void deleteEntityFromDownloadedList(String id);
 
+  /// Метод поиска сущности из скачанного списка
+  T getEntityFromList(String id);
+
 
 
 }
