@@ -15,6 +15,10 @@ class Gender {
 
   }
 
+  List<Gender> getGendersList(){
+    return [Gender(gender: GenderEnum.man), Gender(gender: GenderEnum.woman), Gender(gender: GenderEnum.notChosen)];
+  }
+
   @override
   String toString({bool needTranslate = false}) {
     switch (gender){

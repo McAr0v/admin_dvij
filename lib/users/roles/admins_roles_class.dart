@@ -29,6 +29,15 @@ class AdminRoleClass {
     }
   }
 
+  List<AdminRoleClass> getRolesList(){
+    return [
+      AdminRoleClass(AdminRole.editor),
+      AdminRoleClass(AdminRole.advertiser),
+      AdminRoleClass(AdminRole.contentManager),
+      AdminRoleClass(AdminRole.superAdmin),
+    ];
+  }
+
   @override
   String toString() {
     switch (adminRole) {

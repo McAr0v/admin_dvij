@@ -9,6 +9,7 @@ import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
+import 'package:admin_dvij/users/genders/gender_class.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -26,6 +27,7 @@ class AdminUserClass implements IEntity<AdminUserClass> {
   DateTime registrationDate;
   AdminRoleClass adminRole;
   City city;
+  Gender gender;
 
   AdminUserClass({
     required this.uid,
@@ -37,7 +39,8 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     required this.avatar,
     required this.registrationDate,
     required this.adminRole,
-    required this.city
+    required this.city,
+    required this.gender
   });
 
   static AdminUserClass? _currentUser;
@@ -53,7 +56,8 @@ class AdminUserClass implements IEntity<AdminUserClass> {
         avatar: SystemConstants.defaultAvatar,
         registrationDate: DateTime(2100),
       adminRole: AdminRoleClass(AdminRole.viewer),
-      city: City.empty()
+      city: City.empty(),
+      gender: Gender()
     );
   }
 
@@ -75,7 +79,8 @@ class AdminUserClass implements IEntity<AdminUserClass> {
         avatar: snapshot.child(DatabaseConstants.avatar).value.toString(),
         registrationDate: regDate,
         adminRole: AdminRoleClass.fromString(snapshot.child(DatabaseConstants.adminRole).value.toString()),
-        city: city
+        city: city,
+      gender: Gender.fromString(snapshot.child(DatabaseConstants.gender).value.toString())
     );
   }
 
@@ -94,7 +99,8 @@ class AdminUserClass implements IEntity<AdminUserClass> {
       avatar: json[DatabaseConstants.avatar] ?? '',
       registrationDate: DateTime.parse(json[DatabaseConstants.registrationDate] ?? '2100-01-01'),
       adminRole: AdminRoleClass.fromString(json[DatabaseConstants.adminRole] ?? ''),
-      city: city
+      city: city,
+      gender: Gender.fromString(json[DatabaseConstants.gender] ?? '')
     );
   }
 
@@ -166,6 +172,10 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     }
   }
 
+  String getGender(){
+    return gender.toString(needTranslate: true);
+  }
+
   @override
   Future<String> deleteFromDb() async{
     DatabaseClass db = DatabaseClass();
@@ -201,7 +211,8 @@ class AdminUserClass implements IEntity<AdminUserClass> {
       DatabaseConstants.avatar: avatar,
       DatabaseConstants.registrationDate: registrationDate.toString(),
       DatabaseConstants.adminRole: adminRole.toString(),
-      DatabaseConstants.city: city.id
+      DatabaseConstants.city: city.id,
+      DatabaseConstants.gender: gender.toString()
     };
   }
 
@@ -245,7 +256,7 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     return result;
   }
 
-  String calculateExpirienseTime() {
+  String calculateExperienceTime() {
     final now = DateTime.now();
     final duration = now.difference(registrationDate);
 

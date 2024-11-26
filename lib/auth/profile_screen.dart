@@ -1,13 +1,13 @@
 import 'dart:io';
-
 import 'package:admin_dvij/auth/log_in_screen.dart';
-import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/constants/admins_constants.dart';
 import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
+import 'package:admin_dvij/users/genders/gender_picker.dart';
+import 'package:admin_dvij/users/roles/admin_picker.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -69,7 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       cityController.text = currentUserAdmin.city.name;
       birthDateController.text = currentUserAdmin.formatBirthDateTime();
       adminRoleController.text = currentUserAdmin.adminRole.getNameOrDescOfRole(true);
-      //adminGenderController.text =
+      adminGenderController.text = currentUserAdmin.gender.toString(needTranslate: true);
       chosenCityOnEdit = City.empty();
       selectedBirthDateOnEdit = DateTime(2100);
       chosenAdminRole = AdminRoleClass(AdminRole.viewer);
@@ -191,7 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           style: Theme.of(context).textTheme.labelSmall!.copyWith(color: AppColors.greyText),
                                         ),
                                         Text(
-                                          currentUserAdmin.calculateExpirienseTime(),
+                                          currentUserAdmin.calculateExperienceTime(),
                                           style: Theme.of(context).textTheme.labelSmall!.copyWith(color: Colors.green),
                                         ),
                                       ],
@@ -333,7 +333,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                   enabled: canEdit && (currentUserAdmin.adminRole.adminRole == AdminRole.creator || currentUserAdmin.adminRole.adminRole ==  AdminRole.superAdmin),
                                   onTap: () async {
-                                    //await _showCityPickerDialog();
+                                    await showRolePopup();
                                   },
                                   readOnly: true
                               ),
@@ -344,7 +344,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Expanded(
                               child: TextField(
                                 style: Theme.of(context).textTheme.bodyMedium,
-                                controller: birthDateController,
+                                controller: adminGenderController,
                                 decoration: const InputDecoration(
                                   labelText: 'Пол',
                                   prefixIcon: Icon(Icons.email),
@@ -352,8 +352,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 enabled: canEdit,
                                 readOnly: true,
                                 onTap: () async {
-                                  //await _showDatePickerDialog();
-                                  //await _selectDate(context);
+                                  //await _showGenderPickerDialog();
+                                  showBottomSheetPopup();
                                 },
                               ),
                             ),
@@ -401,6 +401,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  void showBottomSheetPopup() async{
+    dynamic result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return GenderPicker();
+      },
+    );
+
+    if (result != null) {
+
+      setState(() {
+        chosenAdminGender = result;
+        adminGenderController.text = chosenAdminGender.toString(needTranslate: true);
+      });
+
+    }
+
+  }
+
+  Future<void> showRolePopup() async{
+    dynamic result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AdminPicker();
+      },
+    );
+
+    if (result != null) {
+
+      setState(() {
+        chosenAdminGender = result;
+        adminGenderController.text = chosenAdminGender.toString(needTranslate: true);
+      });
+
+    }
+
+  }
+
+
   Future<void> _showCityPickerDialog() async {
 
     dynamic returnedCity = await systemMethods.showPopUpDialog(
@@ -413,6 +452,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         chosenCityOnEdit = returnedCity;
         cityController.text = chosenCityOnEdit.name;
+      });
+
+    }
+  }
+
+  Future<void> _showGenderPickerDialog() async {
+
+    dynamic returnedGender = await systemMethods.showPopUpDialog(
+        context: context,
+        page: const GenderPicker()
+    );
+
+    if (returnedGender != null) {
+
+      setState(() {
+        chosenAdminGender = returnedGender;
+        adminGenderController.text = chosenAdminGender.toString(needTranslate: true);
       });
 
     }
