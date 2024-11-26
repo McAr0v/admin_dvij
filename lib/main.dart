@@ -8,6 +8,7 @@ import 'package:admin_dvij/main_page/main_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:window_manager/window_manager.dart';
 import 'firebase_options.dart';
 
@@ -62,6 +63,16 @@ class MyApp extends StatelessWidget {
       title: 'Dvij админ',
       theme: CustomTheme.darkTheme,
       home: _swapScreen(currentUser),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate
+        //CupertinoLocalizations.delegate
+      ],
+      supportedLocales: const [
+        Locale('ru', 'RU'), // русская локаль
+        Locale('en', 'US'), // английская локаль (если нужно)
+      ],
     );
   }
 }

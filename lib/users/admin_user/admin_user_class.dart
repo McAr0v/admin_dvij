@@ -7,6 +7,7 @@ import 'package:admin_dvij/constants/admins_constants.dart';
 import 'package:admin_dvij/constants/database_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -142,9 +143,9 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     return _currentUser ?? AdminUserClass.empty();
   }
 
-  Future<AdminUserClass> getCurrentUser() async{
+  Future<AdminUserClass> getCurrentUser({bool fromDb = false}) async{
 
-    if (_currentUser == null || _currentUser!.uid.isEmpty) {
+    if (_currentUser == null || _currentUser!.uid.isEmpty || fromDb) {
       await getCurrentUserFromDb();
     }
 
@@ -242,6 +243,64 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     }
 
     return result;
+  }
+
+  String calculateExpirienseTime() {
+    final now = DateTime.now();
+    final duration = now.difference(registrationDate);
+
+    // Разбиваем Duration на годы, месяцы и дни
+    int years = now.year - registrationDate.year;
+    int months = now.month - registrationDate.month;
+    int days = now.day - registrationDate.day;
+
+    // Корректируем отрицательные значения для месяцев и дней
+    if (days < 0) {
+      final previousMonth = DateTime(now.year, now.month - 1, registrationDate.day);
+      days = now.difference(previousMonth).inDays;
+      months -= 1;
+    }
+
+    if (months < 0) {
+      years -= 1;
+      months += 12;
+    }
+
+    // Формируем строку
+    final yearsText = years > 0 ? '$years ${_pluralize(years, "год", "года", "лет")}' : '';
+    final monthsText = months > 0 ? '$months ${_pluralize(months, "месяц", "месяца", "месяцев")}' : '';
+    final daysText = days > 0 ? '$days ${_pluralize(days, "день", "дня", "дней")}' : '';
+
+    // Собираем строку с правильными пробелами
+    return [yearsText, monthsText, daysText].where((text) => text.isNotEmpty).join(', ');
+  }
+
+  String _pluralize(int number, String singular, String pluralFew, String pluralMany) {
+    if (number % 10 == 1 && number % 100 != 11) return singular;
+    if (number % 10 >= 2 && number % 10 <= 4 && (number % 100 < 10 || number % 100 >= 20)) return pluralFew;
+    return pluralMany;
+  }
+
+  String calculateYears() {
+    final now = DateTime.now();
+    int years = now.year - birthDate.year;
+
+    // Проверяем, прошел ли полный год
+    if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
+      years--;
+    }
+
+    // Определяем правильное склонение слова "год"
+    return '$years ${_pluralize(years, "год", "года", "лет")}';
+  }
+
+
+  String formatBirthDateTime() {
+
+    SystemMethodsClass sm = SystemMethodsClass();
+
+    return sm.formatDateTimeToHumanView(birthDate);
+
   }
 
 }

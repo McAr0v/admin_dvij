@@ -26,6 +26,15 @@ class CustomTheme {
         ),
 
         datePickerTheme: DatePickerThemeData(
+          headerBackgroundColor: Colors.transparent,
+            headerHeadlineStyle: TextStyle(
+              fontSize: 16
+            ),
+            headerHelpStyle: TextStyle(
+                fontSize: 16
+            ),
+
+            headerForegroundColor: AppColors.white,
             surfaceTintColor: Colors.transparent,
             /*dayForegroundColor: MaterialStateProperty.resolveWith<Color?>(
               (Set<MaterialState> states) {
@@ -144,7 +153,7 @@ class CustomTheme {
             return AppColors.white;
           },
         ),*/
-            todayBorder: BorderSide(style: BorderStyle.none)
+            todayBorder: BorderSide(style: BorderStyle.none),
         ),
 
         // Стиль кнопки
