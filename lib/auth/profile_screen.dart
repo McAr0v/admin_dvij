@@ -436,9 +436,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   String? imageUrl;
 
                                   if (_imageFile != null){
-                                    final compressedImage = await imagePickerService.compressImage(_imageFile!);
 
-                                    imageUrl = await imageUploader.uploadImage(editUserAdmin.uid, compressedImage);
+                                    imageUrl = await imageUploader.uploadImage(editUserAdmin.uid, _imageFile!);
 
                                     if (imageUrl != null){
                                       print(imageUrl);
