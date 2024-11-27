@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 enum AdminRole {
   creator, // Создатель приложения. Его никак нельзя редактировать и удалять. Обаладает всеми правами доступа
   superAdmin, // Полные права: управление пользователями, контентом, настройками и т.д.
@@ -34,7 +36,7 @@ class AdminRoleClass {
       AdminRoleClass(AdminRole.editor),
       AdminRoleClass(AdminRole.advertiser),
       AdminRoleClass(AdminRole.contentManager),
-      AdminRoleClass(AdminRole.superAdmin),
+      AdminRoleClass(AdminRole.superAdmin)
     ];
   }
 
@@ -55,6 +57,14 @@ class AdminRoleClass {
         return 'viewer';
       default:
         return 'viewer'; // На случай, если adminRole имеет неизвестное значение.
+    }
+  }
+
+  bool accessToEditUsers(){
+    if (adminRole == AdminRole.creator || adminRole == AdminRole.superAdmin) {
+      return true;
+    } else {
+      return false;
     }
   }
 

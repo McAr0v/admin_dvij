@@ -21,7 +21,10 @@ import '../users/admin_user/admin_user_class.dart';
 import '../users/genders/gender_class.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({Key? key}) : super(key: key);
+
+  final AdminUserClass? admin;
+
+  const ProfileScreen({this.admin, Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -29,7 +32,12 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
 
+  // Текущий админ, который вносит изменения. Может редактировать сам себя
   AdminUserClass currentUserAdmin = AdminUserClass.empty();
+
+  // Редактируемый пользователь. Может быть другой, отличный от текущего пользователя
+  AdminUserClass editUserAdmin = AdminUserClass.empty();
+
   SystemMethodsClass systemMethods = SystemMethodsClass();
 
   final TextEditingController emailController = TextEditingController();
@@ -41,6 +49,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController adminRoleController = TextEditingController();
   final TextEditingController adminGenderController = TextEditingController();
 
+  // Переменные для сохранения данных при смене значения
+  // На случай, если пользователь отменит редактирование, вернутся значения по умолчанию
   City chosenCityOnEdit = City.empty();
   DateTime selectedBirthDateOnEdit = DateTime(2100);
   AdminRoleClass chosenAdminRole = AdminRoleClass(AdminRole.viewer);
@@ -55,21 +65,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
 
-    getAdmin();
+    getAdminsInfo();
 
     super.initState();
   }
 
   void setTextFieldsOnDefault(){
     setState(() {
-      emailController.text = currentUserAdmin.email;
-      nameController.text = currentUserAdmin.name;
-      lastnameController.text = currentUserAdmin.lastName;
-      phoneController.text = currentUserAdmin.phone;
-      cityController.text = currentUserAdmin.city.name;
-      birthDateController.text = currentUserAdmin.formatBirthDateTime();
-      adminRoleController.text = currentUserAdmin.adminRole.getNameOrDescOfRole(true);
-      adminGenderController.text = currentUserAdmin.gender.toString(needTranslate: true);
+      emailController.text = editUserAdmin.email;
+      nameController.text = editUserAdmin.name;
+      lastnameController.text = editUserAdmin.lastName;
+      phoneController.text = editUserAdmin.phone;
+      cityController.text = editUserAdmin.city.name;
+      birthDateController.text = editUserAdmin.formatBirthDateTime();
+      adminRoleController.text = editUserAdmin.adminRole.getNameOrDescOfRole(true);
+      adminGenderController.text = editUserAdmin.gender.toString(needTranslate: true);
       chosenCityOnEdit = City.empty();
       selectedBirthDateOnEdit = DateTime(2100);
       chosenAdminRole = AdminRoleClass(AdminRole.viewer);
@@ -77,17 +87,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  Future<void> getAdmin({bool fromDB = false}) async{
+  Future<void> getAdminsInfo({bool fromDB = false}) async{
     setState(() {
 
       loading = true;
 
     });
 
+    // Подгружаем текущего пользователя
     currentUserAdmin = await currentUserAdmin.getCurrentUser(fromDb: fromDB);
 
-    setTextFieldsOnDefault();
+    // Если пользователь не передан, значит пользователь редактируем сам себя
+    if (widget.admin == null) {
+      // подгружаем данные в переменную редактируемого пользователя
+      editUserAdmin = await editUserAdmin.getCurrentUser(fromDb: fromDB);
+    } else {
+      /// TODO Сделать подгрузку менеджера из списка менеджеров
+      /// TODO Сделать обновление менеджера в списке менеджера после изменений
+    }
 
+    // Сбрасываем значения переменных для изменений в исходное состояние
+    setTextFieldsOnDefault();
 
     setState(() {
 
@@ -105,11 +125,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           IconButton(
             onPressed: () async {
-              await getAdmin(fromDB: true);
+              await getAdminsInfo(fromDB: true);
             },
             icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
           ),
-          IconButton(
+
+          // Иконка редактирования. Доступна если у текущего пользователя есть доступ
+          // Или редактируемый пользователь и есть текущий пользователь
+
+          if (currentUserAdmin.adminRole.accessToEditUsers() || currentUserAdmin.uid == editUserAdmin.uid) IconButton(
             onPressed: () async {
 
               setState(() {
@@ -155,13 +179,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Row(
                           children: [
 
-                            if (currentUserAdmin.avatar.isNotEmpty) CircleAvatar(
+                            if (editUserAdmin.avatar.isNotEmpty) CircleAvatar(
                               radius: 40,
                               backgroundColor: Colors.grey, // Цвет фона, который будет виден во время загрузки
                               child: ClipOval(
                                 child: FadeInImage(
                                   placeholder: const AssetImage('assets/u_user.png'),
-                                  image: NetworkImage(currentUserAdmin.avatar),
+                                  image: NetworkImage(editUserAdmin.avatar),
                                   fit: BoxFit.cover,
                                   width: 100,
                                   height: 100,
@@ -178,9 +202,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(currentUserAdmin.getFullName()),
+                                    Text(editUserAdmin.getFullName()),
                                     Text(
-                                        '${currentUserAdmin.calculateYears()}, ${currentUserAdmin.adminRole.getNameOrDescOfRole(true)}',
+                                        '${editUserAdmin.calculateYears()}, ${editUserAdmin.adminRole.getNameOrDescOfRole(true)}',
                                       style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
                                     ),
 
@@ -191,7 +215,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           style: Theme.of(context).textTheme.labelSmall!.copyWith(color: AppColors.greyText),
                                         ),
                                         Text(
-                                          currentUserAdmin.calculateExperienceTime(),
+                                          editUserAdmin.calculateExperienceTime(),
                                           style: Theme.of(context).textTheme.labelSmall!.copyWith(color: Colors.green),
                                         ),
                                       ],
@@ -291,7 +315,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 ),
                                 enabled: canEdit,
                                 onTap: () async {
-                                  await _showCityPickerDialog();
+                                  //await _showCityPickerDialog();
+                                  await showCityTwoPopup();
                                 },
                                 readOnly: true
                               ),
@@ -331,7 +356,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     labelText: 'Роль в приложении',
                                     prefixIcon: Icon(Icons.email),
                                   ),
-                                  enabled: canEdit && (currentUserAdmin.adminRole.adminRole == AdminRole.creator || currentUserAdmin.adminRole.adminRole ==  AdminRole.superAdmin),
+                                  enabled: canEditRole(),
                                   onTap: () async {
                                     await showRolePopup();
                                   },
@@ -353,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 readOnly: true,
                                 onTap: () async {
                                   //await _showGenderPickerDialog();
-                                  showBottomSheetPopup();
+                                  genderPopup();
                                 },
                               ),
                             ),
@@ -401,11 +426,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void showBottomSheetPopup() async{
-    dynamic result = await showDialog(
+  bool canEditRole(){
+    if(editUserAdmin.adminRole.adminRole == AdminRole.creator) {
+      return false;
+    } else {
+      return canEdit && currentUserAdmin.adminRole.accessToEditUsers();
+    }
+  }
+
+  void genderPopup() async{
+    dynamic result = await showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return GenderPicker();
+        return const GenderPicker();
       },
     );
 
@@ -421,83 +454,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> showRolePopup() async{
-    dynamic result = await showDialog(
+    dynamic result = await showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return AdminPicker();
+        return const AdminPicker();
       },
     );
 
     if (result != null) {
 
       setState(() {
-        chosenAdminGender = result;
-        adminGenderController.text = chosenAdminGender.toString(needTranslate: true);
+        chosenAdminRole = result;
+        adminRoleController.text = chosenAdminRole.getNameOrDescOfRole(true);
       });
 
     }
 
   }
 
-
-  Future<void> _showCityPickerDialog() async {
-
-    dynamic returnedCity = await systemMethods.showPopUpDialog(
-        context: context,
-        page: const CityPickerPage()
+  Future<void> showCityTwoPopup() async{
+    dynamic result = await showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return const CityPickerPage();
+      },
     );
 
-    if (returnedCity != null) {
+    if (result != null) {
 
       setState(() {
-        chosenCityOnEdit = returnedCity;
+        chosenCityOnEdit = result;
         cityController.text = chosenCityOnEdit.name;
       });
 
     }
+
   }
 
-  Future<void> _showGenderPickerDialog() async {
-
-    dynamic returnedGender = await systemMethods.showPopUpDialog(
-        context: context,
-        page: const GenderPicker()
-    );
-
-    if (returnedGender != null) {
-
-      setState(() {
-        chosenAdminGender = returnedGender;
-        adminGenderController.text = chosenAdminGender.toString(needTranslate: true);
-      });
-
-    }
-  }
-
-  /*Future<void> _showDatePickerDialog() async {
-
-    dynamic returnedCity = await systemMethods.showPopUpDialog(
-        context: context,
-        page: DataPickerCustom(
-            onActionPressed: () async{
-              await _selectDate(context, needClearInitialDate: true);
-            },
-            labelText: 'Выбери дату рождения'
-        )
-    );
-
-    if (returnedCity != null) {
-
-      setState(() {
-        chosenCityOnEdit = returnedCity;
-        cityController.text = chosenCityOnEdit.name;
-      });
-
-    }
-  }*/
-
-  Future<void> _selectDate(BuildContext context, {bool needClearInitialDate = false}) async {
-    DateTime initial = currentUserAdmin.birthDate;
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime initial = editUserAdmin.birthDate;
     if (selectedBirthDateOnEdit.year != 2100) initial = selectedBirthDateOnEdit;
 
     final DateTime? picked = await showDatePicker(
@@ -517,7 +512,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     );
 
-    if (picked != null && picked != currentUserAdmin.birthDate) {
+    if (picked != null && picked != editUserAdmin.birthDate) {
       setState(() {
         selectedBirthDateOnEdit = picked;
         birthDateController.text = systemMethods.formatDateTimeToHumanView(selectedBirthDateOnEdit);

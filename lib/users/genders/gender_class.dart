@@ -16,7 +16,12 @@ class Gender {
   }
 
   List<Gender> getGendersList(){
-    return [Gender(gender: GenderEnum.man), Gender(gender: GenderEnum.woman), Gender(gender: GenderEnum.notChosen)];
+    return [
+      Gender(gender: GenderEnum.man),
+      Gender(gender: GenderEnum.woman),
+      Gender(gender: GenderEnum.notChosen)
+
+    ];
   }
 
   @override
