@@ -11,4 +11,5 @@ class DatabaseConstants {
   static const String adminRole = 'adminRole';
   static const String city = 'city';
   static const String gender = 'gender';
+  static const String adminsFolder = 'admins';
 }

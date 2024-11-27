@@ -11,10 +11,13 @@ import 'package:admin_dvij/users/roles/admin_picker.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import '../cities/city_class.dart';
 import '../cities/city_picker_page.dart';
 import '../constants/buttons_constants.dart';
 import '../constants/system_constants.dart';
+import '../database/image_picker.dart';
+import '../database/image_uploader.dart';
 import '../design/app_colors.dart';
 import '../design_elements/elements_of_design.dart';
 import '../users/admin_user/admin_user_class.dart';
@@ -39,6 +42,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   AdminUserClass editUserAdmin = AdminUserClass.empty();
 
   SystemMethodsClass systemMethods = SystemMethodsClass();
+  final ImagePickerService imagePickerService = ImagePickerService();
+  final ImageUploader imageUploader = ImageUploader();
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
@@ -48,6 +53,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final TextEditingController birthDateController = TextEditingController();
   final TextEditingController adminRoleController = TextEditingController();
   final TextEditingController adminGenderController = TextEditingController();
+  final TextEditingController imageController = TextEditingController();
 
   // Переменные для сохранения данных при смене значения
   // На случай, если пользователь отменит редактирование, вернутся значения по умолчанию
@@ -55,6 +61,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   DateTime selectedBirthDateOnEdit = DateTime(2100);
   AdminRoleClass chosenAdminRole = AdminRoleClass(AdminRole.viewer);
   Gender chosenAdminGender = Gender();
+
+  File? _imageFile;
 
   bool loading = false;
   bool logOuting = false;
@@ -84,6 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       selectedBirthDateOnEdit = DateTime(2100);
       chosenAdminRole = AdminRoleClass(AdminRole.viewer);
       chosenAdminGender = Gender();
+      _imageFile = null;
     });
   }
 
@@ -154,10 +163,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Stack(
         children: [
-          if (loading) const LoadingScreen(loadingText: SystemConstants.loadingDefault),
-          if (logOuting) const LoadingScreen(loadingText: 'Выход из аккаунта'),
-          if (saving) const LoadingScreen(loadingText: 'Сохранение изменений'),
-          if (!loading) SingleChildScrollView(
+          if (loading) const LoadingScreen(loadingText: SystemConstants.loadingDefault)
+          else if (logOuting) const LoadingScreen(loadingText: 'Выход из аккаунта')
+          else if (saving) const LoadingScreen(loadingText: 'Сохранение изменений')
+          else SingleChildScrollView(
             child: Center(
               child: Column(
                 children: [
@@ -179,18 +188,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Row(
                           children: [
 
-                            if (editUserAdmin.avatar.isNotEmpty) CircleAvatar(
+                            CircleAvatar(
                               radius: 40,
                               backgroundColor: Colors.grey, // Цвет фона, который будет виден во время загрузки
                               child: ClipOval(
-                                child: FadeInImage(
+                                child: _imageFile != null
+                                    ? Image.file(
+                                  _imageFile!,
+                                  fit: BoxFit.cover,
+                                  width: 100,
+                                  height: 100,
+                                )
+                                    : FadeInImage(
                                   placeholder: const AssetImage('assets/u_user.png'),
                                   image: NetworkImage(editUserAdmin.avatar),
                                   fit: BoxFit.cover,
                                   width: 100,
                                   height: 100,
                                   imageErrorBuilder: (context, error, stackTrace) {
-                                    return Image.asset('assets/error_image.png'); // Изображение ошибки, если загрузка не удалась
+                                    return Image.asset(
+                                      'assets/error_image.png', // Изображение ошибки
+                                      fit: BoxFit.cover,
+                                      width: 100,
+                                      height: 100,
+                                    );
                                   },
                                 ),
                               ),
@@ -230,6 +251,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                         if (canEdit) const SizedBox(height: 5,),
                         if (canEdit) GestureDetector(
+                          onTap: ()async{
+                            await _pickImage();
+                          },
                           child: Text(
                             'Изменить фото',
                             style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.brandColor, decoration: TextDecoration.underline,),
@@ -403,7 +427,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             const SizedBox(width: 20,),
                             Expanded(
                               child: ElementsOfDesign.customButton(
-                                method: (){},
+                                method: ()async{
+
+                                  setState(() {
+                                    saving = true;
+                                  });
+
+                                  String? imageUrl;
+
+                                  if (_imageFile != null){
+                                    final compressedImage = await imagePickerService.compressImage(_imageFile!);
+
+                                    imageUrl = await imageUploader.uploadImage(editUserAdmin.uid, compressedImage);
+
+                                    if (imageUrl != null){
+                                      print(imageUrl);
+                                    }
+
+                                  }
+
+                                  setState(() {
+                                    saving = false;
+                                  });
+
+                                },
                                 textOnButton: 'Cохранить',
                                 context: context,
                               ),
@@ -431,6 +478,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return false;
     } else {
       return canEdit && currentUserAdmin.adminRole.accessToEditUsers();
+    }
+  }
+
+  Future<void> _pickImage() async {
+
+    final File? pickedImage = await imagePickerService.pickImage(ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _imageFile = pickedImage;
+        imageController.text = _imageFile!.path;
+      });
     }
   }
 
