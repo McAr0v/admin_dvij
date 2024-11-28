@@ -1,5 +1,6 @@
 import 'dart:io';
-import 'package:admin_dvij/auth/profile_screen.dart';
+import 'package:admin_dvij/users/admin_user/admins_list_screen.dart';
+import 'package:admin_dvij/users/admin_user/profile_screen.dart';
 import 'package:admin_dvij/cities/cities_list_screen.dart';
 import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
@@ -78,6 +79,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ScreenConstants.citiesPage,
                 FontAwesomeIcons.marker,
                 const CitiesListScreen(),
+                context
+            ),
+
+            ElementsOfDesign.drawerListElement(
+                ScreenConstants.adminsPage,
+                FontAwesomeIcons.userShield,
+                const AdminsListScreen(),
                 context
             ),
             

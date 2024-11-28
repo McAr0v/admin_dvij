@@ -40,7 +40,6 @@ class ImageUploader {
       await storageRef.delete();
       return SystemConstants.successConst;
     } on FirebaseException catch (e) {
-      print("Failed with error '${e.code}': ${e.message}");
       return e.toString();
     }
   }

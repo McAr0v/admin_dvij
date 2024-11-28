@@ -1,3 +1,4 @@
+import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -18,7 +19,7 @@ class LogoView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SvgPicture.asset(
-              'assets/logo.svg',
+              SystemConstants.logoSvgPath,
             width: width,
             height: height,
             color: AppColors.brandColor,

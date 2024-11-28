@@ -6,8 +6,8 @@ import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/design_elements/logo_view.dart';
-import 'package:admin_dvij/main_page/main_screen.dart';
 import 'package:flutter/material.dart';
+import '../constants/users_constants.dart';
 import '../database/database_class.dart';
 import '../users/admin_user/admin_user_class.dart';
 import 'auth_class.dart';
@@ -64,7 +64,7 @@ class _LogInScreenState extends State<LogInScreen> {
                       style: Theme.of(context).textTheme.bodyMedium,
                       controller: emailController,
                       decoration: const InputDecoration(
-                        labelText: 'Email',
+                        labelText: UserConstants.email,
                         prefixIcon: Icon(Icons.email),
                       ),
                     ),
@@ -78,7 +78,7 @@ class _LogInScreenState extends State<LogInScreen> {
                       controller: passwordController,
                       decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.key),
-                          labelText: 'Пароль',
+                          labelText: UserConstants.password,
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isObscured ? Icons.visibility : Icons.visibility_off,

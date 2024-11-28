@@ -1,6 +1,5 @@
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:flutter/material.dart';
-
 import '../design/app_colors.dart';
 
 class ElementsOfDesign {
@@ -24,6 +23,20 @@ class ElementsOfDesign {
     );
   }
 
+  static Widget linkButton({
+    required VoidCallback method,
+    required String text,
+    required BuildContext context,
+  }){
+    return GestureDetector(
+      onTap: method,
+      child: Text(
+        text,
+        style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.brandColor, decoration: TextDecoration.underline,),
+      ),
+    );
+  }
+
   static TextButton customButton ({
       required VoidCallback method,
       required String textOnButton,
@@ -36,6 +49,7 @@ class ElementsOfDesign {
     return TextButton(
         onPressed: method,
         style: ButtonStyle(
+
             backgroundColor: WidgetStateProperty.resolveWith<Color?>(
                   (Set<WidgetState> states) {
                     return elements._switchColorButton(buttonState);
@@ -67,6 +81,53 @@ class ElementsOfDesign {
       case ButtonStateEnum.primary: return AppColors.greyOnBackground;
       case ButtonStateEnum.secondary: return AppColors.greyOnBackground;
     }
+  }
+
+  static Widget buildAdaptiveRow(bool isMobile, List<Widget> children) {
+    if (isMobile) {
+      return Column(
+        children: children
+            .map((child) => Padding(
+          padding: const EdgeInsets.only(bottom: 20),
+          child: child,
+        ))
+            .toList(),
+      );
+    } else {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 20),
+        child: Row(
+          children: [
+            for (int i = 0; i < children.length; i++) ...[
+              Expanded(child: children[i]),
+              if (i < children.length - 1) const SizedBox(width: 20), // Отступ только между элементами
+            ],
+          ],
+        ),
+      );
+    }
+  }
+
+  static Widget buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required bool canEdit,
+    required IconData icon,
+    required BuildContext context,
+    VoidCallback? onTap,
+    bool readOnly = false,
+  }) {
+    return TextField(
+      style: Theme.of(context).textTheme.bodyMedium,
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: Icon(icon, size: 18,),
+      ),
+      enabled: canEdit,
+      readOnly: readOnly,
+      onTap: onTap,
+    );
   }
 
   static Future<bool?> exitDialog(BuildContext context, String message, String confirmText, String cancelText, String headline) async {

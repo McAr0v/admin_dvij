@@ -12,17 +12,19 @@ import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import '../cities/city_class.dart';
-import '../cities/city_picker_page.dart';
-import '../constants/buttons_constants.dart';
-import '../constants/system_constants.dart';
-import '../database/image_picker.dart';
-import '../database/image_uploader.dart';
-import '../design/app_colors.dart';
-import '../design_elements/elements_of_design.dart';
-import '../users/admin_user/admin_user_class.dart';
-import '../users/genders/gender_class.dart';
+import '../../cities/city_class.dart';
+import '../../cities/city_picker_page.dart';
+import '../../constants/buttons_constants.dart';
+import '../../constants/system_constants.dart';
+import '../../constants/users_constants.dart';
+import '../../database/image_picker.dart';
+import '../../design/app_colors.dart';
+import '../../design_elements/elements_of_design.dart';
+import 'admin_user_class.dart';
+import '../genders/gender_class.dart';
 
+
+/// Если это страница НЕ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ, то передавать админа не надо
 class ProfileScreen extends StatefulWidget {
 
   final AdminUserClass? admin;
@@ -43,7 +45,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   SystemMethodsClass systemMethods = SystemMethodsClass();
   final ImagePickerService imagePickerService = ImagePickerService();
-  final ImageUploader imageUploader = ImageUploader();
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
@@ -61,7 +62,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   DateTime selectedBirthDateOnEdit = DateTime(2100);
   AdminRoleClass chosenAdminRole = AdminRoleClass(AdminRole.notChosen);
   Gender chosenAdminGender = Gender();
-
   File? _imageFile;
 
   bool loading = false;
@@ -72,9 +72,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-
     getAdminsInfo();
-
     super.initState();
   }
 
@@ -84,8 +82,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       nameController.text = editUserAdmin.name;
       lastnameController.text = editUserAdmin.lastName;
       phoneController.text = editUserAdmin.phone;
-      cityController.text = editUserAdmin.city.name;
-      birthDateController.text = editUserAdmin.formatBirthDateTime();
+      cityController.text = editUserAdmin.city.name.isNotEmpty ? editUserAdmin.city.name : 'Город не выбран';
+      birthDateController.text = editUserAdmin.birthDate.year != 2100 ? editUserAdmin.formatBirthDateTime() : 'Дата не выбрана' ;
       adminRoleController.text = editUserAdmin.adminRole.getNameOrDescOfRole(true);
       adminGenderController.text = editUserAdmin.gender.toString(needTranslate: true);
       chosenCityOnEdit = City.empty();
@@ -122,29 +120,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> getAdminsInfo({bool fromDB = false}) async{
     setState(() {
-
       loading = true;
-
     });
 
     // Подгружаем текущего пользователя
     currentUserAdmin = await currentUserAdmin.getCurrentUser(fromDb: fromDB);
 
-    // Если пользователь не передан, значит пользователь редактируем сам себя
+    // Если пользователь не передан, значит пользователь редактирует сам себя
     if (widget.admin == null) {
       // подгружаем данные в переменную редактируемого пользователя
       editUserAdmin = currentUserAdmin;
     } else {
+      // Если пользователь редактирует не себя, то подружаем данные из сохраненного списка пользователей
       editUserAdmin = await editUserAdmin.getUserFromDownloadedList(uid: widget.admin!.uid, fromDb: fromDB);
     }
 
     // Сбрасываем значения переменных для изменений в исходное состояние
     setTextFieldsOnDefault();
 
+    if (editUserAdmin.uid.isEmpty){
+      canEdit = true;
+    }
+
     setState(() {
-
       loading = false;
-
     });
   }
 
@@ -154,7 +153,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.admin == null ? ScreenConstants.profilePage : '${ScreenConstants.profilePage} ${editUserAdmin.getFullName()}'),
+        title: Text(
+            widget.admin == null
+                ? ScreenConstants.profilePage
+                : editUserAdmin.uid.isNotEmpty
+                ? '${ScreenConstants.profilePage} ${editUserAdmin.getFullName()}'
+                : AdminConstants.createAdminHeadline
+        ),
+
+        // Если пользователь редактирует не себя, то вместо Drawer ставим иконку возвращения
+        // на предыдущий экран
+
         leading: widget.admin != null ? IconButton(
           icon: const Icon(FontAwesomeIcons.chevronLeft, size: 18,),
           onPressed: () {
@@ -163,6 +172,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ) : null,
 
         actions: [
+
+          // Иконка обновления данных. Доступна если это не создание пользователя
 
           if (editUserAdmin.uid.isNotEmpty) IconButton(
             onPressed: () async {
@@ -173,17 +184,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Иконка редактирования. Доступна если у текущего пользователя есть доступ
           // Или редактируемый пользователь и есть текущий пользователь
+          // Если создание пользователя, то она не доступна
 
           if ((currentUserAdmin.adminRole.accessToEditUsers() || currentUserAdmin.uid == editUserAdmin.uid) && editUserAdmin.uid.isNotEmpty) IconButton(
             onPressed: () async {
-
               setState(() {
                 canEdit = true;
               });
-
             },
             icon: const Icon(FontAwesomeIcons.penToSquare, size: 15, color: AppColors.white,),
           ),
+
+          // Иконка выхода из профиля. Доступна только если пользователь редактирует себя
+
           if (currentUserAdmin.uid == editUserAdmin.uid) IconButton(
             onPressed: () async {
               _singOut();
@@ -196,8 +209,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       body: Stack(
         children: [
           if (loading) const LoadingScreen(loadingText: SystemConstants.loadingDefault)
-          else if (logOuting) const LoadingScreen(loadingText: 'Выход из аккаунта')
-          else if (saving) const LoadingScreen(loadingText: 'Сохранение изменений')
+          else if (logOuting) const LoadingScreen(loadingText: SystemConstants.logOut)
+          else if (saving) const LoadingScreen(loadingText: SystemConstants.saving)
           else SingleChildScrollView(
             child: Center(
               child: Column(
@@ -210,173 +223,120 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         horizontal: Platform.isWindows || Platform.isMacOS ? 0 : 10
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.greyOnBackground, // Цвет фона
-                      borderRadius: BorderRadius.circular(20), // Скругление углов
+                      color: AppColors.greyOnBackground,
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
 
-                        Row(
-                          children: [
-
-                            CircleAvatar(
-                              radius: 40,
-                              backgroundColor: Colors.grey, // Цвет фона, который будет виден во время загрузки
-                              child: ClipOval(
-                                child: _imageFile != null
-                                    ? Image.file(
-                                  _imageFile!,
-                                  fit: BoxFit.cover,
-                                  width: 100,
-                                  height: 100,
-                                )
-                                    : FadeInImage(
-                                  placeholder: const AssetImage('assets/u_user.png'),
-                                  image: NetworkImage(editUserAdmin.avatar),
-                                  fit: BoxFit.cover,
-                                  width: 100,
-                                  height: 100,
-                                  imageErrorBuilder: (context, error, stackTrace) {
-                                    return Image.asset(
-                                      'assets/error_image.png', // Изображение ошибки
-                                      fit: BoxFit.cover,
-                                      width: 100,
-                                      height: 100,
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(width: 20,),
-
-                            Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(editUserAdmin.getFullName()),
-                                    Text(
-                                        '${editUserAdmin.calculateYears()}, ${editUserAdmin.adminRole.getNameOrDescOfRole(true)}',
-                                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                                    ),
-
-                                    Row(
-                                      children: [
-                                        Text(
-                                          'В нашей команде ',
-                                          style: Theme.of(context).textTheme.labelSmall!.copyWith(color: AppColors.greyText),
-                                        ),
-                                        Text(
-                                          editUserAdmin.calculateExperienceTime(),
-                                          style: Theme.of(context).textTheme.labelSmall!.copyWith(color: Colors.green),
-                                        ),
-                                      ],
-                                    ),
-
-                                  ],
-                                )
-                            ),
-
-                          ],
-                        ),
+                        // Виджет с аватаром и информацией о пользователе
+                        editUserAdmin.getInfoWidgetForProfile(context: context, imageFile: _imageFile),
 
                         if (canEdit) const SizedBox(height: 5,),
-                        if (canEdit) GestureDetector(
-                          onTap: ()async{
-                            await _pickImage();
-                          },
-                          child: Text(
-                            'Изменить фото',
-                            style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.brandColor, decoration: TextDecoration.underline,),
-                          ),
+
+                        // Кнопка - изменить фотографию
+                        if (canEdit) ElementsOfDesign.linkButton(
+                            method: ()async{
+                              await _pickImage();
+                            },
+                            text: ButtonsConstants.changePhoto,
+                            context: context
                         ),
 
                         const SizedBox(height: 40,),
 
-                        _buildAdaptiveRow(
+                        ElementsOfDesign.buildAdaptiveRow(
                             isMobile,
                             [
-                              _buildTextField(
+                              ElementsOfDesign.buildTextField(
                                   controller: nameController,
-                                  labelText: 'Имя',
+                                  labelText: UserConstants.name,
                                   canEdit: canEdit,
-                                  icon: FontAwesomeIcons.idBadge
+                                  icon: FontAwesomeIcons.idBadge,
+                                  context: context
                               ),
-                              _buildTextField(
+                              ElementsOfDesign.buildTextField(
                                   controller: lastnameController,
-                                  labelText: 'Фамилия',
+                                  labelText: UserConstants.lastName,
                                   canEdit: canEdit,
-                                  icon: FontAwesomeIcons.idBadge
+                                  icon: FontAwesomeIcons.idBadge,
+                                  context: context
                               )
 
                         ]
                         ),
 
-                        _buildAdaptiveRow(
+                        ElementsOfDesign.buildAdaptiveRow(
                             isMobile,
                             [
-                              _buildTextField(
+                              ElementsOfDesign.buildTextField(
                                   controller: emailController,
-                                  labelText: 'Email',
+                                  labelText: UserConstants.email,
                                   canEdit: false,
-                                  icon: FontAwesomeIcons.envelope
+                                  icon: FontAwesomeIcons.envelope,
+                                  context: context
                               ),
-                              _buildTextField(
+                              ElementsOfDesign.buildTextField(
                                   controller: phoneController,
-                                  labelText: 'Контактный телефон',
+                                  labelText: UserConstants.phone,
                                   canEdit: canEdit,
-                                  icon: FontAwesomeIcons.phone
+                                  icon: FontAwesomeIcons.phone,
+                                  context: context
                               )
 
                             ]
                         ),
 
-                        _buildAdaptiveRow(
+                        ElementsOfDesign.buildAdaptiveRow(
                             isMobile,
                             [
-                              _buildTextField(
+                              ElementsOfDesign.buildTextField(
                                   controller: cityController,
-                                  labelText: 'Город',
+                                  labelText: UserConstants.city,
                                   canEdit: canEdit,
                                   icon: FontAwesomeIcons.mapLocation,
-                                readOnly: true,
-                                onTap: () async {
-                                  await showCityTwoPopup();
-                                },
+                                  context: context,
+                                  readOnly: true,
+                                  onTap: () async {
+                                    await showCityTwoPopup();
+                                  },
                               ),
-                              _buildTextField(
+                              ElementsOfDesign.buildTextField(
                                   controller: birthDateController,
-                                  labelText: 'Дата рождения',
+                                  labelText: UserConstants.birthDate,
                                   canEdit: canEdit,
                                   icon: FontAwesomeIcons.cakeCandles,
-                                readOnly: true,
-                                onTap: () async {
-                                  await _selectDate(context);
-                                },
+                                  context: context,
+                                  readOnly: true,
+                                  onTap: () async {
+                                    await _selectDate(context);
+                                  },
                               )
 
                             ]
                         ),
 
-                        _buildAdaptiveRow(
+                        ElementsOfDesign.buildAdaptiveRow(
                             isMobile,
                             [
-                              _buildTextField(
+                              ElementsOfDesign.buildTextField(
                                 controller: adminRoleController,
-                                labelText: 'Роль в приложении',
+                                labelText: UserConstants.adminRole,
                                 canEdit: canEditRole(),
                                 icon: FontAwesomeIcons.userGear,
+                                context: context,
                                 readOnly: true,
                                 onTap: () async {
                                   await showRolePopup();
                                 },
                               ),
-                              _buildTextField(
+                              ElementsOfDesign.buildTextField(
                                 controller: adminGenderController,
-                                labelText: 'Пол',
+                                labelText: UserConstants.gender,
                                 canEdit: canEdit,
                                 icon: FontAwesomeIcons.marsAndVenus,
+                                context: context,
                                 readOnly: true,
                                 onTap: () {
                                   genderPopup();
@@ -387,52 +347,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         if (canEdit) const SizedBox(height: 20,),
-                        if (canEdit) Row(
-                          children: [
-                            Expanded(
-                              child: ElementsOfDesign.customButton(
-                                method: (){
-                                  canEdit = false;
-                                  setTextFieldsOnDefault();
-                                },
-                                textOnButton: 'Отменить',
-                                context: context,
-                                buttonState: ButtonStateEnum.secondary
-                              ),
-                            ),
-                            const SizedBox(width: 20,),
-                            Expanded(
-                              child: ElementsOfDesign.customButton(
-                                method: ()async{
 
-                                  setState(() {
-                                    saving = true;
-                                  });
+                        // Кнопки СОХРАНИТЬ / ОТМЕНИТЬ
 
-                                  setEditAdminBeforeSaving();
-
-                                  String publishResult = await editUserAdmin.publishToDb(_imageFile);
-
-                                  if (publishResult == SystemConstants.successConst) {
-                                    _showSnackBar('Пользователь успешно сохранен!');
-                                    await getAdminsInfo(fromDB: false);
+                        if (canEdit) ElementsOfDesign.buildAdaptiveRow(
+                            isMobile,
+                            [
+                              ElementsOfDesign.customButton(
+                                  method: (){
                                     canEdit = false;
                                     setTextFieldsOnDefault();
-                                  } else {
-                                    _showSnackBar(publishResult);
-                                  }
+                                  },
+                                  textOnButton: ButtonsConstants.cancel,
+                                  context: context,
+                                  buttonState: ButtonStateEnum.secondary
+                              ),
 
-                                  setState(() {
-                                    saving = false;
-                                  });
-
+                              ElementsOfDesign.customButton(
+                                method: () async{
+                                  await saveAdmin();
                                 },
-                                textOnButton: 'Cохранить',
+                                textOnButton: ButtonsConstants.save,
                                 context: context,
                               ),
-                            ),
-                          ],
-                        )
+                        ]),
                       ],
                     ),
                   ),
@@ -446,52 +384,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  // Метод для адаптивного ряда
-  Widget _buildAdaptiveRow(bool isMobile, List<Widget> children) {
-    if (isMobile) {
-      return Column(
-        children: children
-            .map((child) => Padding(
-          padding: const EdgeInsets.only(bottom: 20),
-          child: child,
-        ))
-            .toList(),
-      );
-    } else {
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 20),
-        child: Row(
-          children: [
-            for (int i = 0; i < children.length; i++) ...[
-              Expanded(child: children[i]),
-              if (i < children.length - 1) const SizedBox(width: 20), // Отступ только между элементами
-            ],
-          ],
-        ),
-      );
-    }
-  }
+  Future<void> saveAdmin() async{
+    setState(() {
+      saving = true;
+    });
 
-  // Метод для создания TextField
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String labelText,
-    required bool canEdit,
-    required IconData icon,
-    VoidCallback? onTap,
-    bool readOnly = false,
-  }) {
-    return TextField(
-      style: Theme.of(context).textTheme.bodyMedium,
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: labelText,
-        prefixIcon: Icon(icon, size: 18,),
-      ),
-      enabled: canEdit,
-      readOnly: readOnly,
-      onTap: onTap,
-    );
+    setEditAdminBeforeSaving();
+
+    String publishResult = await editUserAdmin.publishToDb(_imageFile);
+
+    if (publishResult == SystemConstants.successConst) {
+      _showSnackBar(AdminConstants.saveSuccess);
+      await getAdminsInfo(fromDB: false);
+      canEdit = false;
+      setTextFieldsOnDefault();
+    } else {
+      _showSnackBar(publishResult);
+    }
+
+    setState(() {
+      saving = false;
+    });
   }
 
   void _showSnackBar(String message){
@@ -581,7 +494,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    DateTime initial = editUserAdmin.birthDate;
+    DateTime initial = editUserAdmin.birthDate.year != 2100 ? editUserAdmin.birthDate : DateTime.now();
     if (selectedBirthDateOnEdit.year != 2100) initial = selectedBirthDateOnEdit;
 
     final DateTime? picked = await showDatePicker(

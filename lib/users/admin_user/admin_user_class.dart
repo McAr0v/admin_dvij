@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:admin_dvij/auth/auth_class.dart';
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/city_class.dart';
@@ -13,9 +12,10 @@ import 'package:admin_dvij/users/genders/gender_class.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
-
+import 'package:flutter/material.dart';
 import '../../database/database_class.dart';
 import '../../database/image_uploader.dart';
+import '../../design/app_colors.dart';
 
 class AdminUserClass implements IEntity<AdminUserClass> {
   String uid;
@@ -337,6 +337,96 @@ class AdminUserClass implements IEntity<AdminUserClass> {
 
     return sm.formatDateTimeToHumanView(birthDate);
 
+  }
+
+  CircleAvatar getAvatar (){
+    return CircleAvatar(
+      radius: 40,
+      backgroundColor: AppColors.greyOnBackground,
+      child: ClipOval(
+        child: FadeInImage(
+            placeholder: const AssetImage(SystemConstants.defaultImagePath),
+            image: NetworkImage(avatar),
+            fit: BoxFit.fill,
+            width: 100,
+            height: 100,
+            imageErrorBuilder: (context, error, stackTrace) {
+              return Image.asset(
+                SystemConstants.defaultImagePath, // Изображение ошибки
+                fit: BoxFit.cover,
+                width: 100,
+                height: 100,
+              );
+            },
+          ),
+      ),
+    );
+  }
+
+  Widget getInfoWidgetForProfile ({File? imageFile, required BuildContext context}){
+    return  Row(
+      children: [
+
+        CircleAvatar(
+          radius: 40,
+          backgroundColor: AppColors.greyOnBackground,
+          child: ClipOval(
+            child: imageFile != null
+                ? Image.file(
+              imageFile,
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+            )
+                : FadeInImage(
+              placeholder: const AssetImage(SystemConstants.defaultImagePath),
+              image: NetworkImage(avatar),
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+              imageErrorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  SystemConstants.defaultImagePath, // Изображение ошибки
+                  fit: BoxFit.cover,
+                  width: 100,
+                  height: 100,
+                );
+              },
+            ),
+          ),
+        ),
+
+        if (uid.isNotEmpty) const SizedBox(width: 20,),
+
+        if (uid.isNotEmpty) Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(getFullName()),
+                Text(
+                  '${calculateYears()}, ${adminRole.getNameOrDescOfRole(true)}',
+                  style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                ),
+
+                Row(
+                  children: [
+                    Text(
+                      AdminConstants.inTeamSince,
+                      style: Theme.of(context).textTheme.labelSmall!.copyWith(color: AppColors.greyText),
+                    ),
+                    Text(
+                      calculateExperienceTime(),
+                      style: Theme.of(context).textTheme.labelSmall!.copyWith(color: Colors.green),
+                    ),
+                  ],
+                ),
+
+              ],
+            )
+        ),
+
+      ],
+    );
   }
 
 }
