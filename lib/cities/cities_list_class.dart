@@ -114,7 +114,7 @@ class CitiesList implements IEntitiesList<City>{
   }
 
   @override
-  City getEntityFromList(String id){
+  City getEntityFromList(String id) {
     City returnedCity = City.empty();
 
     if (_allCitiesList.isNotEmpty){

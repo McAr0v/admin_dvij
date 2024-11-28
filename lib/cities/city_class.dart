@@ -33,7 +33,7 @@ class City implements IEntity<City>{
   }
 
   @override
-  Future<String> publishToDb() async{
+  Future<String> publishToDb(File? imageFile) async{
 
     DatabaseClass db = DatabaseClass();
 

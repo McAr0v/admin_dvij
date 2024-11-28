@@ -37,7 +37,7 @@ class _AccessPageState extends State<AccessPage> {
 
     currentAdmin = await currentAdmin.getCurrentUserFromDb();
 
-    if (currentAdmin.adminRole.adminRole != AdminRole.viewer){
+    if (currentAdmin.adminRole.adminRole != AdminRole.viewer && currentAdmin.adminRole.adminRole != AdminRole.notChosen){
       await navigateToProfile();
     }
 

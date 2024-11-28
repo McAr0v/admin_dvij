@@ -15,6 +15,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import '../../database/database_class.dart';
+import '../../database/image_uploader.dart';
 
 class AdminUserClass implements IEntity<AdminUserClass> {
   String uid;
@@ -55,7 +56,7 @@ class AdminUserClass implements IEntity<AdminUserClass> {
         birthDate: DateTime(2100),
         avatar: SystemConstants.defaultAvatar,
         registrationDate: DateTime(2100),
-      adminRole: AdminRoleClass(AdminRole.viewer),
+      adminRole: AdminRoleClass(AdminRole.notChosen),
       city: City.empty(),
       gender: Gender()
     );
@@ -149,6 +150,18 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     return _currentUser ?? AdminUserClass.empty();
   }
 
+  Future<AdminUserClass> getUserFromDownloadedList({required String uid, bool fromDb = false}) async{
+
+    AdminUsersListClass adminUsersListClass = AdminUsersListClass();
+
+    if (fromDb) {
+      await adminUsersListClass.getListFromDb();
+    }
+
+    return adminUsersListClass.getEntityFromList(uid);
+
+  }
+
   Future<AdminUserClass> getCurrentUser({bool fromDb = false}) async{
 
     if (_currentUser == null || _currentUser!.uid.isEmpty || fromDb) {
@@ -217,9 +230,14 @@ class AdminUserClass implements IEntity<AdminUserClass> {
   }
 
   @override
-  Future<String> publishToDb() async{
+  Future<String> publishToDb(File? imageFile) async{
 
     DatabaseClass db = DatabaseClass();
+    final ImageUploader imageUploader = ImageUploader();
+
+    // Переменная если будет загружаться изображение
+    String? postedImageUrl;
+
 
     // Если Id не задан
     if (uid == '') {
@@ -231,19 +249,27 @@ class AdminUserClass implements IEntity<AdminUserClass> {
       uid = adminUid ?? 'noUID_${getFullName()}';
     }
 
-    String path = '${AdminConstants.adminsPath}/$uid/${AdminConstants.adminsPath}';
+    String path = '${AdminConstants.adminsPath}/$uid/${AdminConstants.adminFolderInfo}';
 
-    Map <String, dynamic> cityData = getMap();
+    if (imageFile != null){
+
+      postedImageUrl = await imageUploader.uploadImage(uid, imageFile);
+
+    }
+
+    avatar = postedImageUrl ?? avatar;
+
+    Map <String, dynamic> userData = getMap();
 
     String result = '';
 
     if (!Platform.isWindows){
 
-      result = await db.publishToDB(path, cityData);
+      result = await db.publishToDB(path, userData);
 
     } else {
 
-      result = await db.publishToDBForWindows(path, cityData);
+      result = await db.publishToDBForWindows(path, userData);
 
     }
 
@@ -258,7 +284,6 @@ class AdminUserClass implements IEntity<AdminUserClass> {
 
   String calculateExperienceTime() {
     final now = DateTime.now();
-    final duration = now.difference(registrationDate);
 
     // Разбиваем Duration на годы, месяцы и дни
     int years = now.year - registrationDate.year;

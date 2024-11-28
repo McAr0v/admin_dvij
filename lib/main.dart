@@ -5,6 +5,7 @@ import 'package:admin_dvij/auth/log_in_screen.dart';
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/design/custom_theme.dart';
 import 'package:admin_dvij/main_page/main_screen.dart';
+import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,9 @@ Future<void> main() async {
 
   CitiesList citiesList = CitiesList();
   await citiesList.getListFromDb();
+
+  AdminUsersListClass adminsList = AdminUsersListClass();
+  await adminsList.getListFromDb();
 
   runApp(
       MyApp(currentUser: currentUser,)

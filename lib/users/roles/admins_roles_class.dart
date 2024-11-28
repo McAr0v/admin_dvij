@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 
 enum AdminRole {
   creator, // Создатель приложения. Его никак нельзя редактировать и удалять. Обаладает всеми правами доступа
@@ -7,6 +6,7 @@ enum AdminRole {
   advertiser, // Только создание и управление рекламными постами.
   editor, // Редактирование существующего контента (объявлений, постов).
   viewer, // Только просмотр данных без возможности их изменения.
+  notChosen // Не выбраная роль
 }
 
 class AdminRoleClass {
@@ -27,7 +27,9 @@ class AdminRoleClass {
         return AdminRoleClass(AdminRole.advertiser);
       case 'editor':
         return AdminRoleClass(AdminRole.editor);
-      default: return AdminRoleClass(AdminRole.viewer);
+      case 'viewer':
+        return AdminRoleClass(AdminRole.viewer);
+      default: return AdminRoleClass(AdminRole.notChosen);
     }
   }
 
@@ -56,7 +58,7 @@ class AdminRoleClass {
       case AdminRole.viewer:
         return 'viewer';
       default:
-        return 'viewer'; // На случай, если adminRole имеет неизвестное значение.
+        return 'notChosen'; // На случай, если adminRole имеет неизвестное значение.
     }
   }
 

@@ -141,7 +141,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
                           );
 
                           // Публикуем
-                          String result = await publishCity.publishToDb();
+                          String result = await publishCity.publishToDb(null);
 
                           if (result == SystemConstants.successConst){
 
