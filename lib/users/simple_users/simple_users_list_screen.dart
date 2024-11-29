@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:admin_dvij/constants/simple_users_constants.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
+import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/cupertino.dart';
@@ -184,11 +188,11 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
                                 child: Card(
                                   color: AppColors.greyOnBackground,
                                   child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
+                                    padding: const EdgeInsets.all(20),
                                     child: Row(
                                       children: [
 
-                                        //tempUser.getAvatar(),
+                                        tempUser.getAvatar(size: Platform.isWindows || Platform.isMacOS ? 40 : 30),
 
                                         const SizedBox(width: 20,),
 
@@ -196,15 +200,44 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
                                             child: Column(
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
-                                                Text(tempUser.getFullName()),
+                                                Row(
+                                                  children: [
+                                                    Text(tempUser.getFullName()),
+                                                    if (tempUser.getAdminRole().adminRole != AdminRole.notChosen) const SizedBox(width: 10,),
+                                                    if (tempUser.getAdminRole().adminRole != AdminRole.notChosen) const Icon(FontAwesomeIcons.circleCheck, size: 15, color: AppColors.greyText,),
+                                                  ],
+                                                ),
                                                 if (currentAdmin.uid == tempUser.uid) Text('Это вы', style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
                                                 const SizedBox(height: 5,),
                                                 Text(tempUser.email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                                                //Text(tempUser.adminRole.getNameOrDescOfRole(true), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-
+                                                Text(
+                                                  tempUser.getAdminRole().getNameOrDescOfRole(true),
+                                                  style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                                ),
                                               ],
+                                            ),
+                                        ),
+
+                                        if (tempUser.getAdminRole().adminRole == AdminRole.notChosen) IconButton(
+                                            onPressed: () async {
+                                              final results = await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => ProfileScreen(admin: tempUser.createAdminUserFromSimpleUser(), isCreate: true,),
+                                                ),
+                                              );
+
+                                              if (results != null) {
+                                                await initialization(fromDb: false);
+                                              }
+
+                                            },
+                                            icon: const Icon(
+                                              FontAwesomeIcons.userGear,
+                                              size: 15,
+                                              color: AppColors.brandColor,
                                             )
-                                        )
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -213,7 +246,7 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
 
                             }
                         )
-                    )
+                    ),
 
                   ],
                 ),

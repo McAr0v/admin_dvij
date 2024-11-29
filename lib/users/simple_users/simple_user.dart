@@ -1,14 +1,20 @@
 import 'dart:io';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
+import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
+import 'package:admin_dvij/users/admin_user/admins_list_screen.dart';
+import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 import '../../cities/cities_list_class.dart';
 import '../../cities/city_class.dart';
 import '../../constants/database_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 import '../../database/image_uploader.dart';
+import '../../design_elements/elements_of_design.dart';
 import '../genders/gender_class.dart';
 
 class SimpleUser extends IEntity{
@@ -240,5 +246,31 @@ class SimpleUser extends IEntity{
     return gender.toString(needTranslate: true);
   }
 
+  CircleAvatar getAvatar ({double size = 40}){
+    return ElementsOfDesign.getAvatar(url: avatar, size: size);
+  }
+
+  AdminRoleClass getAdminRole (){
+    AdminUsersListClass adminsListClass = AdminUsersListClass();
+
+    return adminsListClass.getAdminRoleFromList(uid);
+
+  }
+
+  AdminUserClass createAdminUserFromSimpleUser(){
+    return AdminUserClass(
+        uid: uid,
+        name: name,
+        lastName: lastName,
+        phone: phone,
+        email: email,
+        birthDate: birthDate,
+        avatar: avatar,
+        registrationDate: DateTime.now(),
+        adminRole: AdminRoleClass(AdminRole.notChosen),
+        city: city,
+        gender: gender
+    );
+  }
 
 }

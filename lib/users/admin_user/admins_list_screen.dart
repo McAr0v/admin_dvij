@@ -169,6 +169,10 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
                                       builder: (context) => ProfileScreen(admin: tempAdmin,),
                                     ),
                                   );
+
+                                  if (results != null) {
+                                    await initialization(fromDb: false);
+                                  }
                                 },
                                 child: Card(
                                   color: AppColors.greyOnBackground,

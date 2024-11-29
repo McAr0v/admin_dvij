@@ -1,5 +1,6 @@
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:flutter/material.dart';
+import '../constants/system_constants.dart';
 import '../design/app_colors.dart';
 
 class ElementsOfDesign {
@@ -106,6 +107,30 @@ class ElementsOfDesign {
         ),
       );
     }
+  }
+
+  static getAvatar({required String url, double size = 40}) {
+    return CircleAvatar(
+      radius: size,
+      backgroundColor: AppColors.greyOnBackground,
+      child: ClipOval(
+        child: FadeInImage(
+          placeholder: const AssetImage(SystemConstants.defaultImagePath),
+          image: NetworkImage(url),
+          fit: BoxFit.fill,
+          width: 100,
+          height: 100,
+          imageErrorBuilder: (context, error, stackTrace) {
+            return Image.asset(
+              SystemConstants.defaultImagePath, // Изображение ошибки
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+            );
+          },
+        ),
+      ),
+    );
   }
 
   static Widget buildTextField({

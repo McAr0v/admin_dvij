@@ -5,6 +5,7 @@ import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/constants/admins_constants.dart';
 import 'package:admin_dvij/constants/database_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
@@ -296,30 +297,38 @@ class AdminUserClass implements IEntity<AdminUserClass> {
   String calculateExperienceTime() {
     final now = DateTime.now();
 
-    // Разбиваем Duration на годы, месяцы и дни
-    int years = now.year - registrationDate.year;
-    int months = now.month - registrationDate.month;
-    int days = now.day - registrationDate.day;
+    SystemMethodsClass systemMethods = SystemMethodsClass();
 
-    // Корректируем отрицательные значения для месяцев и дней
-    if (days < 0) {
-      final previousMonth = DateTime(now.year, now.month - 1, registrationDate.day);
-      days = now.difference(previousMonth).inDays;
-      months -= 1;
+    if (systemMethods.isSameDay(registrationDate, now)){
+      return '0 дней';
+    } else {
+      // Разбиваем Duration на годы, месяцы и дни
+      int years = now.year - registrationDate.year;
+      int months = now.month - registrationDate.month;
+      int days = now.day - registrationDate.day;
+
+      // Корректируем отрицательные значения для месяцев и дней
+      if (days < 0) {
+        final previousMonth = DateTime(now.year, now.month - 1, registrationDate.day);
+        days = now.difference(previousMonth).inDays;
+        months -= 1;
+      }
+
+      if (months < 0) {
+        years -= 1;
+        months += 12;
+      }
+
+      // Формируем строку
+      final yearsText = years > 0 ? '$years ${_pluralize(years, "год", "года", "лет")}' : '';
+      final monthsText = months > 0 ? '$months ${_pluralize(months, "месяц", "месяца", "месяцев")}' : '';
+      final daysText = days > 0 ? '$days ${_pluralize(days, "день", "дня", "дней")}' : '';
+
+      // Собираем строку с правильными пробелами
+      return [yearsText, monthsText, daysText].where((text) => text.isNotEmpty).join(', ');
     }
 
-    if (months < 0) {
-      years -= 1;
-      months += 12;
-    }
 
-    // Формируем строку
-    final yearsText = years > 0 ? '$years ${_pluralize(years, "год", "года", "лет")}' : '';
-    final monthsText = months > 0 ? '$months ${_pluralize(months, "месяц", "месяца", "месяцев")}' : '';
-    final daysText = days > 0 ? '$days ${_pluralize(days, "день", "дня", "дней")}' : '';
-
-    // Собираем строку с правильными пробелами
-    return [yearsText, monthsText, daysText].where((text) => text.isNotEmpty).join(', ');
   }
 
   String _pluralize(int number, String singular, String pluralFew, String pluralMany) {
@@ -332,13 +341,17 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     final now = DateTime.now();
     int years = now.year - birthDate.year;
 
-    // Проверяем, прошел ли полный год
-    if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
-      years--;
-    }
+    if (years <= 0){
+      return 'Дата рождения не выбрана';
+    } else {
+      // Проверяем, прошел ли полный год
+      if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
+        years--;
+      }
 
-    // Определяем правильное склонение слова "год"
-    return '$years ${_pluralize(years, "год", "года", "лет")}';
+      // Определяем правильное склонение слова "год"
+      return '$years ${_pluralize(years, "год", "года", "лет")}';
+    }
   }
 
 
@@ -350,28 +363,9 @@ class AdminUserClass implements IEntity<AdminUserClass> {
 
   }
 
-  CircleAvatar getAvatar (){
-    return CircleAvatar(
-      radius: 40,
-      backgroundColor: AppColors.greyOnBackground,
-      child: ClipOval(
-        child: FadeInImage(
-            placeholder: const AssetImage(SystemConstants.defaultImagePath),
-            image: NetworkImage(avatar),
-            fit: BoxFit.fill,
-            width: 100,
-            height: 100,
-            imageErrorBuilder: (context, error, stackTrace) {
-              return Image.asset(
-                SystemConstants.defaultImagePath, // Изображение ошибки
-                fit: BoxFit.cover,
-                width: 100,
-                height: 100,
-              );
-            },
-          ),
-      ),
-    );
+
+  CircleAvatar getAvatar ({double size = 40}){
+    return ElementsOfDesign.getAvatar(url: avatar, size: size);
   }
 
   Widget getInfoWidgetForProfile ({File? imageFile, required BuildContext context}){

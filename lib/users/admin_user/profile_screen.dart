@@ -6,6 +6,7 @@ import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
+import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:admin_dvij/users/genders/gender_picker.dart';
 import 'package:admin_dvij/users/roles/admin_picker.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
@@ -28,8 +29,9 @@ import '../genders/gender_class.dart';
 class ProfileScreen extends StatefulWidget {
 
   final AdminUserClass? admin;
+  final bool isCreate;
 
-  const ProfileScreen({this.admin, Key? key}) : super(key: key);
+  const ProfileScreen({this.admin, this.isCreate = false, Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -63,6 +65,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   AdminRoleClass chosenAdminRole = AdminRoleClass(AdminRole.notChosen);
   Gender chosenAdminGender = Gender();
   File? _imageFile;
+  AdminUsersListClass adminsListClass = AdminUsersListClass();
 
   bool loading = false;
   bool logOuting = false;
@@ -130,6 +133,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (widget.admin == null) {
       // подгружаем данные в переменную редактируемого пользователя
       editUserAdmin = currentUserAdmin;
+    } else if (
+    widget.admin != null
+        && widget.isCreate
+        && adminsListClass.getAdminRoleFromList(widget.admin!.uid).adminRole == AdminRole.notChosen
+    ) {
+      // Если админа создают, то передаем ему переданного пользователя
+      editUserAdmin = widget.admin!;
     } else {
       // Если пользователь редактирует не себя, то подружаем данные из сохраненного списка пользователей
       editUserAdmin = await editUserAdmin.getUserFromDownloadedList(uid: widget.admin!.uid, fromDb: fromDB);
@@ -156,7 +166,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text(
             widget.admin == null
                 ? ScreenConstants.profilePage
-                : editUserAdmin.uid.isNotEmpty
+                : !widget.isCreate
                 ? '${ScreenConstants.profilePage} ${editUserAdmin.getFullName()}'
                 : AdminConstants.createAdminHeadline
         ),
