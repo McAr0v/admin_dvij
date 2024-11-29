@@ -104,7 +104,9 @@ class AdminUsersListClass implements IEntitiesList<AdminUserClass>{
 
     adminsToReturn = adminsToReturn
         .where((admin) =>
-        admin.email.toLowerCase().contains(query.toLowerCase())).toList();
+        admin.email.toLowerCase().contains(query.toLowerCase())
+            || admin.getFullName().toLowerCase().contains(query.toLowerCase())
+    ).toList();
 
     return adminsToReturn;
   }

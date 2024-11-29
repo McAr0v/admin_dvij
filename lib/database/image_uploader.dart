@@ -10,7 +10,7 @@ class ImageUploader {
   // Инициализируем Storage
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  Future<String?> uploadImage(String entityId, File pickedFile) async {
+  Future<String?> uploadImage({required String entityId, required File pickedFile, required String folder}) async {
 
     ImagePickerService imagePickerService = ImagePickerService();
 
@@ -19,7 +19,7 @@ class ImageUploader {
 
     // Ссылка на ваш объект в Firebase Storage
 
-    final storageRef = _storage.ref().child(DatabaseConstants.adminsFolder).child(entityId).child('image_$entityId.jpeg');
+    final storageRef = _storage.ref().child(folder).child(entityId).child('image_$entityId.jpeg');
 
     // Выгружаем изображение
     final uploadTask = storageRef.putFile(File(compressedImage.path));
@@ -32,9 +32,9 @@ class ImageUploader {
     return downloadURL;
   }
 
-  Future<String> removeImage(String entityId) async {
+  Future<String> removeImage({required String entityId, required String folder}) async {
 
-    final storageRef = _storage.ref().child(DatabaseConstants.adminsFolder).child(entityId).child('image_$entityId.jpeg');
+    final storageRef = _storage.ref().child(folder).child(entityId).child('image_$entityId.jpeg');
 
     try {
       await storageRef.delete();

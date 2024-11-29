@@ -192,10 +192,17 @@ class AdminUserClass implements IEntity<AdminUserClass> {
   @override
   Future<String> deleteFromDb() async{
     DatabaseClass db = DatabaseClass();
+    final ImageUploader imageUploader = ImageUploader();
 
     String path = '${AdminConstants.adminsPath}/$uid/';
 
     String result = '';
+
+    // Удаляем картинку
+    await imageUploader.removeImage(
+      folder: AdminConstants.adminsPath,
+      entityId: uid
+    );
 
     if (!Platform.isWindows){
       result =  await db.deleteFromDb(path);
@@ -246,14 +253,18 @@ class AdminUserClass implements IEntity<AdminUserClass> {
 
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
-      uid = adminUid ?? 'noUID_${getFullName()}';
+      uid = adminUid ?? 'noUID_$email';
     }
 
     String path = '${AdminConstants.adminsPath}/$uid/${AdminConstants.adminFolderInfo}';
 
     if (imageFile != null){
 
-      postedImageUrl = await imageUploader.uploadImage(uid, imageFile);
+      postedImageUrl = await imageUploader.uploadImage(
+        entityId: uid,
+        pickedFile: imageFile,
+        folder: AdminConstants.adminsPath
+      );
 
     }
 

@@ -11,5 +11,8 @@ class DatabaseConstants {
   static const String adminRole = 'adminRole';
   static const String city = 'city';
   static const String gender = 'gender';
-  static const String adminsFolder = 'admins';
+  static const String whatsapp = 'whatsapp';
+  static const String telegram = 'telegram';
+  static const String instagram = 'instagram';
+
 }
