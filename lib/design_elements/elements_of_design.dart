@@ -1,5 +1,6 @@
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/system_constants.dart';
 import '../design/app_colors.dart';
 
@@ -194,6 +195,52 @@ class ElementsOfDesign {
           ],
         );
       },
+    );
+  }
+
+  static Container getSearchBar({
+    required BuildContext context,
+    required TextEditingController textController,
+    TextInputType textInputType = TextInputType.text,
+    required String labelText,
+    required IconData icon,
+    required ValueChanged<String> onChanged,
+    required VoidCallback onClean
+  }){
+    return Container(
+      padding: const EdgeInsets.all(10),
+      child: Row(
+        children: [
+
+          // Форма ввода названия
+          Expanded(
+            child: TextField(
+              style: Theme.of(context).textTheme.bodyMedium,
+              keyboardType: textInputType,
+              controller: textController,
+              decoration: InputDecoration(
+                labelText: labelText,
+                prefixIcon: Icon(
+                    icon,
+                  size: 18,
+                ),
+              ),
+              onChanged: onChanged
+            ),
+          ),
+
+          if (textController.text.isNotEmpty) const SizedBox(width: 20,),
+
+          // Кнопка сброса
+          if (textController.text.isNotEmpty) IconButton(
+              onPressed: onClean,
+              icon: const Icon(
+                FontAwesomeIcons.x,
+                size: 15,
+              )
+          ),
+        ],
+      ),
     );
   }
 

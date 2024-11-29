@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 
 class SystemMethodsClass {
   SystemMethodsClass();
@@ -23,6 +24,29 @@ class SystemMethodsClass {
     return date1.year == date2.year &&
         date1.month == date2.month &&
         date1.day == date2.day;
+  }
+
+  Future<dynamic> pushToPageWithResult({required BuildContext context, dynamic page}) async{
+    return await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => page,
+      ),
+    );
+  }
+
+  void popBackToPreviousPageWithResult({required BuildContext context, dynamic result}){
+    Navigator.of(context).pop(result);
+  }
+
+  Future<void> pushAndDeletePreviousPages({required BuildContext context, dynamic page}) async {
+    await Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (context) => page,
+        ),
+            (_) => false
+    );
   }
 
 

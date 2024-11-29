@@ -1,14 +1,13 @@
 import 'dart:io';
-
+import 'package:admin_dvij/constants/admins_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../../constants/screen_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../constants/users_constants.dart';
@@ -32,6 +31,8 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
 
   AdminUserClass currentAdmin = AdminUserClass.empty();
 
+  SystemMethodsClass systemMethods = SystemMethodsClass();
+
   bool loading = false;
   bool upSorting = false;
 
@@ -41,6 +42,27 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
   void initState() {
     initialization();
     super.initState();
+  }
+
+  void sorting () {
+    setState(() {
+      upSorting = !upSorting;
+      usersList.sortUsersForEmail(upSorting);
+    });
+
+  }
+
+  Future<void> createAdmin(SimpleUser user) async{
+
+    final results = await systemMethods.pushToPageWithResult(
+        context: context,
+        page: ProfileScreen(admin: user.createAdminUserFromSimpleUser(), isCreate: true,)
+    );
+
+    if (results != null) {
+      await initialization(fromDb: false);
+    }
+
   }
 
   Future<void>initialization({bool fromDb = false}) async{
@@ -82,7 +104,6 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
           // Кнопка "Обновить"
           IconButton(
             onPressed: () async {
-              //await initData(fromDb: true);
               await initialization(fromDb: true);
             },
             icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
@@ -91,18 +112,10 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
           // Кнопка "Сорировать"
           IconButton(
             onPressed: (){
-              //sorting();
+              sorting();
             },
             icon: Icon(upSorting ? FontAwesomeIcons.sortUp : FontAwesomeIcons.sortDown, size: 15, color: AppColors.white,),
           ),
-
-          // Кнопка "Создать"
-          /*IconButton(
-            onPressed: () async {
-              await createAdmin();
-            },
-            icon: const Icon(FontAwesomeIcons.plus, size: 15, color: AppColors.white,),
-          ),*/
         ],
       ),
       body: Stack(
@@ -113,47 +126,23 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
 
               // ПОЛЕ ПОИСКА
 
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  children: [
-
-                    // Форма ввода названия
-                    Expanded(
-                      child: TextField(
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        keyboardType: TextInputType.text,
-                        controller: adminEmailController,
-                        decoration: const InputDecoration(
-                          labelText: UserConstants.email,
-                          prefixIcon: Icon(Icons.place),
-                        ),
-                        onChanged: (value){
-                          setState(() {
-                            adminEmailController.text = value;
-                            usersList = usersListClass.searchElementInList(adminEmailController.text);
-                          });
-                        },
-                      ),
-                    ),
-
-                    if (adminEmailController.text.isNotEmpty) const SizedBox(width: 20,),
-
-                    // Кнопка сброса
-                    if (adminEmailController.text.isNotEmpty) IconButton(
-                        onPressed: () async {
-                          usersList = await usersListClass.getDownloadedList(fromDb: false);
-                          setState(() {
-                            adminEmailController.text = '';
-                          });
-                        },
-                        icon: const Icon(
-                          FontAwesomeIcons.x,
-                          size: 15,
-                        )
-                    ),
-                  ],
-                ),
+              ElementsOfDesign.getSearchBar(
+                  context: context,
+                  textController: adminEmailController,
+                  labelText: SystemConstants.inputNameOrEmail,
+                  icon: FontAwesomeIcons.envelope,
+                  onChanged: (value){
+                    setState(() {
+                      adminEmailController.text = value;
+                      usersList = usersListClass.searchElementInList(adminEmailController.text);
+                    });
+                  },
+                  onClean: () async {
+                    usersList = await usersListClass.getDownloadedList(fromDb: false);
+                    setState(() {
+                      adminEmailController.text = '';
+                    });
+                  }
               ),
 
               // СПИСОК
@@ -207,7 +196,7 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
                                                     if (tempUser.getAdminRole().adminRole != AdminRole.notChosen) const Icon(FontAwesomeIcons.circleCheck, size: 15, color: AppColors.greyText,),
                                                   ],
                                                 ),
-                                                if (currentAdmin.uid == tempUser.uid) Text('Это вы', style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
+                                                if (currentAdmin.uid == tempUser.uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
                                                 const SizedBox(height: 5,),
                                                 Text(tempUser.email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
                                                 Text(
@@ -220,17 +209,7 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
 
                                         if (tempUser.getAdminRole().adminRole == AdminRole.notChosen) IconButton(
                                             onPressed: () async {
-                                              final results = await Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => ProfileScreen(admin: tempUser.createAdminUserFromSimpleUser(), isCreate: true,),
-                                                ),
-                                              );
-
-                                              if (results != null) {
-                                                await initialization(fromDb: false);
-                                              }
-
+                                              await createAdmin(tempUser);
                                             },
                                             icon: const Icon(
                                               FontAwesomeIcons.userGear,

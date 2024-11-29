@@ -62,8 +62,30 @@ class AdminRoleClass {
     }
   }
 
+  /// Метод выдачи доступа на редактирование пользователей
   bool accessToEditUsers(){
     if (adminRole == AdminRole.creator || adminRole == AdminRole.superAdmin) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /// Метод разрешения для создателя редактировать все
+  bool accessToAll(){
+    if (adminRole == AdminRole.creator) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /// Метод разрешения на редактирование текущего пользователя
+  /// <br><br>
+  /// Вернет true если пользователь не создатель. Создателя нельзя редактировать никому
+  /// кроме создателя
+  bool accessToEditingCurrentAdminUser(){
+    if (adminRole != AdminRole.creator) {
       return true;
     } else {
       return false;

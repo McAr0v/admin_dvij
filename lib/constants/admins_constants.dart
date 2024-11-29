@@ -7,6 +7,7 @@ class AdminConstants{
   static const String saveSuccess = 'Пользователь успешно сохранен!';
   static const String createAdminHeadline = 'Создание пользователя';
   static const String adminsLoading = 'Загрузка списка администраторов';
+  static const String itsYou = 'Это вы';
 
   static const String signOutHeadline = 'Выход из профиля';
   static const String signOutDesc = 'Вы действительно хотите выйти из текущего профиля?';

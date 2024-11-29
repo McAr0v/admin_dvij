@@ -4,13 +4,14 @@ import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:admin_dvij/users/admin_user/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import '../../constants/city_constants.dart';
 import '../../constants/screen_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../constants/users_constants.dart';
 import '../../design/app_colors.dart';
 import '../../design/loading_screen.dart';
+import '../../design_elements/elements_of_design.dart';
 import '../../navigation/drawer_custom.dart';
+import '../../system_methods/system_methods_class.dart';
 
 class AdminsListScreen extends StatefulWidget {
   const AdminsListScreen({Key? key}) : super(key: key);
@@ -25,6 +26,8 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
   List<AdminUserClass> adminsList = [];
 
   AdminUserClass currentAdmin = AdminUserClass.empty();
+
+  SystemMethodsClass systemMethods = SystemMethodsClass();
 
   bool loading = false;
   bool upSorting = false;
@@ -58,6 +61,14 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
 
   }
 
+  void sorting () {
+    setState(() {
+      upSorting = !upSorting;
+      adminsList.sortAdminsForEmail(upSorting);
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +78,6 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
           // Кнопка "Обновить"
           IconButton(
             onPressed: () async {
-              //await initData(fromDb: true);
               await initialization(fromDb: true);
             },
             icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
@@ -76,18 +86,10 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
           // Кнопка "Сорировать"
           IconButton(
             onPressed: (){
-              //sorting();
+              sorting();
             },
             icon: Icon(upSorting ? FontAwesomeIcons.sortUp : FontAwesomeIcons.sortDown, size: 15, color: AppColors.white,),
           ),
-
-          // Кнопка "Создать"
-          /*IconButton(
-            onPressed: () async {
-              await createAdmin();
-            },
-            icon: const Icon(FontAwesomeIcons.plus, size: 15, color: AppColors.white,),
-          ),*/
         ],
       ),
       body: Stack(
@@ -98,47 +100,23 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
 
               // ПОЛЕ ПОИСКА
 
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  children: [
-
-                    // Форма ввода названия
-                    Expanded(
-                      child: TextField(
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        keyboardType: TextInputType.text,
-                        controller: adminEmailController,
-                        decoration: const InputDecoration(
-                          labelText: UserConstants.email,
-                          prefixIcon: Icon(Icons.place),
-                        ),
-                        onChanged: (value){
-                          setState(() {
-                            adminEmailController.text = value;
-                            adminsList = adminsListClass.searchElementInList(adminEmailController.text);
-                          });
-                        },
-                      ),
-                    ),
-
-                    if (adminEmailController.text.isNotEmpty) const SizedBox(width: 20,),
-
-                    // Кнопка сброса
-                    if (adminEmailController.text.isNotEmpty) IconButton(
-                        onPressed: () async {
-                          adminsList = await adminsListClass.getDownloadedList(fromDb: false);
-                          setState(() {
-                            adminEmailController.text = '';
-                          });
-                        },
-                        icon: const Icon(
-                          FontAwesomeIcons.x,
-                          size: 15,
-                        )
-                    ),
-                  ],
-                ),
+              ElementsOfDesign.getSearchBar(
+                context: context,
+                textController: adminEmailController,
+                labelText: SystemConstants.inputNameOrEmail,
+                icon: FontAwesomeIcons.envelope,
+                onChanged: (value){
+                  setState(() {
+                    adminEmailController.text = value;
+                    adminsList = adminsListClass.searchElementInList(adminEmailController.text);
+                  });
+                },
+                onClean: () async {
+                  adminsList = await adminsListClass.getDownloadedList(fromDb: false);
+                  setState(() {
+                    adminEmailController.text = '';
+                  });
+                },
               ),
 
               // СПИСОК
@@ -163,16 +141,7 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
 
                               return GestureDetector(
                                 onTap: () async {
-                                  final results = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ProfileScreen(admin: tempAdmin,),
-                                    ),
-                                  );
-
-                                  if (results != null) {
-                                    await initialization(fromDb: false);
-                                  }
+                                  await editAdmin(tempAdmin);
                                 },
                                 child: Card(
                                   color: AppColors.greyOnBackground,
@@ -190,7 +159,7 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
                                               crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 Text(tempAdmin.getFullName()),
-                                                if (currentAdmin.uid == tempAdmin.uid) Text('Это вы', style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
+                                                if (currentAdmin.uid == tempAdmin.uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
                                                 const SizedBox(height: 5,),
                                                 Text(tempAdmin.email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
                                                 Text(tempAdmin.adminRole.getNameOrDescOfRole(true), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
@@ -219,34 +188,20 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
     );
   }
 
-  Future<void> createAdmin() async{
+  Future<void> editAdmin(AdminUserClass admin) async{
 
     // Уходим на страницу создания / редактирования
     // Ждем результат с нее
 
-    final results = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProfileScreen(admin: AdminUserClass.empty(),),
-      ),
+    final results = await systemMethods.pushToPageWithResult(
+        context: context,
+        page: ProfileScreen(admin: admin)
     );
 
-    // Если результат есть
     if (results != null) {
-
-      setState(() {
-        loading = true;
-      });
-
-      // Обновляем список
-      await initialization();
-
-      setState(() {
-        loading = false;
-      });
-
-      _showSnackBar(AdminConstants.saveSuccess);
+      await initialization(fromDb: false);
     }
+
   }
 
   void sortingByEmail () {

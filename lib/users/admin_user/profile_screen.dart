@@ -25,7 +25,7 @@ import 'admin_user_class.dart';
 import '../genders/gender_class.dart';
 
 
-/// Если это страница НЕ ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ, то передавать админа не надо
+/// Если это страница ТЕКУЩЕГО ПОЛЬЗОВАТЕЛЯ, то передавать админа не надо
 class ProfileScreen extends StatefulWidget {
 
   final AdminUserClass? admin;
@@ -47,6 +47,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   SystemMethodsClass systemMethods = SystemMethodsClass();
   final ImagePickerService imagePickerService = ImagePickerService();
+  AdminUsersListClass adminsListClass = AdminUsersListClass();
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
@@ -65,7 +66,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   AdminRoleClass chosenAdminRole = AdminRoleClass(AdminRole.notChosen);
   Gender chosenAdminGender = Gender();
   File? _imageFile;
-  AdminUsersListClass adminsListClass = AdminUsersListClass();
 
   bool loading = false;
   bool logOuting = false;
@@ -134,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // подгружаем данные в переменную редактируемого пользователя
       editUserAdmin = currentUserAdmin;
     } else if (
-    widget.admin != null
+        widget.admin != null
         && widget.isCreate
         && adminsListClass.getAdminRoleFromList(widget.admin!.uid).adminRole == AdminRole.notChosen
     ) {
@@ -147,10 +147,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     // Сбрасываем значения переменных для изменений в исходное состояние
     setTextFieldsOnDefault();
-
-    if (editUserAdmin.uid.isEmpty){
-      canEdit = true;
-    }
 
     setState(() {
       loading = false;
@@ -177,7 +173,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         leading: widget.admin != null ? IconButton(
           icon: const Icon(FontAwesomeIcons.chevronLeft, size: 18,),
           onPressed: () {
-            Navigator.of(context).pop(true);
+            systemMethods.popBackToPreviousPageWithResult(context: context, result: true);
           },
         ) : null,
 
@@ -185,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Иконка обновления данных. Доступна если это не создание пользователя
 
-          if (editUserAdmin.uid.isNotEmpty) IconButton(
+          IconButton(
             onPressed: () async {
               await getAdminsInfo(fromDB: true);
             },
@@ -194,9 +190,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
           // Иконка редактирования. Доступна если у текущего пользователя есть доступ
           // Или редактируемый пользователь и есть текущий пользователь
-          // Если создание пользователя, то она не доступна
+          // И если редактируемый пользователь не создатель
+          // Или текущий пользователь создатель
+          // Т.е супер админ может зайти отредактировать всех, кроме создателя
+          // Создатель может вообще всех отредактировать
+          // Любой другой не сможет никого отредактировать, кроме себя самого
 
-          if ((currentUserAdmin.adminRole.accessToEditUsers() || currentUserAdmin.uid == editUserAdmin.uid) && editUserAdmin.uid.isNotEmpty) IconButton(
+          if (
+          (
+              currentUserAdmin.adminRole.accessToEditUsers()
+              || currentUserAdmin.uid == editUserAdmin.uid
+          )
+              && (
+              editUserAdmin.adminRole.accessToEditingCurrentAdminUser()
+                  || currentUserAdmin.adminRole.accessToAll()
+          )
+
+          ) IconButton(
             onPressed: () async {
               setState(() {
                 canEdit = true;
@@ -558,12 +568,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> navigateToLogIn()async {
-    await Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-          builder: (context) => const LogInScreen(),
-      ),
-        (_) => false
-    );
+    await systemMethods.pushAndDeletePreviousPages(context: context, page: const LogInScreen());
   }
 }
