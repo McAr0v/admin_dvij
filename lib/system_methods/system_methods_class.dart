@@ -49,6 +49,61 @@ class SystemMethodsClass {
     );
   }
 
+  String _pluralize(int number, String singular, String pluralFew, String pluralMany) {
+    if (number % 10 == 1 && number % 100 != 11) return singular;
+    if (number % 10 >= 2 && number % 10 <= 4 && (number % 100 < 10 || number % 100 >= 20)) return pluralFew;
+    return pluralMany;
+  }
 
+  String calculateYears(DateTime date) {
+    final now = DateTime.now();
+    int years = now.year - date.year;
+
+    if (years <= 0){
+      return 'Дата рождения не выбрана';
+    } else {
+      // Проверяем, прошел ли полный год
+      if (now.month < date.month || (now.month == date.month && now.day < date.day)) {
+        years--;
+      }
+      // Определяем правильное склонение слова "год"
+      return '$years ${_pluralize(years, "год", "года", "лет")}';
+    }
+  }
+
+  String calculateExperienceTime(DateTime date) {
+    final now = DateTime.now();
+
+    if (isSameDay(date, now)){
+      return '0 дней';
+    } else {
+      // Разбиваем Duration на годы, месяцы и дни
+      int years = now.year - date.year;
+      int months = now.month - date.month;
+      int days = now.day - date.day;
+
+      // Корректируем отрицательные значения для месяцев и дней
+      if (days < 0) {
+        final previousMonth = DateTime(now.year, now.month - 1, date.day);
+        days = now.difference(previousMonth).inDays;
+        months -= 1;
+      }
+
+      if (months < 0) {
+        years -= 1;
+        months += 12;
+      }
+
+      // Формируем строку
+      final yearsText = years > 0 ? '$years ${_pluralize(years, "год", "года", "лет")}' : '';
+      final monthsText = months > 0 ? '$months ${_pluralize(months, "месяц", "месяца", "месяцев")}' : '';
+      final daysText = days > 0 ? '$days ${_pluralize(days, "день", "дня", "дней")}' : '';
+
+      // Собираем строку с правильными пробелами
+      return [yearsText, monthsText, daysText].where((text) => text.isNotEmpty).join(', ');
+    }
+
+
+  }
 
 }

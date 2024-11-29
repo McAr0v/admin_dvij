@@ -8,4 +8,7 @@ class UserConstants{
   static const adminRole = 'Роль в приложении';
   static const gender = 'Пол';
   static const password = 'Пароль';
+  static const whatsapp = 'Whatsapp';
+  static const telegram = 'Telegram';
+  static const instagram = 'Instagram';
 }

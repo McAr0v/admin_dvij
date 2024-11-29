@@ -3,7 +3,6 @@ import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
-import 'package:admin_dvij/users/admin_user/admins_list_screen.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -14,7 +13,9 @@ import '../../constants/database_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 import '../../database/image_uploader.dart';
+import '../../design/app_colors.dart';
 import '../../design_elements/elements_of_design.dart';
+import '../../system_methods/system_methods_class.dart';
 import '../genders/gender_class.dart';
 
 class SimpleUser extends IEntity{
@@ -270,6 +271,73 @@ class SimpleUser extends IEntity{
         adminRole: AdminRoleClass(AdminRole.notChosen),
         city: city,
         gender: gender
+    );
+  }
+
+  String formatBirthDateTime() {
+
+    SystemMethodsClass sm = SystemMethodsClass();
+
+    return sm.formatDateTimeToHumanView(birthDate);
+
+  }
+
+  String calculateYears() {
+    SystemMethodsClass sm = SystemMethodsClass();
+
+    return sm.calculateYears(birthDate);
+
+  }
+
+  Widget getInfoWidgetForProfile ({File? imageFile, required BuildContext context}){
+    return  Row(
+      children: [
+
+        CircleAvatar(
+          radius: 40,
+          backgroundColor: AppColors.greyOnBackground,
+          child: ClipOval(
+            child: imageFile != null
+                ? Image.file(
+              imageFile,
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+            )
+                : FadeInImage(
+              placeholder: const AssetImage(SystemConstants.defaultImagePath),
+              image: NetworkImage(avatar),
+              fit: BoxFit.cover,
+              width: 100,
+              height: 100,
+              imageErrorBuilder: (context, error, stackTrace) {
+                return Image.asset(
+                  SystemConstants.defaultImagePath, // Изображение ошибки
+                  fit: BoxFit.cover,
+                  width: 100,
+                  height: 100,
+                );
+              },
+            ),
+          ),
+        ),
+
+        if (uid.isNotEmpty) const SizedBox(width: 20,),
+
+        if (uid.isNotEmpty) Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(getFullName()),
+                Text(
+                  calculateYears(),
+                  style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                ),
+              ],
+            )
+        ),
+
+      ],
     );
   }
 

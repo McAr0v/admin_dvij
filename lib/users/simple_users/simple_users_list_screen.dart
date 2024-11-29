@@ -5,6 +5,7 @@ import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
+import 'package:admin_dvij/users/simple_users/simple_user_screen.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -167,12 +168,15 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
 
                               return GestureDetector(
                                 onTap: () async {
-                                  /*final results = await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ProfileScreen(admin: tempUser,),
-                                    ),
-                                  );*/
+
+                                  final results = await systemMethods.pushToPageWithResult(
+                                      context: context,
+                                      page: SimpleUserScreen(simpleUser: tempUser)
+                                  );
+
+                                  if (results != null) {
+                                    await initialization(fromDb: false);
+                                  }
                                 },
                                 child: Card(
                                   color: AppColors.greyOnBackground,

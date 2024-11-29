@@ -7,6 +7,8 @@ class Gender {
     GenderEnum tempGender = GenderEnum.notChosen;
     switch (genderInString) {
       case 'man': tempGender = GenderEnum.man;
+      case 'male': tempGender = GenderEnum.man;
+      case 'female': tempGender = GenderEnum.woman;
       case 'woman': tempGender = GenderEnum.woman;
       default: tempGender = GenderEnum.notChosen;
     }
