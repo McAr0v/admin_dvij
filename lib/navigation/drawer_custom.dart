@@ -6,6 +6,7 @@ import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/main_page/main_screen.dart';
+import 'package:admin_dvij/users/simple_users/simple_users_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../design_elements/logo_view.dart';
@@ -86,6 +87,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ScreenConstants.adminsPage,
                 FontAwesomeIcons.userShield,
                 const AdminsListScreen(),
+                context
+            ),
+
+            ElementsOfDesign.drawerListElement(
+                ScreenConstants.usersPage,
+                FontAwesomeIcons.users,
+                const SimpleUsersListScreen(),
                 context
             ),
             
