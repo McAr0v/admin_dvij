@@ -1,9 +1,6 @@
-import 'dart:io';
-import 'package:admin_dvij/constants/admins_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
-import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_user_screen.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
@@ -165,65 +162,23 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
 
                               SimpleUser tempUser = usersList[index];
 
-                              return GestureDetector(
-                                onTap: () async {
+                              return tempUser.getUserCardInList(
+                                  context: context,
+                                  onTap: () async {
 
-                                  final results = await systemMethods.pushToPageWithResult(
-                                      context: context,
-                                      page: SimpleUserScreen(simpleUser: tempUser)
-                                  );
+                                    final results = await systemMethods.pushToPageWithResult(
+                                        context: context,
+                                        page: SimpleUserScreen(simpleUser: tempUser)
+                                    );
 
-                                  if (results != null) {
-                                    await initialization(fromDb: false);
-                                  }
-                                },
-                                child: Card(
-                                  color: AppColors.greyOnBackground,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: Row(
-                                      children: [
-
-                                        tempUser.getAvatar(size: Platform.isWindows || Platform.isMacOS ? 40 : 30),
-
-                                        const SizedBox(width: 20,),
-
-                                        Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Row(
-                                                  children: [
-                                                    Text(tempUser.getFullName()),
-                                                    if (tempUser.getAdminRole().adminRole != AdminRole.notChosen) const SizedBox(width: 10,),
-                                                    if (tempUser.getAdminRole().adminRole != AdminRole.notChosen) const Icon(FontAwesomeIcons.circleCheck, size: 15, color: AppColors.greyText,),
-                                                  ],
-                                                ),
-                                                if (currentAdmin.uid == tempUser.uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
-                                                const SizedBox(height: 5,),
-                                                Text(tempUser.email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                                                Text(
-                                                  tempUser.getAdminRole().getNameOrDescOfRole(true),
-                                                  style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                                                ),
-                                              ],
-                                            ),
-                                        ),
-
-                                        if (tempUser.getAdminRole().adminRole == AdminRole.notChosen) IconButton(
-                                            onPressed: () async {
-                                              await createAdmin(tempUser);
-                                            },
-                                            icon: const Icon(
-                                              FontAwesomeIcons.userGear,
-                                              size: 15,
-                                              color: AppColors.brandColor,
-                                            )
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                                    if (results != null) {
+                                      await initialization(fromDb: false);
+                                    }
+                                  },
+                                  createAdminFunc: () async {
+                                    await createAdmin(tempUser);
+                                  },
+                                  currentAdmin: currentAdmin
                               );
 
                             }

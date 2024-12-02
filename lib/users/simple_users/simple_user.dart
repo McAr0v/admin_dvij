@@ -7,8 +7,10 @@ import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../cities/cities_list_class.dart';
 import '../../cities/city_class.dart';
+import '../../constants/admins_constants.dart';
 import '../../constants/database_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
@@ -338,6 +340,63 @@ class SimpleUser extends IEntity{
         ),
 
       ],
+    );
+  }
+
+  Widget getUserCardInList ({
+    required BuildContext context,
+    required VoidCallback onTap,
+    required VoidCallback createAdminFunc,
+    required AdminUserClass currentAdmin
+  }){
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        color: AppColors.greyOnBackground,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+
+              getAvatar(size: Platform.isWindows || Platform.isMacOS ? 40 : 30),
+
+              const SizedBox(width: 20,),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(getFullName()),
+                        if (getAdminRole().adminRole != AdminRole.notChosen) const SizedBox(width: 10,),
+                        if (getAdminRole().adminRole != AdminRole.notChosen) const Icon(FontAwesomeIcons.circleCheck, size: 15, color: AppColors.greyText,),
+                      ],
+                    ),
+                    if (currentAdmin.uid == uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
+                    const SizedBox(height: 5,),
+                    Text(email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                    Text(
+                      getAdminRole().getNameOrDescOfRole(true),
+                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                    ),
+                  ],
+                ),
+              ),
+
+              if (getAdminRole().adminRole == AdminRole.notChosen) IconButton(
+                  onPressed: createAdminFunc,
+                  icon: const Icon(
+                    FontAwesomeIcons.userGear,
+                    size: 15,
+                    color: AppColors.brandColor,
+                  )
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

@@ -138,40 +138,12 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
 
                               AdminUserClass tempAdmin = adminsList[index];
 
-                              return GestureDetector(
-                                onTap: () async {
-                                  await editAdmin(tempAdmin);
-                                },
-                                child: Card(
-                                  color: AppColors.greyOnBackground,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20.0),
-                                    child: Row(
-                                      children: [
-
-                                        tempAdmin.getAvatar(),
-
-                                        const SizedBox(width: 20,),
-
-                                        Expanded(
-                                            child: Column(
-                                              crossAxisAlignment: CrossAxisAlignment.start,
-                                              children: [
-                                                Text(tempAdmin.getFullName()),
-                                                if (currentAdmin.uid == tempAdmin.uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
-                                                const SizedBox(height: 5,),
-                                                Text(tempAdmin.email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                                                Text(tempAdmin.adminRole.getNameOrDescOfRole(true), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-
-                                              ],
-                                            )
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                              return tempAdmin.getAdminCardInList(
+                                  onTap: () async {
+                                    await editAdmin(tempAdmin);
+                                  },
+                                  context: context
                               );
-
                             }
                         )
                     )

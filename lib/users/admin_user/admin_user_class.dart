@@ -389,4 +389,40 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     );
   }
 
+  Widget getAdminCardInList ({required VoidCallback onTap, required BuildContext context,  }){
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        color: AppColors.greyOnBackground,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Row(
+            children: [
+
+              getAvatar(),
+
+              const SizedBox(width: 20,),
+
+              Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(getFullName()),
+                      if (_currentUser != null && _currentUser!.uid == uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
+                      const SizedBox(height: 5,),
+                      Text(email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                      Text(adminRole.getNameOrDescOfRole(true), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+
+                    ],
+                  )
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+
+  }
+
 }
