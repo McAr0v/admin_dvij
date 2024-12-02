@@ -14,4 +14,6 @@ class CityConstants {
   static const String inputEditCityDesc = 'Измени название города и нажми кнопку "Сохранить"';
   static const String noCityName = 'Введите название города!';
   static const String cityAlreadyExists = 'Такой город уже есть!';
+  static const String citySearch = 'Поиск города...';
+  static const String cityNotChosen = 'Город не выбран';
 }

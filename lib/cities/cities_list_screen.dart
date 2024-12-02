@@ -7,6 +7,7 @@ import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/buttons_constants.dart';
@@ -29,6 +30,8 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
   bool upSorting = false;
 
   CitiesList citiesListManager = CitiesList();
+
+  SystemMethodsClass sm = SystemMethodsClass();
 
   final TextEditingController _cityNameController = TextEditingController();
 
@@ -73,7 +76,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
         title: const Text(ScreenConstants.citiesPage),
         actions: [
 
-          // КНОПКИ В APPBAR'е
+          // КНОПКИ В AppBar
 
           // Кнопка "Обновить"
           IconButton(
@@ -112,47 +115,23 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
 
               // ПОЛЕ ПОИСКА
 
-              Container(
-                padding: const EdgeInsets.all(10),
-                child: Row(
-                  children: [
-
-                    // Форма ввода названия
-                    Expanded(
-                      child: TextField(
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        keyboardType: TextInputType.text,
-                        controller: _cityNameController,
-                        decoration: const InputDecoration(
-                          labelText: CityConstants.cityNameForField,
-                          prefixIcon: Icon(Icons.place),
-                        ),
-                        onChanged: (value){
-                          setState(() {
-                            _cityNameController.text = value;
-                            citiesList = CitiesList().searchElementInList(_cityNameController.text);
-                          });
-                        },
-                      ),
-                    ),
-
-                    if (_cityNameController.text.isNotEmpty) const SizedBox(width: 20,),
-
-                    // Кнопка сброса
-                    if (_cityNameController.text.isNotEmpty) IconButton(
-                        onPressed: () async {
-                          citiesList = await citiesListManager.getDownloadedList(fromDb: false);
-                          setState(() {
-                            _cityNameController.text = '';
-                          });
-                        },
-                        icon: const Icon(
-                          FontAwesomeIcons.x,
-                          size: 15,
-                        )
-                    ),
-                  ],
-                ),
+              ElementsOfDesign.getSearchBar(
+                  context: context,
+                  textController: _cityNameController,
+                  labelText: CityConstants.cityNameForField,
+                  icon: FontAwesomeIcons.mapLocationDot,
+                  onChanged: (value){
+                    setState(() {
+                      _cityNameController.text = value;
+                      citiesList = CitiesList().searchElementInList(_cityNameController.text);
+                    });
+                  },
+                  onClean: () async {
+                    citiesList = await citiesListManager.getDownloadedList(fromDb: false);
+                    setState(() {
+                      _cityNameController.text = '';
+                    });
+                  }
               ),
 
               // СПИСОК
@@ -203,12 +182,7 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
     // Уходим на страницу создания / редактирования
     // Ждем результат с нее
 
-    final results = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CityCreateOrEditScreen(city: city),
-      ),
-    );
+    final results = await sm.pushToPageWithResult(context: context, page: CityCreateOrEditScreen(city: city));
 
     // Если результат есть
     if (results != null) {

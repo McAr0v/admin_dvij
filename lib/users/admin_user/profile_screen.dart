@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:admin_dvij/auth/log_in_screen.dart';
 import 'package:admin_dvij/constants/admins_constants.dart';
+import 'package:admin_dvij/constants/city_constants.dart';
+import 'package:admin_dvij/constants/date_constants.dart';
 import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
@@ -85,8 +87,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       nameController.text = editUserAdmin.name;
       lastnameController.text = editUserAdmin.lastName;
       phoneController.text = editUserAdmin.phone;
-      cityController.text = editUserAdmin.city.name.isNotEmpty ? editUserAdmin.city.name : 'Город не выбран';
-      birthDateController.text = editUserAdmin.birthDate.year != 2100 ? editUserAdmin.formatBirthDateTime() : 'Дата не выбрана' ;
+      cityController.text = editUserAdmin.city.name.isNotEmpty ? editUserAdmin.city.name : CityConstants.cityNotChosen;
+      birthDateController.text = editUserAdmin.birthDate.year != 2100 ? editUserAdmin.formatBirthDateTime() : DateConstants.noDate ;
       adminRoleController.text = editUserAdmin.adminRole.getNameOrDescOfRole(true);
       adminGenderController.text = editUserAdmin.gender.toString(needTranslate: true);
       chosenCityOnEdit = City.empty();
@@ -524,12 +526,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       initialDate: initial,
       firstDate: DateTime(1930),
       lastDate: DateTime.now(),
-      helpText: 'Выбранная дата',
-      cancelText: 'Отмена',
-      confirmText: 'Подтвердить',
+      helpText: DateConstants.chosenDate,
+      cancelText: ButtonsConstants.cancel,
+      confirmText: ButtonsConstants.ok,
       keyboardType: TextInputType.datetime,
       initialEntryMode: DatePickerEntryMode.inputOnly,
-      fieldLabelText: 'Ваша дата рождения',
+      fieldLabelText: DateConstants.yourBirthdayDate,
 
 
     );

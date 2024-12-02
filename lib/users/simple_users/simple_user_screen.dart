@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:admin_dvij/constants/city_constants.dart';
+import 'package:admin_dvij/constants/date_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
@@ -78,8 +80,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
       nameController.text = editUser.name;
       lastnameController.text = editUser.lastName;
       phoneController.text = editUser.phone;
-      cityController.text = editUser.city.name.isNotEmpty ? editUser.city.name : 'Город не выбран';
-      birthDateController.text = editUser.birthDate.year != 2100 ? editUser.formatBirthDateTime() : 'Дата не выбрана' ;
+      cityController.text = editUser.city.name.isNotEmpty ? editUser.city.name : CityConstants.cityNotChosen;
+      birthDateController.text = editUser.birthDate.year != 2100 ? editUser.formatBirthDateTime() : DateConstants.noDate ;
       genderController.text = editUser.gender.toString(needTranslate: true);
       chosenCityOnEdit = City.empty();
       selectedBirthDateOnEdit = DateTime(2100);
@@ -460,12 +462,12 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
       initialDate: initial,
       firstDate: DateTime(1930),
       lastDate: DateTime.now(),
-      helpText: 'Выбранная дата',
-      cancelText: 'Отмена',
-      confirmText: 'Подтвердить',
+      helpText: DateConstants.chosenDate,
+      cancelText: ButtonsConstants.cancel,
+      confirmText: ButtonsConstants.ok,
       keyboardType: TextInputType.datetime,
       initialEntryMode: DatePickerEntryMode.inputOnly,
-      fieldLabelText: 'Ваша дата рождения',
+      fieldLabelText: DateConstants.yourBirthdayDate,
 
 
     );

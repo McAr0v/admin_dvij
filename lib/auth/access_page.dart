@@ -4,6 +4,7 @@ import 'package:admin_dvij/constants/admins_constants.dart';
 import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ class AccessPage extends StatefulWidget {
 }
 
 class _AccessPageState extends State<AccessPage> {
+
+  SystemMethodsClass sm = SystemMethodsClass();
 
   AdminUserClass currentAdmin = AdminUserClass.empty();
 
@@ -37,8 +40,9 @@ class _AccessPageState extends State<AccessPage> {
 
     currentAdmin = await currentAdmin.getCurrentUserFromDb();
 
+    // Если у пользователя есть доступ, отправляем его на главную страницу
     if (currentAdmin.adminRole.adminRole != AdminRole.viewer && currentAdmin.adminRole.adminRole != AdminRole.notChosen){
-      await navigateToProfile();
+      await navigateToMainPage();
     }
 
     setState(() {
@@ -47,26 +51,16 @@ class _AccessPageState extends State<AccessPage> {
 
   }
 
-  Future<void> navigateToProfile()async {
+  Future<void> navigateToMainPage()async {
 
-    await Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const MainPageCustom()
-        ),
-            (_) => false
-    );
+    await sm.pushAndDeletePreviousPages(context: context, page: const MainPageCustom());
+
   }
 
   Future<void> navigateToLogIn()async {
 
-    await Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(
-            builder: (context) => const LogInScreen()
-        ),
-            (_) => false
-    );
+    await sm.pushAndDeletePreviousPages(context: context, page: const LogInScreen());
+
   }
 
   @override

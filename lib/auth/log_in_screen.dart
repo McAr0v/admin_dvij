@@ -6,6 +6,7 @@ import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/design_elements/logo_view.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 import '../constants/users_constants.dart';
 import '../database/database_class.dart';
@@ -21,6 +22,8 @@ class LogInScreen extends StatefulWidget {
 
 class _LogInScreenState extends State<LogInScreen> {
   AuthClass authClass = AuthClass();
+
+  SystemMethodsClass sm = SystemMethodsClass();
 
   bool _isObscured = true;
 
@@ -124,7 +127,7 @@ class _LogInScreenState extends State<LogInScreen> {
 
     if (uid != null && uid.isNotEmpty){
 
-      await navigateToProfile(uid);
+      await navigateToAccessPage(uid);
     }
 
     setState(() {
@@ -142,7 +145,7 @@ class _LogInScreenState extends State<LogInScreen> {
     );
   }
 
-  Future<void> navigateToProfile(String message)async {
+  Future<void> navigateToAccessPage(String message)async {
 
     if (emailController.text.isNotEmpty && passwordController.text.isNotEmpty){
 
@@ -156,15 +159,7 @@ class _LogInScreenState extends State<LogInScreen> {
       } else {
 
         // Если ошибок нет, переходи на главную страницу
-
-        await Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const AccessPage()
-            ),
-                (_) => false
-        );
-
+        await sm.pushAndDeletePreviousPages(context: context, page: const AccessPage());
       }
 
     } else {

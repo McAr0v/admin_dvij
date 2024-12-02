@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:admin_dvij/constants/date_constants.dart';
 import 'package:flutter/material.dart';
 
 class SystemMethodsClass {
@@ -60,7 +61,7 @@ class SystemMethodsClass {
     int years = now.year - date.year;
 
     if (years <= 0){
-      return 'Дата рождения не выбрана';
+      return DateConstants.noBirthDate;
     } else {
       // Проверяем, прошел ли полный год
       if (now.month < date.month || (now.month == date.month && now.day < date.day)) {

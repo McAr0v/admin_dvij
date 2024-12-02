@@ -30,8 +30,6 @@ class AuthClass{
     try {
       await auth.signOut();
 
-      // TODO Сделать автоматическое обнуление переменной с инфой о текущем пользователе
-
       return SystemConstants.successConst;
 
     } catch (e) {

@@ -7,6 +7,7 @@ import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 
 class CityCreateOrEditScreen extends StatefulWidget {
@@ -22,6 +23,8 @@ class CityCreateOrEditScreen extends StatefulWidget {
 class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
 
   CitiesList citiesList = CitiesList();
+
+  SystemMethodsClass sm = SystemMethodsClass();
 
   final TextEditingController _cityNameController = TextEditingController();
 
@@ -50,10 +53,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
 
   void navigateToCitiesListScreen() {
     // Метод возвращения на экран списка без результата
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const CitiesListScreen()),
-    );
+    sm.pushAndDeletePreviousPages(context: context, page: const CitiesListScreen());
   }
 
   @override
@@ -174,6 +174,6 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
   // Возвращение на экран списка с результатом
   void navigateToPreviousScreen(){
     List<dynamic> result = [true];
-    Navigator.of(context).pop(result);
+    sm.popBackToPreviousPageWithResult(context: context, result: result);
   }
 }

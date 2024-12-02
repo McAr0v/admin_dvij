@@ -1,3 +1,5 @@
+import 'package:admin_dvij/constants/gender_constants.dart';
+
 class Gender {
   GenderEnum gender;
 
@@ -6,10 +8,10 @@ class Gender {
   factory Gender.fromString(String genderInString){
     GenderEnum tempGender = GenderEnum.notChosen;
     switch (genderInString) {
-      case 'man': tempGender = GenderEnum.man;
+      case GenderConstants.man: tempGender = GenderEnum.man;
       case 'male': tempGender = GenderEnum.man;
       case 'female': tempGender = GenderEnum.woman;
-      case 'woman': tempGender = GenderEnum.woman;
+      case GenderConstants.woman: tempGender = GenderEnum.woman;
       default: tempGender = GenderEnum.notChosen;
     }
 
@@ -29,9 +31,9 @@ class Gender {
   @override
   String toString({bool needTranslate = false}) {
     switch (gender){
-      case GenderEnum.man: return needTranslate ? 'Мужчина' : 'man';
-      case GenderEnum.woman: return needTranslate ? 'Женщина' : 'woman';
-      case GenderEnum.notChosen: return needTranslate ? 'Пол не выбран' : 'notChosen';
+      case GenderEnum.man: return needTranslate ? GenderConstants.manHeadline : GenderConstants.man;
+      case GenderEnum.woman: return needTranslate ? GenderConstants.womanHeadline : GenderConstants.woman;
+      case GenderEnum.notChosen: return needTranslate ? GenderConstants.notChosenHeadline : GenderConstants.notChosen;
     }
   }
 

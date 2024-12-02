@@ -27,5 +27,10 @@ class SystemConstants {
   static const String noPassword = 'Поле с паролем не заполнено';
   static const String fillAllFields = 'Пожалуйста, заполните все поля';
   static const String inputNameOrEmail = 'Введи имя или Email для поиска';
+
+  static String requestAnswerNegative(String message){
+    return 'По запросу $message ничего не найдено';
+  }
+
 }
 

@@ -1,4 +1,6 @@
 
+import 'package:admin_dvij/constants/admin_role_constants.dart';
+
 enum AdminRole {
   creator, // Создатель приложения. Его никак нельзя редактировать и удалять. Обаладает всеми правами доступа
   superAdmin, // Полные права: управление пользователями, контентом, настройками и т.д.
@@ -17,17 +19,17 @@ class AdminRoleClass {
 
   factory AdminRoleClass.fromString(String adminRole){
     switch (adminRole) {
-      case 'creator':
+      case AdminRoleConstants.creator:
         return AdminRoleClass(AdminRole.creator);
-      case 'superAdmin':
+      case AdminRoleConstants.superAdmin:
         return AdminRoleClass(AdminRole.superAdmin);
-      case 'contentManager':
+      case AdminRoleConstants.contentManager:
         return AdminRoleClass(AdminRole.contentManager);
-      case 'advertiser':
+      case AdminRoleConstants.advertiser:
         return AdminRoleClass(AdminRole.advertiser);
-      case 'editor':
+      case AdminRoleConstants.editor:
         return AdminRoleClass(AdminRole.editor);
-      case 'viewer':
+      case AdminRoleConstants.viewer:
         return AdminRoleClass(AdminRole.viewer);
       default: return AdminRoleClass(AdminRole.notChosen);
     }
@@ -46,19 +48,19 @@ class AdminRoleClass {
   String toString() {
     switch (adminRole) {
       case AdminRole.creator:
-        return 'creator';
+        return AdminRoleConstants.creator;
       case AdminRole.superAdmin:
-        return 'superAdmin';
+        return AdminRoleConstants.superAdmin;
       case AdminRole.contentManager:
-        return 'contentManager';
+        return AdminRoleConstants.contentManager;
       case AdminRole.advertiser:
-        return 'advertiser';
+        return AdminRoleConstants.advertiser;
       case AdminRole.editor:
-        return 'editor';
+        return AdminRoleConstants.editor;
       case AdminRole.viewer:
-        return 'viewer';
+        return AdminRoleConstants.viewer;
       default:
-        return 'notChosen'; // На случай, если adminRole имеет неизвестное значение.
+        return AdminRoleConstants.notChosen; // На случай, если adminRole имеет неизвестное значение.
     }
   }
 
@@ -96,30 +98,30 @@ class AdminRoleClass {
     switch (adminRole) {
       case AdminRole.creator:
         return needHeadline
-            ? 'Создатель'
-            : 'Создатель приложения. Его никак нельзя редактировать и удалять. Обаладает всеми правами доступа';
+            ? AdminRoleConstants.creatorHeadline
+            : AdminRoleConstants.creatorDesc;
       case AdminRole.superAdmin:
         return needHeadline
-            ? 'Супер-админ'
-            : 'Полные права: управление пользователями, контентом, настройками и т.д.';
+            ? AdminRoleConstants.superAdminHeadline
+            : AdminRoleConstants.superAdminDesc;
       case AdminRole.contentManager:
         return needHeadline
-            ? 'Контент-менеджер'
-            : 'Создание и редактирование контента (постов, объявлений, рекламных материалов).';
+            ? AdminRoleConstants.contentManagerHeadline
+            : AdminRoleConstants.contentManagerDesc;
       case AdminRole.advertiser:
         return needHeadline
-            ? 'Рекламщик'
-            : 'Создание и управление рекламными постами.';
+            ? AdminRoleConstants.advertiserHeadline
+            : AdminRoleConstants.advertiserDesc;
       case AdminRole.editor:
         return needHeadline
-            ? 'Редактор'
-            : 'Редактирование существующего контента (объявлений, постов).';
+            ? AdminRoleConstants.editorHeadline
+            : AdminRoleConstants.editorDesc;
       case AdminRole.viewer:
         return needHeadline
-            ? 'Просмотр'
-            : 'Только просмотр данных без возможности их изменения.';
+            ? AdminRoleConstants.viewerHeadline
+            : AdminRoleConstants.viewerDesc;
       default:
-        return needHeadline ? 'Неизвестная роль' : 'Роль не определена.';
+        return needHeadline ? AdminRoleConstants.notChosenHeadline : AdminRoleConstants.notChosenDesc;
     }
   }
 

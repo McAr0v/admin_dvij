@@ -1,5 +1,7 @@
+import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:flutter/material.dart';
+import '../constants/system_constants.dart';
 import '../design/app_colors.dart';
 import 'cities_list_class.dart';
 import 'city_class.dart';
@@ -67,7 +69,7 @@ class _CityPickerPageState extends State<CityPickerPage> {
                 child: TextField(
                   controller: searchController,
                   decoration: const InputDecoration(
-                    hintText: 'Поиск города...',
+                    hintText: CityConstants.citySearch,
                   ),
                   onChanged: (value) {
                     updateFilteredCities(value);
@@ -76,7 +78,7 @@ class _CityPickerPageState extends State<CityPickerPage> {
               ),
               const SizedBox(height: 8.0),
               if (filteredCities.isEmpty) Expanded(
-                  child: Text('По запросу ${searchController.text} ничего не найдено')
+                  child: Text(SystemConstants.requestAnswerNegative(searchController.text))
               ),
 
               if (filteredCities.isNotEmpty) Expanded(
