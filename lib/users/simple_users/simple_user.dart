@@ -371,7 +371,7 @@ class SimpleUser extends IEntity{
                       children: [
                         Text(getFullName()),
                         if (getAdminRole().adminRole != AdminRole.notChosen) const SizedBox(width: 10,),
-                        if (getAdminRole().adminRole != AdminRole.notChosen) const Icon(FontAwesomeIcons.circleCheck, size: 15, color: AppColors.greyText,),
+                        if (getAdminRole().adminRole != AdminRole.notChosen) const Icon(FontAwesomeIcons.circleCheck, size: 15, color: Colors.green,),
                       ],
                     ),
                     if (currentAdmin.uid == uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
