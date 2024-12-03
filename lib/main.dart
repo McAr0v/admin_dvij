@@ -2,9 +2,11 @@ import 'dart:io';
 import 'package:admin_dvij/auth/access_page.dart';
 import 'package:admin_dvij/auth/auth_class.dart';
 import 'package:admin_dvij/auth/log_in_screen.dart';
+import 'package:admin_dvij/categories/event_categories/event_categories_list.dart';
+import 'package:admin_dvij/categories/place_categories/place_categories_list.dart';
+import 'package:admin_dvij/categories/promo_categories/promo_categories_list.dart';
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/design/custom_theme.dart';
-import 'package:admin_dvij/main_page/main_screen.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -40,6 +42,15 @@ Future<void> main() async {
 
   AdminUsersListClass adminsList = AdminUsersListClass();
   await adminsList.getListFromDb();
+
+  EventCategoriesList eventCategoriesList = EventCategoriesList();
+  await eventCategoriesList.getListFromDb();
+
+  PlaceCategoriesList placeCategoriesList = PlaceCategoriesList();
+  await placeCategoriesList.getListFromDb();
+
+  PromoCategoriesList promoCategoriesList = PromoCategoriesList();
+  await promoCategoriesList.getListFromDb();
 
   runApp(
       MyApp(currentUser: currentUser,)

@@ -2,10 +2,13 @@ import 'dart:io';
 import 'package:admin_dvij/categories/promo_categories/promo_categories_list.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../constants/categories_constants.dart';
 import '../../constants/database_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
+import '../../design/app_colors.dart';
 
 class PromoCategory implements IEntity{
   String id;
@@ -99,6 +102,49 @@ class PromoCategory implements IEntity{
     }
 
     return result;
+  }
+
+  Widget getWidgetElementInList({
+    required VoidCallback onEdit,
+    required VoidCallback onDelete,
+    required BuildContext context
+  }){
+    return Card(
+      color: AppColors.greyOnBackground,
+      margin: const EdgeInsets.symmetric(vertical: 5),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+        child: Row(
+          children: [
+
+            IconButton(
+              onPressed: onEdit,
+              icon: const Icon(FontAwesomeIcons.penToSquare, size: 15, color: AppColors.brandColor),
+            ),
+
+            const SizedBox(width: 20,),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(name, style: Theme.of(context).textTheme.bodyMedium,),
+                  const SizedBox(width: 20,),
+                  Text(id, style: Theme.of(context).textTheme.labelSmall,),
+
+                ],
+              ),
+            ),
+
+            IconButton(
+              onPressed: onDelete,
+              icon: const Icon(FontAwesomeIcons.trash, size: 15, color: AppColors.attentionRed,),
+            ),
+
+          ],
+        ),
+      ),
+    );
   }
 
 }
