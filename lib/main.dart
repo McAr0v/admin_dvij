@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:admin_dvij/ads/ad_class.dart';
+import 'package:admin_dvij/ads/ads_list_class.dart';
 import 'package:admin_dvij/auth/access_page.dart';
 import 'package:admin_dvij/auth/auth_class.dart';
 import 'package:admin_dvij/auth/log_in_screen.dart';
@@ -51,6 +53,14 @@ Future<void> main() async {
 
   PromoCategoriesList promoCategoriesList = PromoCategoriesList();
   await promoCategoriesList.getListFromDb();
+
+  AdsList adsList = AdsList();
+  List<AdClass> tempAds = await adsList.getListFromDb();
+
+  for (AdClass tempAd in tempAds) {
+    print(tempAd.headline);
+    print('------');
+  }
 
   runApp(
       MyApp(currentUser: currentUser,)

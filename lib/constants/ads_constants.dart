@@ -32,4 +32,7 @@ class AdsConstants{
   static const draftHeadline = 'Черновик';
   static const completedSystem = 'completed';
   static const completedHeadline = 'Завершено';
+
+  // database
+  static const adsFolder = 'ads';
 }

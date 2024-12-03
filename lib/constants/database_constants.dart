@@ -14,5 +14,18 @@ class DatabaseConstants {
   static const String whatsapp = 'whatsapp';
   static const String telegram = 'telegram';
   static const String instagram = 'instagram';
+  static const String headline = 'headline';
+  static const String desc = 'desc';
+  static const String url = 'url';
+  static const String imageUrl = 'imageUrl';
+  static const String startDate = 'startDate';
+  static const String endDate = 'endDate';
+  static const String location = 'location';
+  static const String adIndex = 'adIndex';
+  static const String adStatus = 'adStatus';
+  static const String clientPhone = 'clientPhone';
+  static const String clientName = 'clientName';
+  static const String clientWhatsapp = 'clientWhatsapp';
+  static const String ordersDate = 'ordersDate';
 
 }
