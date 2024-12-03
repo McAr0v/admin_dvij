@@ -81,7 +81,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
             ElementsOfDesign.drawerListElement(
                 ScreenConstants.citiesPage,
-                FontAwesomeIcons.marker,
+                FontAwesomeIcons.mapLocationDot,
                 const CitiesListScreen(),
                 context
             ),

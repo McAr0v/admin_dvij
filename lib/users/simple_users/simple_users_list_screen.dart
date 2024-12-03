@@ -127,7 +127,7 @@ class _SimpleUsersListScreenState extends State<SimpleUsersListScreen> {
                   context: context,
                   textController: adminEmailController,
                   labelText: SystemConstants.inputNameOrEmail,
-                  icon: FontAwesomeIcons.envelope,
+                  icon: FontAwesomeIcons.person,
                   onChanged: (value){
                     setState(() {
                       adminEmailController.text = value;
