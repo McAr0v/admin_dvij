@@ -1,41 +1,41 @@
 import 'dart:io';
-import 'package:admin_dvij/categories/event_categories/event_categories_list.dart';
-import 'package:admin_dvij/constants/categories_constants.dart';
+import 'package:admin_dvij/categories/promo_categories/promo_categories_list.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
+import '../../constants/categories_constants.dart';
 import '../../constants/database_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 
-class EventCategory implements IEntity {
+class PromoCategory implements IEntity{
   String id;
   String name;
 
-  EventCategory({required this.id, required this.name});
+  PromoCategory({required this.id, required this.name});
 
-  factory EventCategory.fromSnapshot({required DataSnapshot snapshot}) {
-    return EventCategory(
+  factory PromoCategory.fromSnapshot({required DataSnapshot snapshot}) {
+    return PromoCategory(
       id: snapshot.child(DatabaseConstants.id).value.toString(),
       name: snapshot.child(DatabaseConstants.name).value.toString(),
     );
   }
 
-  factory EventCategory.fromJson({required Map<String, dynamic> json}){
-    return EventCategory(
+  factory PromoCategory.fromJson({required Map<String, dynamic> json}){
+    return PromoCategory(
         id: json[DatabaseConstants.id] ?? '',
         name: json[DatabaseConstants.name] ?? ''
     );
   }
 
-  factory EventCategory.empty(){
-    return EventCategory(id: '', name: '');
+  factory PromoCategory.empty(){
+    return PromoCategory(id: '', name: '');
   }
 
   @override
-  Future<String> deleteFromDb() async{
+  Future<String> deleteFromDb() async {
     DatabaseClass db = DatabaseClass();
 
-    String path = '${CategoriesConstants.eventCategoryPath}/$id/';
+    String path = '${CategoriesConstants.promoCategoryPath}/$id/';
 
     String result = '';
 
@@ -47,9 +47,8 @@ class EventCategory implements IEntity {
 
     if (result == SystemConstants.successConst) {
       // Если удаление прошло успешно, удаляем из общего списка
-      EventCategoriesList eventsList = EventCategoriesList();
-      eventsList.deleteEntityFromDownloadedList(id);
-
+      PromoCategoriesList promoCategories = PromoCategoriesList();
+      promoCategories.deleteEntityFromDownloadedList(id);
     }
 
     return result;
@@ -64,7 +63,7 @@ class EventCategory implements IEntity {
   }
 
   @override
-  Future<String> publishToDb(File? imageFile) async {
+  Future<String> publishToDb(File? imageFile) async{
     DatabaseClass db = DatabaseClass();
 
     // Если Id не задан
@@ -77,7 +76,7 @@ class EventCategory implements IEntity {
       id = idCategory ?? 'noId_$name';
     }
 
-    String path = '${CategoriesConstants.eventCategoryPath}/$id';
+    String path = '${CategoriesConstants.promoCategoryPath}/$id';
 
     Map <String, dynamic> categoryData = getMap();
 
@@ -95,11 +94,11 @@ class EventCategory implements IEntity {
 
     if (result == SystemConstants.successConst) {
       // Если результат успешный, добавляем в общий сохраненный список
-      EventCategoriesList eventsList = EventCategoriesList();
-      eventsList.addToCurrentDownloadedList(this);
-
+      PromoCategoriesList promoCategories = PromoCategoriesList();
+      promoCategories.addToCurrentDownloadedList(this);
     }
 
     return result;
   }
+
 }
