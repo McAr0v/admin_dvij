@@ -4,6 +4,7 @@ enum AdLocationEnum {
   places,
   events,
   promos,
+  mainPage,
   notChosen
 }
 
@@ -22,6 +23,8 @@ class AdLocation {
         return !translate ? AdsConstants.promoLocation : AdsConstants.promoHeadline;
       case AdLocationEnum.events:
         return !translate ? AdsConstants.eventLocation : AdsConstants.eventHeadline;
+      case AdLocationEnum.mainPage:
+        return !translate ? AdsConstants.mainPageLocation : AdsConstants.mainPageHeadline;
       case AdLocationEnum.notChosen:
         return !translate ? AdsConstants.notChosenLocation : AdsConstants.notChosenHeadline;
     }
@@ -32,6 +35,7 @@ class AdLocation {
       case AdsConstants.placeLocation: return AdLocation(location: AdLocationEnum.places);
       case AdsConstants.promoLocation: return AdLocation(location: AdLocationEnum.promos);
       case AdsConstants.eventLocation: return AdLocation(location: AdLocationEnum.events);
+      case AdsConstants.mainPageLocation: return AdLocation(location: AdLocationEnum.mainPage);
       default: return AdLocation(location: AdLocationEnum.notChosen);
     }
   }

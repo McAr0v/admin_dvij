@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:admin_dvij/ads/ad_for_main_app_class.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_index.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_location.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_status.dart';
@@ -139,6 +140,13 @@ class AdClass implements IEntity{
 
     }
 
+    // Если удаляем со статусом "Активно" или "Завершено", то удаляем и запись из
+    // папки рекламы основного приложения
+    if (status.status == AdStatusEnum.active || status.status == AdStatusEnum.completed){
+      AdForMainApp adForMainApp = AdForMainApp.fromAdClass(adminAd: this);
+      result = await adForMainApp.deleteFromDb();
+    }
+
     return result;
   }
 
@@ -215,6 +223,13 @@ class AdClass implements IEntity{
       AdsList adsList = AdsList();
       adsList.addToCurrentDownloadedList(this);
 
+    }
+
+    // Публикуем копию для основного приложения с активной рекламой
+
+    if (status.status == AdStatusEnum.active){
+      AdForMainApp adForMainApp = AdForMainApp.fromAdClass(adminAd: this);
+      result = await adForMainApp.publishToDb(null);
     }
 
     return result;

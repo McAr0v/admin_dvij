@@ -3,10 +3,12 @@ class AdsConstants{
   static const placeLocation = 'places';
   static const eventLocation = 'events';
   static const promoLocation = 'promos';
+  static const mainPageLocation = 'main_page';
   static const notChosenLocation = 'notChosen';
   static const placeHeadline = 'В заведениях';
   static const eventHeadline = 'В мероприятиях';
   static const promoHeadline = 'В акциях';
+  static const mainPageHeadline = 'На главной странице';
   static const notChosenHeadline = 'Место не выбрано';
 
   // index
@@ -31,4 +33,5 @@ class AdsConstants{
 
   // database
   static const adsFolder = 'ads_for_admins';
+  static const adsForMainAppFolder = 'ads_for_users';
 }
