@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:admin_dvij/ads/ads_page.dart';
 import 'package:admin_dvij/categories/event_categories/event_categories_list_screen.dart';
 import 'package:admin_dvij/categories/place_categories/place_categories_list_screen.dart';
 import 'package:admin_dvij/categories/promo_categories/promo_categories_list_screen.dart';
@@ -120,7 +121,13 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 const PromoCategoriesListScreen(),
                 context
             ),
-            
+
+            ElementsOfDesign.drawerListElement(
+                ScreenConstants.adsPage,
+                FontAwesomeIcons.rectangleAd,
+                const AdsPage(),
+                context
+            ),
           ],
         ),
       ),

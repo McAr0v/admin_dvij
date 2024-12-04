@@ -8,6 +8,7 @@ class ScreenConstants {
   static const String eventsCategoriesPage = 'Категории мероприятий';
   static const String placeCategoriesPage = 'Категории заведений';
   static const String promoCategoriesPage = 'Категории акций';
+  static const String adsPage = 'Реклама';
 
 
 }

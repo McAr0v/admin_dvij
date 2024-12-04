@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:admin_dvij/ads/ad_class.dart';
+import 'package:admin_dvij/ads/ads_enums_class/ad_status.dart';
 import 'package:admin_dvij/constants/ads_constants.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -30,8 +31,18 @@ class AdsList implements IEntitiesList<AdClass>{
 
   @override
   bool checkEntityNameInList(String entity) {
-    // TODO: Прописать функцию сравнения периода дат, чтобы проверять, входит ли реклама в диапазон дат, в которых уже есть активная реклама
-    return false;
+    final now = DateTime.now(); // Текущее время
+
+    if (_currentAdsList.isNotEmpty){
+      AdClass tempAd = getEntityFromList(entity);
+
+      return now.isAfter(tempAd.startDate) || now.isAtSameMomentAs(tempAd.startDate) &&
+          now.isBefore(tempAd.endDate) || now.isAtSameMomentAs(tempAd.endDate);
+
+    } else {
+      return false;
+    }
+
   }
 
   @override
@@ -133,6 +144,55 @@ class AdsList implements IEntitiesList<AdClass>{
     _currentAdsList = [];
     _currentAdsList = list;
   }
+
+  Future<List<AdClass>> getActiveAds({bool fromDb = false}) async {
+    List<AdClass> tempList = [];
+
+    if (_currentAdsList.isEmpty || fromDb){
+      await getListFromDb();
+    }
+
+    for (AdClass ad in _currentAdsList){
+      if (ad.status.status == AdStatusEnum.active){
+        tempList.add(ad);
+      }
+    }
+
+    return tempList;
+  }
+
+  Future<List<AdClass>> getDraftAds({bool fromDb = false}) async {
+    List<AdClass> tempList = [];
+
+    if (_currentAdsList.isEmpty || fromDb){
+      await getListFromDb();
+    }
+
+    for (AdClass ad in _currentAdsList){
+      if (ad.status.status == AdStatusEnum.draft){
+        tempList.add(ad);
+      }
+    }
+
+    return tempList;
+  }
+
+  Future<List<AdClass>> getCompletedAds({bool fromDb = false}) async {
+    List<AdClass> tempList = [];
+
+    if (_currentAdsList.isEmpty || fromDb){
+      await getListFromDb();
+    }
+
+    for (AdClass ad in _currentAdsList){
+      if (ad.status.status == AdStatusEnum.completed){
+        tempList.add(ad);
+      }
+    }
+
+    return tempList;
+  }
+
 
 }
 

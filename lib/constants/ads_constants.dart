@@ -24,14 +24,12 @@ class AdsConstants{
   // status
   static const activeSystem = 'active';
   static const activeHeadline = 'Активно';
-  static const notActiveSystem = 'notActive';
-  static const notActiveHeadline = 'Не активно';
   static const draftSystem = 'draft';
   static const draftHeadline = 'Черновик';
   static const completedSystem = 'completed';
   static const completedHeadline = 'Завершено';
 
   // database
-  static const adsFolder = 'ads_for_admins';
+  static const adsFolder = 'ads';
   static const adsForMainAppFolder = 'ads_for_users';
 }

@@ -11,6 +11,7 @@ import 'package:firebase_database/firebase_database.dart';
 import '../constants/database_constants.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
+import '../system_methods/system_methods_class.dart';
 
 class AdClass implements IEntity{
   String id;
@@ -104,7 +105,7 @@ class AdClass implements IEntity{
         endDate: DateTime(2100),
         location: AdLocation(location: AdLocationEnum.notChosen),
         adIndex: AdIndex(index: AdIndexEnum.notChosen),
-        status: AdStatus(status: AdStatusEnum.notActive),
+        status: AdStatus(status: AdStatusEnum.draft),
         clientName: '',
         clientPhone: '',
         clientWhatsapp: '',
@@ -230,9 +231,17 @@ class AdClass implements IEntity{
     if (status.status == AdStatusEnum.active){
       AdForMainApp adForMainApp = AdForMainApp.fromAdClass(adminAd: this);
       result = await adForMainApp.publishToDb(null);
+    } else if (status.status == AdStatusEnum.completed){
+      AdForMainApp adForMainApp = AdForMainApp.fromAdClass(adminAd: this);
+      result = await adForMainApp.deleteFromDb();
     }
 
     return result;
+  }
+
+  String getDatePeriod(){
+    SystemMethodsClass sm = SystemMethodsClass();
+    return '${sm.formatDateTimeToHumanView(startDate)} - ${sm.formatDateTimeToHumanView(endDate)}';
   }
 
 }

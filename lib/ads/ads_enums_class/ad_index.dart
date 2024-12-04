@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import '../../constants/ads_constants.dart';
+import '../../design/app_colors.dart';
 
 enum AdIndexEnum {
   first,
@@ -33,6 +35,29 @@ class AdIndex {
       case AdsConstants.secondIndex: return AdIndex(index: AdIndexEnum.second);
       case AdsConstants.thirdIndex: return AdIndex(index: AdIndexEnum.third);
       default: return AdIndex(index: AdIndexEnum.notChosen);
+    }
+  }
+
+  Widget getStatusWidget({required BuildContext context}){
+    return Card(
+      color: switchColorWidget(),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Text(toString(translate: true), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyOnBackground),),
+      ),
+    );
+  }
+
+  Color switchColorWidget(){
+    switch (index) {
+      case AdIndexEnum.first:
+        return AppColors.slot1Color;
+      case AdIndexEnum.second:
+        return AppColors.slot2Color;
+      case AdIndexEnum.third:
+        return AppColors.slot3Color;
+      case AdIndexEnum.notChosen:
+        return AppColors.greyForCards;
     }
   }
 

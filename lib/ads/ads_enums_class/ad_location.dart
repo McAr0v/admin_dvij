@@ -1,4 +1,6 @@
 import 'package:admin_dvij/constants/ads_constants.dart';
+import 'package:admin_dvij/design/app_colors.dart';
+import 'package:flutter/material.dart';
 
 enum AdLocationEnum {
   places,
@@ -37,6 +39,31 @@ class AdLocation {
       case AdsConstants.eventLocation: return AdLocation(location: AdLocationEnum.events);
       case AdsConstants.mainPageLocation: return AdLocation(location: AdLocationEnum.mainPage);
       default: return AdLocation(location: AdLocationEnum.notChosen);
+    }
+  }
+
+  Widget getStatusWidget({required BuildContext context}){
+    return Card(
+      color: switchColorWidget(),
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Text(toString(translate: true), style: Theme.of(context).textTheme.labelMedium,),
+      ),
+    );
+  }
+
+  Color switchColorWidget(){
+    switch (location) {
+      case AdLocationEnum.mainPage:
+        return AppColors.mainPageLocationColor;
+      case AdLocationEnum.events:
+        return AppColors.eventLocationColor;
+      case AdLocationEnum.places:
+        return AppColors.placesLocationColor;
+      case AdLocationEnum.promos:
+        return AppColors.promotionLocationColor;
+      case AdLocationEnum.notChosen:
+        return AppColors.greyForCards;
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/system_constants.dart';
@@ -12,15 +13,15 @@ class ElementsOfDesign {
       dynamic page,
       BuildContext context,
       ){
+
+    SystemMethodsClass sm = SystemMethodsClass();
+
     return ListTile(
       title: Text(text, style: Theme.of(context).textTheme.bodyMedium,),
       leading: Icon(icon, size: 15,),
       onTap: () {
         Navigator.pop(context);
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => page),
-        );
+        sm.pushAndDeletePreviousPages(context: context, page: page);
       },
     );
   }
