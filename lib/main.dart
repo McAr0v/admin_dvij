@@ -57,10 +57,14 @@ Future<void> main() async {
   AdsList adsList = AdsList();
   List<AdClass> tempAds = await adsList.getListFromDb();
 
-  for (AdClass tempAd in tempAds) {
-    print(tempAd.headline);
-    print('------');
+  if (tempAds.isNotEmpty){
+    for (AdClass tempAd in tempAds) {
+      print(tempAd.headline);
+      print('------');
+    }
   }
+
+
 
   runApp(
       MyApp(currentUser: currentUser,)

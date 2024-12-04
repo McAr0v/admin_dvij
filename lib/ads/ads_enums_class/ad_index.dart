@@ -4,7 +4,6 @@ enum AdIndexEnum {
   first,
   second,
   third,
-  all,
   notChosen
 }
 
@@ -23,8 +22,6 @@ class AdIndex {
         return !translate ? AdsConstants.secondIndex : AdsConstants.secondIndexSlot;
       case AdIndexEnum.third:
         return !translate ? AdsConstants.thirdIndex : AdsConstants.thirdIndexSlot;
-      case AdIndexEnum.all:
-        return !translate ? AdsConstants.allIndex : AdsConstants.adlIndexSlot;
       case AdIndexEnum.notChosen:
         return !translate ? AdsConstants.notChosenIndex : AdsConstants.notChosenIndexSlot;
     }
@@ -35,7 +32,6 @@ class AdIndex {
       case AdsConstants.firstIndex: return AdIndex(index: AdIndexEnum.first);
       case AdsConstants.secondIndex: return AdIndex(index: AdIndexEnum.second);
       case AdsConstants.thirdIndex: return AdIndex(index: AdIndexEnum.third);
-      case AdsConstants.allIndex: return AdIndex(index: AdIndexEnum.all);
       default: return AdIndex(index: AdIndexEnum.notChosen);
     }
   }

@@ -92,16 +92,17 @@ class AdsList implements IEntitiesList<AdClass>{
       // Подгрузка если Windows
       dynamic data = await database.getInfoFromDbForWindows(path);
 
-      data.forEach((key, location) {
-        location.forEach((key, index){
-          index.forEach((key, idsFolders){
-            tempAds.add(
-                AdClass.fromJson(json: idsFolders)
-            );
+      if (data != null){
+        data.forEach((key, location) {
+          location.forEach((key, index){
+            index.forEach((key, idsFolders){
+              tempAds.add(
+                  AdClass.fromJson(json: idsFolders)
+              );
+            });
           });
         });
-      });
-
+      }
     }
 
     // Устанавливаем подгруженный список в нашу доступную переменную

@@ -90,12 +90,14 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
       // Подгрузка если Windows
       dynamic data = await database.getInfoFromDbForWindows(path);
 
-      data.forEach((key, value) {
+      if (data != null){
+        data.forEach((key, value) {
 
-        tempUsersList.add(
-            SimpleUser.fromJson(value[SimpleUsersConstants.usersFolderInfo])
-        );
-      });
+          tempUsersList.add(
+              SimpleUser.fromJson(value[SimpleUsersConstants.usersFolderInfo])
+          );
+        });
+      }
 
     }
 

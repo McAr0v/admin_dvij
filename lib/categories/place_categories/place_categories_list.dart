@@ -91,12 +91,14 @@ class PlaceCategoriesList implements IEntitiesList<PlaceCategory>{
       // Подгрузка если Windows
       dynamic data = await database.getInfoFromDbForWindows(path);
 
-      data.forEach((key, value) {
+      if (data != null){
+        data.forEach((key, value) {
 
-        tempCategories.add(
-            PlaceCategory.fromJson(json: value)
-        );
-      });
+          tempCategories.add(
+              PlaceCategory.fromJson(json: value)
+          );
+        });
+      }
 
     }
 
