@@ -6,11 +6,15 @@ import 'package:admin_dvij/ads/ads_enums_class/ad_status.dart';
 import 'package:admin_dvij/ads/ads_list_class.dart';
 import 'package:admin_dvij/constants/ads_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
+import 'package:admin_dvij/design_elements/cards_elements.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/database_constants.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
+import '../design/app_colors.dart';
 import '../system_methods/system_methods_class.dart';
 
 class AdClass implements IEntity{
@@ -55,7 +59,7 @@ class AdClass implements IEntity{
     return AdClass(
         id: snapshot.child(DatabaseConstants.id).value.toString(),
         headline: snapshot.child(DatabaseConstants.headline).value.toString(),
-        desc: snapshot.child(DatabaseConstants.headline).value.toString(),
+        desc: snapshot.child(DatabaseConstants.desc).value.toString(),
         url: snapshot.child(DatabaseConstants.url).value.toString(),
         imageUrl: snapshot.child(DatabaseConstants.imageUrl).value.toString(),
         startDate: startDate,
@@ -141,9 +145,9 @@ class AdClass implements IEntity{
 
     }
 
-    // Если удаляем со статусом "Активно" или "Завершено", то удаляем и запись из
+    // Если удаляем со статусом "Активно", то удаляем и запись из
     // папки рекламы основного приложения
-    if (status.status == AdStatusEnum.active || status.status == AdStatusEnum.completed){
+    if (status.status == AdStatusEnum.active){
       AdForMainApp adForMainApp = AdForMainApp.fromAdClass(adminAd: this);
       result = await adForMainApp.deleteFromDb();
     }
@@ -231,7 +235,7 @@ class AdClass implements IEntity{
     if (status.status == AdStatusEnum.active){
       AdForMainApp adForMainApp = AdForMainApp.fromAdClass(adminAd: this);
       result = await adForMainApp.publishToDb(null);
-    } else if (status.status == AdStatusEnum.completed){
+    } else {
       AdForMainApp adForMainApp = AdForMainApp.fromAdClass(adminAd: this);
       result = await adForMainApp.deleteFromDb();
     }
@@ -242,6 +246,51 @@ class AdClass implements IEntity{
   String getDatePeriod(){
     SystemMethodsClass sm = SystemMethodsClass();
     return '${sm.formatDateTimeToHumanView(startDate)} - ${sm.formatDateTimeToHumanView(endDate)}';
+  }
+
+  Widget getInfoWidget({required BuildContext context}){
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        Text('${location.toString(translate: true)}, ${adIndex.toString(translate: true)}', style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText)),
+        const SizedBox(height: 10,),
+        Row(
+          children: [
+            if (status.status == AdStatusEnum.active) const Icon(FontAwesomeIcons.solidCircle, color: AppColors.success, size: 6,),
+            if (status.status == AdStatusEnum.active) const SizedBox(width: 10,),
+            Text(headline, style: Theme.of(context).textTheme.bodyMedium,),
+          ],
+        ),
+        const SizedBox(height: 10,),
+        Text(
+            desc,
+            style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+            softWrap: true,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis
+        ),
+        const SizedBox(height: 10,),
+        Text(getDatePeriod(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText)),
+      ],
+    );
+  }
+
+  Widget getCard({
+    required BuildContext context,
+    required VoidCallback onTap,
+  }){
+
+    CardsElements cards = CardsElements();
+
+    return cards.getCard(
+        context: context,
+        onTap: onTap,
+        imageUrl: imageUrl,
+        widget: getInfoWidget(context: context),
+        leftTopTag: status.getStatusWidget(context: context)
+    );
   }
 
 }

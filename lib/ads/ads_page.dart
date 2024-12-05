@@ -4,7 +4,6 @@ import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../constants/screen_constants.dart';
 import '../design/app_colors.dart';
 
@@ -137,66 +136,38 @@ class _AdsPageState extends State<AdsPage> {
               ),
               body: TabBarView(
                   children: [
-                    Container(
-                      child: ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
-                          itemCount: activeAdsList.length,
-                          itemBuilder: (context, index) {
+                    ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        itemCount: activeAdsList.length,
+                        itemBuilder: (context, index) {
 
-                            AdClass tempAd = activeAdsList[index];
+                          AdClass tempAd = activeAdsList[index];
 
-                            return Text(tempAd.headline);
+                          return tempAd.getCard(context: context, onTap: (){});
 
-                          }
-                      ),
+                        }
                     ),
                     ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 20),
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         itemCount: draftAdsList.length,
                         itemBuilder: (context, index) {
 
                           AdClass tempAd = draftAdsList[index];
-
-                          return Card(
-                            color: AppColors.greyOnBackground,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      tempAd.status.getStatusWidget(context: context),
-                                      SizedBox(width: 10,),
-                                      tempAd.location.getStatusWidget(context: context),
-                                      SizedBox(width: 10,),
-                                      tempAd.adIndex.getStatusWidget(context: context),
-                                    ],
-                                  ),
-                                  SizedBox(height: 10,),
-                                  Text(tempAd.headline, style: Theme.of(context).textTheme.bodyMedium,),
-                                  SizedBox(height: 10,),
-                                  Text(
-                                      tempAd.desc,
-                                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                                      softWrap: true,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis
-                                  ),
-                                  SizedBox(height: 10,),
-                                  Text(tempAd.getDatePeriod(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText)),
-                                  SizedBox(height: 10,),
-                                  Text(tempAd.clientName, style: Theme.of(context).textTheme.bodyMedium,),
-
-
-                                ],
-                              ),
-                            ),
-                          );
+                          return  tempAd.getCard(context: context, onTap: (){});
 
                         }
                     ),
-                    Text('tab 3'),
+                    ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                        itemCount: completedAdsList.length,
+                        itemBuilder: (context, index) {
+
+                          AdClass tempAd = activeAdsList[index];
+
+                          return tempAd.getCard(context: context, onTap: (){});
+
+                        }
+                    ),
                   ]
               ),
               drawer: const CustomDrawer(),
@@ -205,4 +176,5 @@ class _AdsPageState extends State<AdsPage> {
         )
     );
   }
+
 }

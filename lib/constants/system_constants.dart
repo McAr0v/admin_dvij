@@ -16,6 +16,7 @@ class SystemConstants {
   static const String loadingDefault = 'Подожди чуть-чуть) Идет загрузка';
   static const String emptyList = 'Список пуст';
   static const String saving = 'Сохранение изменений';
+  static const String errorLoad = 'Ошибка загрузки';
 
   // Изображения по умолчанию
   static const String defaultAvatar = 'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg';

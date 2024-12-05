@@ -30,12 +30,13 @@ class ElementsOfDesign {
     required VoidCallback method,
     required String text,
     required BuildContext context,
+    Color textColor = AppColors.brandColor
   }){
     return GestureDetector(
       onTap: method,
       child: Text(
         text,
-        style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.brandColor, decoration: TextDecoration.underline,),
+        style: Theme.of(context).textTheme.labelMedium!.copyWith(color: textColor, decoration: TextDecoration.underline,),
       ),
     );
   }
@@ -116,20 +117,103 @@ class ElementsOfDesign {
       radius: size,
       backgroundColor: AppColors.greyOnBackground,
       child: ClipOval(
-        child: FadeInImage(
-          placeholder: const AssetImage(SystemConstants.defaultImagePath),
-          image: NetworkImage(url),
-          fit: BoxFit.cover,
-          width: 100,
-          height: 100,
-          imageErrorBuilder: (context, error, stackTrace) {
-            return Image.asset(
-              SystemConstants.defaultImagePath, // Изображение ошибки
-              fit: BoxFit.cover,
-              width: 100,
-              height: 100,
+        child: Image.network(
+          url, // Ссылка на картинку
+
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return child; // Показываем картинку, когда загрузка завершена
+            }
+            return Center(
+              child: CircularProgressIndicator(
+                value: loadingProgress.expectedTotalBytes != null
+                    ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                    : null, // Показываем прогресс загрузки
+              ),
             );
           },
+          errorBuilder: (context, error, stackTrace) {
+            return const Center(
+              child: Text(SystemConstants.errorLoad), // Показываем текст при ошибке загрузки
+            );
+          },
+          fit: BoxFit.cover, // Настройка масштабирования
+          height: 100,
+        )
+      ),
+    );
+  }
+
+  static Widget getImage ({required String imageUrl}){
+    return Image.network(
+      imageUrl, // Ссылка на картинку
+
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) {
+          return child; // Показываем картинку, когда загрузка завершена
+        }
+        return Center(
+          child: CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
+                : null, // Показываем прогресс загрузки
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return const Center(
+          child: Text(SystemConstants.errorLoad), // Показываем текст при ошибке загрузки
+        );
+      },
+      fit: BoxFit.cover, // Настройка масштабирования
+    );
+  }
+
+  static Widget imageWithTags({
+    required String imageUrl,
+    required double width,
+    required double height,
+    Widget? leftTopTag,
+    Widget? rightTopTag,
+    Widget? leftBottomTag,
+    Widget? rightBottomTag,
+
+  }){
+    return SizedBox(
+      width: width, // Растягиваем картинку на всю ширину
+      height: height,
+      child: Card(
+        margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+            SizedBox(
+              width: double.infinity, // Растягиваем картинку на всю ширину
+              height: 250,
+              child: getImage(imageUrl: imageUrl),
+            ),
+
+            if (leftTopTag != null) Positioned(
+              top: 10.0,
+              left: 10.0,
+              child: leftTopTag,
+            ),
+            if (leftBottomTag != null) Positioned(
+              bottom: 10.0,
+              left: 10.0,
+              child: leftBottomTag,
+            ),
+            if (rightTopTag != null) Positioned(
+              top: 10.0,
+              right: 10.0,
+              child: rightTopTag,
+            ),
+            if (rightBottomTag != null) Positioned(
+              right: 10.0,
+              bottom: 10.0,
+              child: rightBottomTag,
+            ),
+          ],
         ),
       ),
     );
