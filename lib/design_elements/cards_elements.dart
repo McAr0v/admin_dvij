@@ -4,7 +4,7 @@ import '../design/app_colors.dart';
 import 'elements_of_design.dart';
 
 class CardsElements{
-  Widget _columnForCard({
+  static Widget columnForCard({
     required BuildContext context,
     required Widget image,
     required Widget info,
@@ -17,7 +17,7 @@ class CardsElements{
     );
   }
 
-  Widget _rowForCard({
+  static Widget rowForCard({
     required BuildContext context,
     required Widget image,
     required Widget info,
@@ -30,7 +30,7 @@ class CardsElements{
     );
   }
 
-  Widget getCard({
+  static Widget getCard({
     required BuildContext context,
     required VoidCallback onTap,
     required String imageUrl,
@@ -68,11 +68,11 @@ class CardsElements{
         child: Card(
             color: AppColors.greyOnBackground,
             clipBehavior: Clip.antiAlias,
-            child: Platform.isWindows || Platform.isMacOS ? _rowForCard(
+            child: Platform.isWindows || Platform.isMacOS ? rowForCard(
                 context: context,
                 image: image,
                 info: info
-            ) : _columnForCard(
+            ) : columnForCard(
                 context: context,
                 image: image,
                 info: info

@@ -11,6 +11,18 @@ class AdsConstants{
   static const mainPageHeadline = 'На главной странице';
   static const notChosenHeadline = 'Место не выбрано';
 
+  // screens
+  static const editAd = 'Редактирование рекламы';
+  static const createAd = 'Создание рекламы';
+  static const createAdProcess = 'Идет создание рекламы';
+  static const deleteAdProcess = 'Идет удаление рекламы';
+  static const editAdProcess = 'Сохранение рекламы';
+
+  // fields
+
+  static const headlineAdField = 'Заголовок рекламы';
+  static const statusAdField = 'Статус';
+
   // index
   static const firstIndex = 'first';
   static const secondIndex = 'second';
@@ -32,4 +44,5 @@ class AdsConstants{
   // database
   static const adsFolder = 'ads';
   static const adsForMainAppFolder = 'ads_for_users';
+
 }

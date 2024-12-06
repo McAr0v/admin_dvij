@@ -1,20 +1,26 @@
 import 'package:admin_dvij/ads/ad_class.dart';
+import 'package:admin_dvij/ads/ad_view_create_edit_screen.dart';
 import 'package:admin_dvij/ads/ads_list_class.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/screen_constants.dart';
 import '../design/app_colors.dart';
+import '../design_elements/cards_elements.dart';
 
 class AdsPage extends StatefulWidget {
-  const AdsPage({Key? key}) : super(key: key);
+  final int initialIndex;
+  const AdsPage({this.initialIndex = 0, Key? key}) : super(key: key);
 
   @override
   State<AdsPage> createState() => _AdsPageState();
 }
 
 class _AdsPageState extends State<AdsPage> {
+
+  SystemMethodsClass sm = SystemMethodsClass();
 
   bool loading = false;
 
@@ -48,6 +54,7 @@ class _AdsPageState extends State<AdsPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
+      initialIndex: widget.initialIndex,
         length: 3,
         child: Stack(
           children: [
@@ -143,7 +150,15 @@ class _AdsPageState extends State<AdsPage> {
 
                           AdClass tempAd = activeAdsList[index];
 
-                          return tempAd.getCard(context: context, onTap: (){});
+                          return CardsElements.getCard(
+                              context: context,
+                              onTap: () async {
+                                await editAds(ad: tempAd, tabIndex: 0);
+                              },
+                              imageUrl: tempAd.imageUrl,
+                              widget: tempAd.getInfoWidget(context: context),
+                            leftTopTag: tempAd.status.getStatusWidget(context: context)
+                          );
 
                         }
                     ),
@@ -153,18 +168,34 @@ class _AdsPageState extends State<AdsPage> {
                         itemBuilder: (context, index) {
 
                           AdClass tempAd = draftAdsList[index];
-                          return  tempAd.getCard(context: context, onTap: (){});
+                          return  CardsElements.getCard(
+                              context: context,
+                              onTap: () async {
+                                await editAds(ad: tempAd, tabIndex: 1);
+                              },
+                              imageUrl: tempAd.imageUrl,
+                              widget: tempAd.getInfoWidget(context: context),
+                              leftTopTag: tempAd.status.getStatusWidget(context: context)
+                          );
 
                         }
                     ),
                     ListView.builder(
                         padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
                         itemCount: completedAdsList.length,
-                        itemBuilder: (context, index) {
+                        itemBuilder: (contextOnCard, index) {
 
                           AdClass tempAd = activeAdsList[index];
 
-                          return tempAd.getCard(context: context, onTap: (){});
+                          return CardsElements.getCard(
+                              context: context,
+                              onTap: () async {
+                                await editAds(ad: tempAd, tabIndex: 2);
+                              },
+                              imageUrl: tempAd.imageUrl,
+                              widget: tempAd.getInfoWidget(context: context),
+                              leftTopTag: tempAd.status.getStatusWidget(context: context)
+                          );
 
                         }
                     ),
@@ -175,6 +206,22 @@ class _AdsPageState extends State<AdsPage> {
           ],
         )
     );
+  }
+
+  Future<void> editAds({AdClass? ad, required int tabIndex}) async{
+
+    // Уходим на страницу создания / редактирования
+    // Ждем результат с нее
+
+    final results = await sm.pushToPageWithResult(
+        context: context,
+        page: AdViewCreateEditScreen(ad: ad, indexTabPage: tabIndex,)
+    );
+
+    if (results != null) {
+      await initialization(fromDb: false);
+    }
+
   }
 
 }

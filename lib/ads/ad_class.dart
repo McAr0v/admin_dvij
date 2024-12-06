@@ -15,6 +15,7 @@ import '../constants/database_constants.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
 import '../design/app_colors.dart';
+import '../design_elements/elements_of_design.dart';
 import '../system_methods/system_methods_class.dart';
 
 class AdClass implements IEntity{
@@ -274,22 +275,6 @@ class AdClass implements IEntity{
         const SizedBox(height: 10,),
         Text(getDatePeriod(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText)),
       ],
-    );
-  }
-
-  Widget getCard({
-    required BuildContext context,
-    required VoidCallback onTap,
-  }){
-
-    CardsElements cards = CardsElements();
-
-    return cards.getCard(
-        context: context,
-        onTap: onTap,
-        imageUrl: imageUrl,
-        widget: getInfoWidget(context: context),
-        leftTopTag: status.getStatusWidget(context: context)
     );
   }
 
