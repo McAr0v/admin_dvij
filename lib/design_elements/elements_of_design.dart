@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
@@ -183,7 +185,7 @@ class ElementsOfDesign {
       width: width, // Растягиваем картинку на всю ширину
       height: height,
       child: Card(
-        margin: const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        margin: Platform.isMacOS || Platform.isWindows ? const EdgeInsets.fromLTRB(10, 10, 10, 10) : const EdgeInsets.fromLTRB(10, 10, 10, 0),
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
