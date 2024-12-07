@@ -22,6 +22,14 @@ class AdsConstants{
 
   static const headlineAdField = 'Заголовок рекламы';
   static const statusAdField = 'Статус';
+  static const locationAdField = 'Местоположение рекламы';
+  static const slotAdField = 'Слот';
+  static const descAdField = 'Описание';
+  static const orderDateAdField = 'Дата обращения по рекламе';
+  static const urlAdField = 'Целевая ссылка';
+  static const startDateAdField = 'Начало показов';
+  static const endDateAdField = 'Завершение показов';
+  static const clientNameAdField = 'Имя заказчика';
 
   // index
   static const firstIndex = 'first';
@@ -44,5 +52,7 @@ class AdsConstants{
   // database
   static const adsFolder = 'ads';
   static const adsForMainAppFolder = 'ads_for_users';
+
+  static const String saveSuccess = 'Реклама успешно сохранена!';
 
 }

@@ -332,27 +332,8 @@ class AdminUserClass implements IEntity<AdminUserClass> {
           backgroundColor: AppColors.greyOnBackground,
           child: ClipOval(
             child: imageFile != null
-                ? Image.file(
-              imageFile,
-              fit: BoxFit.cover,
-              width: 100,
-              height: 100,
-            )
-                : FadeInImage(
-              placeholder: const AssetImage(SystemConstants.defaultImagePath),
-              image: NetworkImage(avatar),
-              fit: BoxFit.cover,
-              width: 100,
-              height: 100,
-              imageErrorBuilder: (context, error, stackTrace) {
-                return Image.asset(
-                  SystemConstants.defaultImagePath, // Изображение ошибки
-                  fit: BoxFit.cover,
-                  width: 100,
-                  height: 100,
-                );
-              },
-            ),
+                ? ElementsOfDesign.getImageFromFile(image: imageFile)
+                : ElementsOfDesign.getImageFromUrl(imageUrl: avatar),
           ),
         ),
 

@@ -114,42 +114,42 @@ class ElementsOfDesign {
     }
   }
 
+  static Widget getImageFromUrlOrPickedImage({
+    File? imageFile,
+    required String url
+  }){
+    return SizedBox(
+      width: double.infinity,
+      height: 300,
+      child: imageFile != null
+          ? getImageFromFile(image: imageFile)
+          : getImageFromUrl(imageUrl: url),
+    );
+  }
+
+  static Widget getImageFromFile({ required File image}){
+    return Image.file(
+      image,
+      fit: BoxFit.cover,
+      width: 100,
+      height: 100,
+    );
+  }
+
   static getAvatar({required String url, double size = 40}) {
     return CircleAvatar(
       radius: size,
       backgroundColor: AppColors.greyOnBackground,
       child: ClipOval(
-        child: Image.network(
-          url, // Ссылка на картинку
-
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) {
-              return child; // Показываем картинку, когда загрузка завершена
-            }
-            return Center(
-              child: CircularProgressIndicator(
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded / (loadingProgress.expectedTotalBytes ?? 1)
-                    : null, // Показываем прогресс загрузки
-              ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return const Center(
-              child: Text(SystemConstants.errorLoad), // Показываем текст при ошибке загрузки
-            );
-          },
-          fit: BoxFit.cover, // Настройка масштабирования
-          height: 100,
-        )
+        child: getImageFromUrl(imageUrl: url)
       ),
     );
   }
 
-  static Widget getImage ({required String imageUrl}){
+  static Widget getImageFromUrl ({required String imageUrl}){
     return Image.network(
       imageUrl, // Ссылка на картинку
-
+      height: 100,
       loadingBuilder: (context, child, loadingProgress) {
         if (loadingProgress == null) {
           return child; // Показываем картинку, когда загрузка завершена
@@ -192,7 +192,7 @@ class ElementsOfDesign {
             SizedBox(
               width: double.infinity, // Растягиваем картинку на всю ширину
               height: 250,
-              child: getImage(imageUrl: imageUrl),
+              child: getImageFromUrl(imageUrl: imageUrl),
             ),
 
             if (leftTopTag != null) Positioned(
@@ -227,6 +227,7 @@ class ElementsOfDesign {
     required bool canEdit,
     required IconData icon,
     required BuildContext context,
+    int? maxLines = 1,
     VoidCallback? onTap,
     bool readOnly = false,
   }) {
@@ -240,6 +241,7 @@ class ElementsOfDesign {
       enabled: canEdit,
       readOnly: readOnly,
       onTap: onTap,
+      maxLines: maxLines,
     );
   }
 

@@ -45,5 +45,7 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>Приложению требуется доступ к вашей библиотеке фотографий, чтобы выбрать и загрузить изображения.</string>
 </dict>
 </plist>

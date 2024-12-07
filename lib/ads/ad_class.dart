@@ -6,7 +6,6 @@ import 'package:admin_dvij/ads/ads_enums_class/ad_status.dart';
 import 'package:admin_dvij/ads/ads_list_class.dart';
 import 'package:admin_dvij/constants/ads_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
-import 'package:admin_dvij/design_elements/cards_elements.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +14,6 @@ import '../constants/database_constants.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
 import '../design/app_colors.dart';
-import '../design_elements/elements_of_design.dart';
 import '../system_methods/system_methods_class.dart';
 
 class AdClass implements IEntity{

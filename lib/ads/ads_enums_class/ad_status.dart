@@ -35,6 +35,14 @@ class AdStatus {
     }
   }
 
+  List<AdStatus> getStatusList(){
+    return [
+      AdStatus(status: AdStatusEnum.draft),
+      AdStatus(status: AdStatusEnum.active),
+      AdStatus(status: AdStatusEnum.completed),
+    ];
+  }
+
   Widget getStatusWidget({required BuildContext context}){
     return Card(
       color: switchColorWidget(),
