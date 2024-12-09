@@ -48,6 +48,8 @@ class AdsConstants{
   static const draftHeadline = 'Черновик';
   static const completedSystem = 'completed';
   static const completedHeadline = 'Завершено';
+  static const notChosenStatusSystem = 'notChosen';
+  static const notChosenStatusHeadline = 'Статус не выбран';
 
   // database
   static const adsFolder = 'ads';

@@ -2,14 +2,25 @@ import 'dart:io';
 import 'package:admin_dvij/constants/date_constants.dart';
 import 'package:flutter/material.dart';
 
+import '../constants/buttons_constants.dart';
+
 class SystemMethodsClass {
   SystemMethodsClass();
 
-  double getScreenWidth(){
+  double getScreenWidth({double neededWidth = 600}){
 
     bool isDesktop = Platform.isWindows || Platform.isMacOS || Platform.isLinux;
-    return isDesktop ? 600 : double.infinity;
+    return isDesktop ? neededWidth : double.infinity;
 
+  }
+
+  Future<dynamic> getPopup({ required BuildContext context, required dynamic page}) async{
+    return await showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return page;
+      },
+    );
   }
 
   String formatDateTimeToHumanView(DateTime date) {
@@ -25,6 +36,36 @@ class SystemMethodsClass {
     return date1.year == date2.year &&
         date1.month == date2.month &&
         date1.day == date2.day;
+  }
+
+  Future<DateTime?> dataPicker({
+    required BuildContext context,
+    DateTime? currentDate,
+    required String label,
+    required DateTime firstDate,
+    required DateTime lastDate,
+    bool needCalendar = false
+  }) async{
+    DateTime initial = DateTime.now();
+
+    if (currentDate != null) {
+      initial = currentDate;
+    }
+
+    return await showDatePicker(
+
+      locale: const Locale('ru'), // Локализация (например, русский)
+      context: context,
+      initialDate: initial,
+      firstDate: firstDate,
+      lastDate: lastDate,
+      helpText: DateConstants.chosenDate,
+      cancelText: ButtonsConstants.cancel,
+      confirmText: ButtonsConstants.ok,
+      keyboardType: TextInputType.datetime,
+      initialEntryMode: !needCalendar ? DatePickerEntryMode.inputOnly : DatePickerEntryMode.calendar,
+      fieldLabelText: label
+    );
   }
 
   Future<dynamic> pushToPageWithResult({required BuildContext context, dynamic page}) async{
@@ -105,6 +146,12 @@ class SystemMethodsClass {
     }
 
 
+  }
+
+  /// Проверяет, пересекаются ли 2 диапазона дат
+  bool dateCrash(DateTime start1, DateTime end1, DateTime start2, DateTime end2) {
+    // Проверяем, чтобы один диапазон заканчивался раньше, чем начался другой
+    return end1.isBefore(start2) || end2.isBefore(start1);
   }
 
 }

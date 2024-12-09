@@ -112,7 +112,7 @@ class AdClass implements IEntity{
         clientName: '',
         clientPhone: '',
         clientWhatsapp: '',
-        ordersDate: DateTime(2100)
+        ordersDate: DateTime.now()
     );
   }
 
@@ -121,7 +121,7 @@ class AdClass implements IEntity{
     DatabaseClass db = DatabaseClass();
     final ImageUploader imageUploader = ImageUploader();
 
-    String path = '${AdsConstants.adsFolder}/${location.toString()}/${adIndex.toString()}/$id/';
+    String path = '${AdsConstants.adsFolder}/$id/';
 
     String result = '';
 
@@ -193,7 +193,7 @@ class AdClass implements IEntity{
       id = adId ?? 'noID_$headline';
     }
 
-    String path = '${AdsConstants.adsFolder}/${location.toString()}/${adIndex.toString()}/$id/';
+    String path = '${AdsConstants.adsFolder}/$id/';
 
     if (imageFile != null){
 
@@ -259,7 +259,7 @@ class AdClass implements IEntity{
           children: [
             if (status.status == AdStatusEnum.active) const Icon(FontAwesomeIcons.solidCircle, color: AppColors.success, size: 6,),
             if (status.status == AdStatusEnum.active) const SizedBox(width: 10,),
-            Text(headline, style: Theme.of(context).textTheme.bodyMedium,),
+            Expanded(child: Text(headline, style: Theme.of(context).textTheme.bodyMedium,)),
           ],
         ),
         const SizedBox(height: 10,),

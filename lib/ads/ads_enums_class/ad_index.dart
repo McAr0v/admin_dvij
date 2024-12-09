@@ -61,4 +61,13 @@ class AdIndex {
     }
   }
 
+  List<AdIndex> getIndexList(){
+    return [
+      AdIndex(index: AdIndexEnum.notChosen),
+      AdIndex(index: AdIndexEnum.first),
+      AdIndex(index: AdIndexEnum.second),
+      AdIndex(index: AdIndexEnum.third),
+    ];
+  }
+
 }

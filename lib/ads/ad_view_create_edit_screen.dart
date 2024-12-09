@@ -3,6 +3,8 @@ import 'package:admin_dvij/ads/ad_class.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_index.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_location.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_status.dart';
+import 'package:admin_dvij/ads/ads_enums_class/location_picker.dart';
+import 'package:admin_dvij/ads/ads_enums_class/slot_picker.dart';
 import 'package:admin_dvij/ads/ads_enums_class/status_picker.dart';
 import 'package:admin_dvij/ads/ads_list_class.dart';
 import 'package:admin_dvij/ads/ads_page.dart';
@@ -15,7 +17,6 @@ import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-import '../constants/admins_constants.dart';
 import '../constants/system_constants.dart';
 import '../database/image_picker.dart';
 import '../design/app_colors.dart';
@@ -47,14 +48,20 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
   bool hasChanges = false;
 
+  // Переменные для сохранения изначальных даты рекламы
+  // Для исправления ошибки когда диапазон дат уже занят
+  // и отображаются выбранные даты
+  AdClass firstTempAd = AdClass.empty();
+
   AdClass ad = AdClass.empty();
 
   DateTime chosenStartDate = DateTime(2100);
   DateTime chosenEndDate = DateTime(2100);
-  DateTime chosenOrderDate = DateTime.now();
   AdLocation chosenLocation = AdLocation.fromString(text: '');
   AdIndex chosenIndex = AdIndex.fromString(text: '');
-  AdStatus chosenStatus = AdStatus.fromString(text: '');
+  AdStatus chosenStatus = AdStatus(status: AdStatusEnum.notChosen);
+
+
 
   File? _imageFile;
 
@@ -76,12 +83,14 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
     setState(() {
       chosenStartDate = DateTime(2100);
       chosenEndDate = DateTime(2100);
-      chosenOrderDate = DateTime.now();
       chosenLocation = AdLocation.fromString(text: '');
       chosenIndex = AdIndex.fromString(text: '');
-      chosenStatus = AdStatus.fromString(text: '');
+      chosenStatus = AdStatus(status: AdStatusEnum.notChosen);
       _imageFile = null;
     });
+
+    setControllersFields();
+
   }
 
   void setControllersFields (){
@@ -92,7 +101,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
     _imageUrlController.text = ad.imageUrl;
     _startDateController.text = ad.startDate.year == 2100 ? DateConstants.noDate : sm.formatDateTimeToHumanView(ad.startDate);
     _endDateController.text = ad.endDate.year == 2100 ? DateConstants.noDate : sm.formatDateTimeToHumanView(ad.endDate);
-    _orderDateController.text = sm.formatDateTimeToHumanView(ad.endDate);
+    _orderDateController.text = sm.formatDateTimeToHumanView(ad.ordersDate);
     _locationController.text = ad.location.toString(translate: true);
     _adIndexController.text = ad.adIndex.toString(translate: true);
     _statusController.text = ad.status.toString(translate: true);
@@ -115,6 +124,10 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
     if (widget.ad != null) {
       ad = adList.getEntityFromList(widget.ad!.id);
+
+      // Сохраняем в переменные данные дат по умолчанию
+      // Для исправления ошибки если диапазон дат попадает в уже занятый
+      firstTempAd = ad;
     }
 
     resetChosenOptions();
@@ -165,7 +178,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
               child: Column(
                 children: [
                   Container(
-                    width: sm.getScreenWidth(),
+                    width: sm.getScreenWidth(neededWidth: 1000),
                     padding: const EdgeInsets.all(20),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,24 +231,6 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                               ),
 
                               ElementsOfDesign.buildTextField(
-                                controller: _orderDateController,
-                                labelText: AdsConstants.orderDateAdField,
-                                canEdit: canEdit,
-                                icon: FontAwesomeIcons.calendarDay,
-                                context: context,
-                                readOnly: true,
-                                onTap: () async {
-                                  //await _selectDate(context);
-                                },
-                              ),
-
-                            ]
-                        ),
-
-                        ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
-                              ElementsOfDesign.buildTextField(
                                 controller: _locationController,
                                 labelText: AdsConstants.locationAdField,
                                 canEdit: canEdit,
@@ -243,7 +238,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                                 context: context,
                                 readOnly: true,
                                 onTap: () async {
-                                  //await showCityTwoPopup();
+                                  await locationPopup();
                                 },
                               ),
                               ElementsOfDesign.buildTextField(
@@ -254,9 +249,11 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                                 context: context,
                                 readOnly: true,
                                 onTap: () async {
-                                  //await showCityTwoPopup();
+                                  await slotPopup();
                                 },
                               ),
+
+
 
                             ]
                         ),
@@ -265,6 +262,15 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                             isMobile,
                             [
                               ElementsOfDesign.buildTextField(
+                                controller: _orderDateController,
+                                labelText: AdsConstants.orderDateAdField,
+                                canEdit: false,
+                                icon: FontAwesomeIcons.calendarDay,
+                                context: context,
+                                readOnly: true,
+                              ),
+
+                              ElementsOfDesign.buildTextField(
                                 controller: _startDateController,
                                 labelText: AdsConstants.startDateAdField,
                                 canEdit: canEdit,
@@ -272,7 +278,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                                 context: context,
                                 readOnly: true,
                                 onTap: () async {
-                                  //await _selectDate(context);
+                                  await _selectStartDate(context);
                                 },
                               ),
                               ElementsOfDesign.buildTextField(
@@ -283,10 +289,39 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                                 context: context,
                                 readOnly: true,
                                 onTap: () async {
-                                  //await _selectDate(context);
+                                  await _selectEndDate(context);
                                 },
                               ),
 
+                            ]
+                        ),
+
+                        ElementsOfDesign.buildAdaptiveRow(
+                            isMobile,
+                            [
+                              ElementsOfDesign.buildTextField(
+                                  controller: _clientNameController,
+                                  labelText: AdsConstants.clientNameAdField,
+                                  canEdit: canEdit,
+                                  icon: FontAwesomeIcons.person,
+                                  context: context
+                              ),
+
+                              ElementsOfDesign.buildTextField(
+                                  controller: _clientPhoneController,
+                                  labelText: UserConstants.phone,
+                                  canEdit: canEdit,
+                                  icon: FontAwesomeIcons.phone,
+                                  context: context
+                              ),
+
+                              ElementsOfDesign.buildTextField(
+                                  controller: _clientWhatsappController,
+                                  labelText: UserConstants.whatsapp,
+                                  canEdit: canEdit,
+                                  icon: FontAwesomeIcons.whatsapp,
+                                  context: context
+                              ),
                             ]
                         ),
 
@@ -321,46 +356,14 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
                         const SizedBox(height: 20,),
 
-                        ElementsOfDesign.buildTextField(
-                            controller: _clientNameController,
-                            labelText: AdsConstants.clientNameAdField,
-                            canEdit: canEdit,
-                            icon: FontAwesomeIcons.person,
-                            context: context
-                        ),
 
-                        const SizedBox(height: 20,),
-
-                        ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
-
-                              ElementsOfDesign.buildTextField(
-                                  controller: _clientPhoneController,
-                                  labelText: UserConstants.phone,
-                                  canEdit: canEdit,
-                                  icon: FontAwesomeIcons.phone,
-                                  context: context
-                              ),
-
-                              ElementsOfDesign.buildTextField(
-                                  controller: _clientWhatsappController,
-                                  labelText: UserConstants.whatsapp,
-                                  canEdit: canEdit,
-                                  icon: FontAwesomeIcons.whatsapp,
-                                  context: context
-                              ),
-                            ]
-                        ),
 
                         if (canEdit) ElementsOfDesign.buildAdaptiveRow(
                             isMobile,
                             [
                               ElementsOfDesign.customButton(
-                                  method: (){
-                                    setState(() async {
-                                      await saveAd();
-                                    });
+                                  method: () async {
+                                    await saveAd();
 
                                   },
                                   textOnButton: ButtonsConstants.save,
@@ -396,12 +399,8 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
   }
 
   Future<void> statusPopup() async{
-    dynamic result = await showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return const StatusPicker();
-      },
-    );
+
+    dynamic result = await sm.getPopup(context: context, page: const StatusPicker());
 
     if (result != null) {
 
@@ -414,37 +413,89 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
   }
 
-  /*Future<void> _selectOrderDate(BuildContext context) async {
-    DateTime initial = ad.ordersDate. != 2100 ? editUserAdmin.birthDate : DateTime.now();
-    if (selectedBirthDateOnEdit.year != 2100) initial = selectedBirthDateOnEdit;
+  Future<void> locationPopup() async{
+    dynamic result = await sm.getPopup(context: context, page: const LocationPicker());
 
-    final DateTime? picked = await showDatePicker(
-
-      locale: const Locale('ru'), // Локализация (например, русский)
-      context: context,
-      initialDate: initial,
-      firstDate: DateTime(1930),
-      lastDate: DateTime.now(),
-      helpText: DateConstants.chosenDate,
-      cancelText: ButtonsConstants.cancel,
-      confirmText: ButtonsConstants.ok,
-      keyboardType: TextInputType.datetime,
-      initialEntryMode: DatePickerEntryMode.inputOnly,
-      fieldLabelText: DateConstants.yourBirthdayDate,
-
-
-    );
-
-    if (picked != null && picked != editUserAdmin.birthDate) {
+    if (result != null){
       setState(() {
-        selectedBirthDateOnEdit = picked;
-        birthDateController.text = systemMethods.formatDateTimeToHumanView(selectedBirthDateOnEdit);
+        chosenLocation = result;
+        _locationController.text = chosenLocation.toString(translate: true);
       });
     }
 
-  }*/
+  }
+
+  Future<void> slotPopup() async{
+    dynamic result = await sm.getPopup(context: context, page: const SlotPicker());
+
+    if (result != null){
+      setState(() {
+        chosenIndex = result;
+        _adIndexController.text = chosenIndex.toString(translate: true);
+      });
+    }
+
+  }
+
+  Future<void> _selectStartDate(BuildContext context) async {
+
+    DateTime currentDate = DateTime.now();
+
+    if (chosenStartDate.year == 2100 && ad.startDate.year != 2100){
+      currentDate = ad.startDate;
+    } else if (chosenStartDate.year != 2100 && ad.startDate.year != 2100){
+      currentDate = chosenStartDate;
+    }
+
+    final DateTime? picked = await sm.dataPicker(
+        context: context,
+        label: 'Первый день показов',
+        firstDate: DateTime(2024),
+        lastDate: DateTime(2050),
+        currentDate: currentDate,
+        needCalendar: true
+    );
+
+    if (picked != null) {
+      setState(() {
+        chosenStartDate = picked;
+        _startDateController.text = sm.formatDateTimeToHumanView(chosenStartDate);
+      });
+    }
+
+  }
+
+  Future<void> _selectEndDate(BuildContext context) async {
+
+    DateTime currentDate = DateTime.now();
+
+    if (chosenEndDate.year == 2100 && ad.endDate.year != 2100){
+      currentDate = ad.endDate;
+    } else if (chosenEndDate.year != 2100 && ad.endDate.year != 2100){
+      currentDate = chosenEndDate;
+    }
+
+    final DateTime? picked = await sm.dataPicker(
+        context: context,
+        label: 'Последний день показов',
+        firstDate: DateTime(2024),
+        lastDate: DateTime(2050),
+        currentDate: currentDate,
+        needCalendar: true
+    );
+
+    if (picked != null) {
+      setState(() {
+        chosenEndDate = picked;
+        _endDateController.text = sm.formatDateTimeToHumanView(chosenEndDate);
+      });
+    }
+
+  }
 
   Future<void> _pickImage() async {
+
+    // TODO - сделать подборщика картинок на macOs
 
     final File? pickedImage = await imagePickerService.pickImage(ImageSource.gallery);
 
@@ -460,13 +511,14 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
       saving = true;
     });
 
-    setEditAdminBeforeSaving();
+    setAdBeforeSaving();
 
     if (checkStatus()){
       String publishResult = await ad.publishToDb(_imageFile);
 
       if (publishResult == SystemConstants.successConst) {
         _showSnackBar(AdsConstants.saveSuccess);
+
         await initialization();
         canEdit = false;
         resetChosenOptions();
@@ -474,6 +526,9 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
       } else {
         _showSnackBar(publishResult);
       }
+    } else {
+      // Исправляем ошибку меняющихся дат если диапазон занят
+      ad = firstTempAd;
     }
 
     setState(() {
@@ -482,6 +537,9 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
   }
 
   bool checkStatus(){
+
+    AdsList adsList = AdsList();
+
     if (ad.status.status == AdStatusEnum.active || chosenStatus.status == AdStatusEnum.active){
       if (ad.adIndex.index == AdIndexEnum.notChosen){
         _showSnackBar('Для активации рекламы нужно выбрать слот');
@@ -503,13 +561,13 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
         return false;
       }
 
-      if (ad.ordersDate.year == 2100){
-        _showSnackBar('Для активации рекламы нужно выбрать дату создания рекламы');
+      if (ad.imageUrl == SystemConstants.defaultAdImagePath && _imageFile == null) {
+        _showSnackBar('Для активации рекламы нужно выбрать изображение');
         return false;
       }
 
-      if (ad.imageUrl == SystemConstants.defaultAdImagePath && _imageFile == null) {
-        _showSnackBar('Для активации рекламы нужно выбрать изображение');
+      if (!adsList.checkActiveAd(ad)){
+        _showSnackBar('Этот слот на указанные даты уже занят');
         return false;
       }
 
@@ -538,20 +596,31 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
     );
   }
 
-  void setEditAdminBeforeSaving(){
+  void setAdBeforeSaving(){
 
-    ad.status = chosenStatus;
-    ad.url = _urlController.text;
-    ad.ordersDate = chosenOrderDate;
-    ad.startDate = chosenStartDate;
-    ad.endDate = chosenEndDate;
-    ad.desc = _descController.text;
-    ad.headline = _nameController.text;
-    ad.location = chosenLocation;
+    if (chosenStatus.status != AdStatusEnum.notChosen){
+      ad.status = chosenStatus;
+    }
+
+    if (chosenLocation.location != AdLocationEnum.notChosen){
+      ad.location = chosenLocation;
+    }
+
+    if (chosenStartDate.year != 2100){
+      ad.startDate = chosenStartDate;
+    }
+
+    if (chosenEndDate.year != 2100){
+      ad.endDate = chosenEndDate;
+    }
+
     if (chosenIndex.index != AdIndexEnum.notChosen){
       ad.adIndex = chosenIndex;
     }
 
+    ad.url = _urlController.text;
+    ad.desc = _descController.text;
+    ad.headline = _nameController.text;
     ad.clientName = _clientNameController.text;
     ad.clientPhone = _clientPhoneController.text;
     ad.clientWhatsapp = _clientWhatsappController.text;

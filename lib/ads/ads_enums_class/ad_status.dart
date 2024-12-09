@@ -6,7 +6,8 @@ import '../../constants/ads_constants.dart';
 enum AdStatusEnum {
   active,
   draft,
-  completed
+  completed,
+  notChosen
 }
 
 class AdStatus {
@@ -24,6 +25,8 @@ class AdStatus {
         return !translate ? AdsConstants.draftSystem : AdsConstants.draftHeadline;
       case AdStatusEnum.completed:
         return !translate ? AdsConstants.completedSystem : AdsConstants.completedHeadline;
+      case AdStatusEnum.notChosen:
+        return !translate ? AdsConstants.notChosenStatusSystem : AdsConstants.notChosenStatusHeadline;
     }
   }
 
@@ -31,6 +34,7 @@ class AdStatus {
     switch (text){
       case AdsConstants.activeSystem: return AdStatus(status: AdStatusEnum.active);
       case AdsConstants.completedSystem: return AdStatus(status: AdStatusEnum.completed);
+      case AdsConstants.notChosenStatusSystem: return AdStatus(status: AdStatusEnum.notChosen);
       default: return AdStatus(status: AdStatusEnum.draft);
     }
   }
@@ -61,6 +65,8 @@ class AdStatus {
         return AppColors.draftAdColor;
       case AdStatusEnum.completed:
         return AppColors.completedAdColor;
+      case AdStatusEnum.notChosen:
+        return AppColors.draftAdColor;
     }
   }
 
@@ -72,6 +78,8 @@ class AdStatus {
         return AppColors.greyOnBackground;
       case AdStatusEnum.completed:
         return AppColors.white;
+      case AdStatusEnum.notChosen:
+        return AppColors.greyOnBackground;
     }
   }
 

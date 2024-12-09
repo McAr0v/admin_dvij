@@ -42,7 +42,7 @@ class AdLocation {
     }
   }
 
-  Widget getStatusWidget({required BuildContext context}){
+  Widget getLocationWidget({required BuildContext context}){
     return Card(
       color: switchColorWidget(),
       child: Padding(
@@ -65,6 +65,16 @@ class AdLocation {
       case AdLocationEnum.notChosen:
         return AppColors.greyForCards;
     }
+  }
+
+  List<AdLocation> getLocationList(){
+    return [
+      AdLocation(location: AdLocationEnum.notChosen),
+      AdLocation(location: AdLocationEnum.mainPage),
+      AdLocation(location: AdLocationEnum.events),
+      AdLocation(location: AdLocationEnum.places),
+      AdLocation(location: AdLocationEnum.promos),
+    ];
   }
 
 }

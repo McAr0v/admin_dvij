@@ -4,6 +4,7 @@ import 'package:admin_dvij/ads/ad_class.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_status.dart';
 import 'package:admin_dvij/constants/ads_constants.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import '../database/database_class.dart';
@@ -88,30 +89,21 @@ class AdsList implements IEntitiesList<AdClass>{
       DataSnapshot? snapshot = await database.getInfoFromDb(path);
 
       if (snapshot != null && snapshot.exists) {
-        for(DataSnapshot location in snapshot.children) {
-          for(DataSnapshot index in location.children){
-            for(DataSnapshot idFolder in index.children){
-              AdClass tempAd = AdClass.fromSnapshot(snapshot: idFolder);
-              tempAds.add(tempAd);
-            }
-          }
+        for(DataSnapshot idFolder in snapshot.children){
+          AdClass tempAd = AdClass.fromSnapshot(snapshot: idFolder);
+          tempAds.add(tempAd);
         }
       }
 
     } else {
 
       // Подгрузка если Windows
+
       dynamic data = await database.getInfoFromDbForWindows(path);
 
       if (data != null){
-        data.forEach((key, location) {
-          location.forEach((key, index){
-            index.forEach((key, idsFolders){
-              tempAds.add(
-                  AdClass.fromJson(json: idsFolders)
-              );
-            });
-          });
+        data.forEach((key, idFolders) {
+          tempAds.add(AdClass.fromJson(json: idFolders));
         });
       }
     }
@@ -145,7 +137,11 @@ class AdsList implements IEntitiesList<AdClass>{
     _currentAdsList = list;
   }
 
-  Future<List<AdClass>> getActiveAds({bool fromDb = false}) async {
+  Future<List<AdClass>> getNeededAds({
+    bool fromDb = false,
+    required AdStatusEnum status
+  }) async {
+
     List<AdClass> tempList = [];
 
     if (_currentAdsList.isEmpty || fromDb){
@@ -153,7 +149,7 @@ class AdsList implements IEntitiesList<AdClass>{
     }
 
     for (AdClass ad in _currentAdsList){
-      if (ad.status.status == AdStatusEnum.active){
+      if (ad.status.status == status){
         tempList.add(ad);
       }
     }
@@ -161,38 +157,35 @@ class AdsList implements IEntitiesList<AdClass>{
     return tempList;
   }
 
-  Future<List<AdClass>> getDraftAds({bool fromDb = false}) async {
+  bool checkActiveAd(AdClass ad){
+
+    SystemMethodsClass sm = SystemMethodsClass();
+
     List<AdClass> tempList = [];
 
-    if (_currentAdsList.isEmpty || fromDb){
-      await getListFromDb();
-    }
+    if (_currentAdsList.isNotEmpty){
 
-    for (AdClass ad in _currentAdsList){
-      if (ad.status.status == AdStatusEnum.draft){
-        tempList.add(ad);
+      for(AdClass tempAd in _currentAdsList){
+        if (tempAd.status.status == AdStatusEnum.active){
+          if (tempAd.location.location == ad.location.location && tempAd.adIndex.index == ad.adIndex.index){
+            tempList.add(tempAd);
+          }
+        }
+      }
+
+      for (AdClass tempAd in tempList){
+        if (tempAd.id != ad.id){
+          if (!sm.dateCrash(tempAd.startDate, tempAd.endDate, ad.startDate, ad.endDate)) {
+            return false;
+          }
+        }
+
       }
     }
 
-    return tempList;
+    return true;
+
   }
-
-  Future<List<AdClass>> getCompletedAds({bool fromDb = false}) async {
-    List<AdClass> tempList = [];
-
-    if (_currentAdsList.isEmpty || fromDb){
-      await getListFromDb();
-    }
-
-    for (AdClass ad in _currentAdsList){
-      if (ad.status.status == AdStatusEnum.completed){
-        tempList.add(ad);
-      }
-    }
-
-    return tempList;
-  }
-
 
 }
 

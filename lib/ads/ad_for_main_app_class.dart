@@ -48,7 +48,7 @@ class AdForMainApp implements IEntity{
   Future<String> deleteFromDb() async{
     DatabaseClass db = DatabaseClass();
 
-    String path = '${AdsConstants.adsForMainAppFolder}/${location.toString()}/${adIndex.toString()}/$id/';
+    String path = '${AdsConstants.adsForMainAppFolder}/$id/';
 
     String result = '';
 
@@ -91,7 +91,7 @@ class AdForMainApp implements IEntity{
       id = adId ?? 'noID_$headline';
     }
 
-    String path = '${AdsConstants.adsForMainAppFolder}/${location.toString()}/${adIndex.toString()}/$id/';
+    String path = '${AdsConstants.adsForMainAppFolder}/$id/';
 
     Map <String, dynamic> userData = getMap();
 

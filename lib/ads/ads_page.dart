@@ -1,5 +1,6 @@
 import 'package:admin_dvij/ads/ad_class.dart';
 import 'package:admin_dvij/ads/ad_view_create_edit_screen.dart';
+import 'package:admin_dvij/ads/ads_enums_class/ad_status.dart';
 import 'package:admin_dvij/ads/ads_list_class.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
@@ -41,9 +42,18 @@ class _AdsPageState extends State<AdsPage> {
       loading = true;
     });
 
-    activeAdsList = await adsList.getActiveAds(fromDb: fromDb);
-    draftAdsList = await adsList.getDraftAds(fromDb: fromDb);
-    completedAdsList = await adsList.getCompletedAds(fromDb: fromDb);
+    activeAdsList = await adsList.getNeededAds(
+        fromDb: fromDb,
+      status: AdStatusEnum.active
+    );
+    draftAdsList = await adsList.getNeededAds(
+        fromDb: fromDb,
+        status: AdStatusEnum.draft
+    );
+    completedAdsList = await adsList.getNeededAds(
+        fromDb: fromDb,
+        status: AdStatusEnum.completed
+    );
 
     setState(() {
       loading = false;
@@ -95,7 +105,10 @@ class _AdsPageState extends State<AdsPage> {
                   // Кнопка "Создать"
                   IconButton(
                     onPressed: () async {
-                      //await saveCity(null);
+                      final result = await sm.pushToPageWithResult(context: context, page: const AdViewCreateEditScreen(indexTabPage: 0));
+                      if (result != null){
+                        await initialization(fromDb: false);
+                      }
                     },
                     icon: const Icon(FontAwesomeIcons.plus, size: 15, color: AppColors.white,),
                   ),
@@ -185,7 +198,7 @@ class _AdsPageState extends State<AdsPage> {
                         itemCount: completedAdsList.length,
                         itemBuilder: (contextOnCard, index) {
 
-                          AdClass tempAd = activeAdsList[index];
+                          AdClass tempAd = completedAdsList[index];
 
                           return CardsElements.getCard(
                               context: context,
