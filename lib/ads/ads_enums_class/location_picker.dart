@@ -1,7 +1,6 @@
 import 'package:admin_dvij/ads/ads_enums_class/ad_location.dart';
 import 'package:flutter/material.dart';
 import '../../design/app_colors.dart';
-import 'ad_status.dart';
 
 class LocationPicker extends StatefulWidget {
   const LocationPicker({Key? key}) : super(key: key);

@@ -48,17 +48,12 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
   bool hasChanges = false;
 
-  // Переменные для сохранения изначальных даты рекламы
-  // Для исправления ошибки когда диапазон дат уже занят
-  // и отображаются выбранные даты
-  AdClass firstTempAd = AdClass.empty();
-
   AdClass ad = AdClass.empty();
 
   DateTime chosenStartDate = DateTime(2100);
   DateTime chosenEndDate = DateTime(2100);
-  AdLocation chosenLocation = AdLocation.fromString(text: '');
-  AdIndex chosenIndex = AdIndex.fromString(text: '');
+  AdLocation chosenLocation = AdLocation(location: AdLocationEnum.notChosen);
+  AdIndex chosenIndex = AdIndex(index: AdIndexEnum.notChosen);
   AdStatus chosenStatus = AdStatus(status: AdStatusEnum.notChosen);
 
 
@@ -83,8 +78,8 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
     setState(() {
       chosenStartDate = DateTime(2100);
       chosenEndDate = DateTime(2100);
-      chosenLocation = AdLocation.fromString(text: '');
-      chosenIndex = AdIndex.fromString(text: '');
+      chosenLocation = AdLocation(location: AdLocationEnum.notChosen);
+      chosenIndex = AdIndex(index: AdIndexEnum.notChosen);
       chosenStatus = AdStatus(status: AdStatusEnum.notChosen);
       _imageFile = null;
     });
@@ -122,12 +117,13 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
       loading = true;
     });
 
+    if (widget.ad == null){
+      canEdit = true;
+    }
+
     if (widget.ad != null) {
       ad = adList.getEntityFromList(widget.ad!.id);
 
-      // Сохраняем в переменные данные дат по умолчанию
-      // Для исправления ошибки если диапазон дат попадает в уже занятый
-      firstTempAd = ad;
     }
 
     resetChosenOptions();
@@ -157,6 +153,13 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
         ),
 
         actions: [
+          if (widget.ad != null) IconButton(
+            onPressed: () async {
+              await deleteAd();
+            },
+            icon: const Icon(FontAwesomeIcons.trash, size: 15, color: AppColors.attentionRed,),
+          ),
+
           IconButton(
             onPressed: () async {
               setState(() {
@@ -511,10 +514,10 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
       saving = true;
     });
 
-    setAdBeforeSaving();
+    AdClass tempAd = setAdBeforeSaving();
 
-    if (checkStatus()){
-      String publishResult = await ad.publishToDb(_imageFile);
+    if (checkStatus(tempAd)){
+      String publishResult = await tempAd.publishToDb(_imageFile);
 
       if (publishResult == SystemConstants.successConst) {
         _showSnackBar(AdsConstants.saveSuccess);
@@ -523,12 +526,14 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
         canEdit = false;
         resetChosenOptions();
         hasChanges = true;
+
+        if (widget.ad == null){
+          navigateToAdsListScreen();
+        }
+
       } else {
         _showSnackBar(publishResult);
       }
-    } else {
-      // Исправляем ошибку меняющихся дат если диапазон занят
-      ad = firstTempAd;
     }
 
     setState(() {
@@ -536,49 +541,82 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
     });
   }
 
-  bool checkStatus(){
+  Future<void> deleteAd() async{
+
+    bool? result = await ElementsOfDesign.exitDialog(
+        context,
+        'Удаленную рекламу нельзя будет восстановить',
+        ButtonsConstants.delete,
+        ButtonsConstants.cancel,
+        'Удалить рекламу'
+    );
+
+    if (result != null && result){
+      setState(() {
+        deleting = true;
+      });
+
+      String publishResult = await ad.deleteFromDb();
+
+      if (publishResult == SystemConstants.successConst){
+
+        hasChanges = true;
+        _showSnackBar(AdsConstants.saveSuccess);
+        navigateToAdsListScreen();
+
+      } else {
+        _showSnackBar(publishResult);
+      }
+
+      setState(() {
+        saving = false;
+      });
+    }
+  }
+
+  bool checkStatus(AdClass tempAd){
 
     AdsList adsList = AdsList();
 
-    if (ad.status.status == AdStatusEnum.active || chosenStatus.status == AdStatusEnum.active){
-      if (ad.adIndex.index == AdIndexEnum.notChosen){
+    if (tempAd.status.status == AdStatusEnum.active || chosenStatus.status == AdStatusEnum.active){
+      if (tempAd.adIndex.index == AdIndexEnum.notChosen){
         _showSnackBar('Для активации рекламы нужно выбрать слот');
         return false;
       }
 
-      if (ad.location.location == AdLocationEnum.notChosen){
+      if (tempAd.location.location == AdLocationEnum.notChosen){
         _showSnackBar('Для активации рекламы нужно выбрать место');
         return false;
       }
 
-      if (ad.startDate.year == 2100){
+      if (tempAd.startDate.year == 2100){
         _showSnackBar('Для активации рекламы нужно выбрать дату начала показа');
         return false;
       }
 
-      if (ad.endDate.year == 2100){
+      if (tempAd.endDate.year == 2100){
         _showSnackBar('Для активации рекламы нужно выбрать дату завершения показа');
         return false;
       }
 
-      if (ad.imageUrl == SystemConstants.defaultAdImagePath && _imageFile == null) {
+      if (tempAd.imageUrl == SystemConstants.defaultAdImagePath && _imageFile == null) {
         _showSnackBar('Для активации рекламы нужно выбрать изображение');
         return false;
       }
 
-      if (!adsList.checkActiveAd(ad)){
+      if (!adsList.checkActiveAd(tempAd)){
         _showSnackBar('Этот слот на указанные даты уже занят');
         return false;
       }
 
     }
 
-    if (ad.clientName.isEmpty || ad.clientPhone.isEmpty){
+    if (tempAd.clientName.isEmpty || tempAd.clientPhone.isEmpty){
       _showSnackBar('Для сохранения рекламы нужно указать данные заказчика');
       return false;
     }
 
-    if (ad.headline.isEmpty || ad.desc.isEmpty) {
+    if (tempAd.headline.isEmpty || tempAd.desc.isEmpty) {
       _showSnackBar('Для сохранения рекламы нужно заполнить заголовок и описание рекламы');
       return false;
     }
@@ -596,45 +634,64 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
     );
   }
 
-  void setAdBeforeSaving(){
+  AdClass setAdBeforeSaving(){
+
+    AdClass tempAd = AdClass.empty();
 
     if (chosenStatus.status != AdStatusEnum.notChosen){
-      ad.status = chosenStatus;
+      tempAd.status = chosenStatus;
+    } else {
+      tempAd.status = ad.status;
     }
 
     if (chosenLocation.location != AdLocationEnum.notChosen){
-      ad.location = chosenLocation;
+      tempAd.location = chosenLocation;
+    } else {
+      tempAd.location = ad.location;
     }
 
     if (chosenStartDate.year != 2100){
-      ad.startDate = chosenStartDate;
+      tempAd.startDate = chosenStartDate;
+    } else {
+      tempAd.startDate = ad.startDate;
     }
 
     if (chosenEndDate.year != 2100){
-      ad.endDate = chosenEndDate;
+      tempAd.endDate = chosenEndDate;
+    } else {
+      tempAd.endDate = ad.endDate;
     }
 
     if (chosenIndex.index != AdIndexEnum.notChosen){
-      ad.adIndex = chosenIndex;
+      tempAd.adIndex = chosenIndex;
+    } else {
+      tempAd.adIndex = ad.adIndex;
     }
 
-    ad.url = _urlController.text;
-    ad.desc = _descController.text;
-    ad.headline = _nameController.text;
-    ad.clientName = _clientNameController.text;
-    ad.clientPhone = _clientPhoneController.text;
-    ad.clientWhatsapp = _clientWhatsappController.text;
+    tempAd.url = _urlController.text;
+    tempAd.desc = _descController.text;
+    tempAd.headline = _nameController.text;
+    tempAd.clientName = _clientNameController.text;
+    tempAd.clientPhone = _clientPhoneController.text;
+    tempAd.clientWhatsapp = _clientWhatsappController.text;
+    tempAd.id = ad.id;
+    tempAd.imageUrl = ad.imageUrl;
+    tempAd.ordersDate = ad.ordersDate;
+
+    return tempAd;
 
   }
 
   void navigateToAdsListScreen() {
 
-    if (hasChanges){
-      sm.popBackToPreviousPageWithResult(context: context, result: ad);
+    sm.popBackToPreviousPageWithResult(context: context, result: ad);
+
+    /*if (hasChanges){
+
     } else {
       // Метод возвращения на экран списка без результата
       sm.pushAndDeletePreviousPages(context: context, page: AdsPage(initialIndex: widget.indexTabPage));
-    }
+    }*/
 
   }
 

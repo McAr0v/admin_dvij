@@ -64,7 +64,7 @@ class CardsElements{
     return GestureDetector(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 0),
+        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
         child: Card(
             color: AppColors.greyOnBackground,
             clipBehavior: Clip.antiAlias,

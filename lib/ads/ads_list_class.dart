@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:admin_dvij/ads/ad_class.dart';
+import 'package:admin_dvij/ads/ads_enums_class/ad_index.dart';
+import 'package:admin_dvij/ads/ads_enums_class/ad_location.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_status.dart';
 import 'package:admin_dvij/constants/ads_constants.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
@@ -139,7 +141,10 @@ class AdsList implements IEntitiesList<AdClass>{
 
   Future<List<AdClass>> getNeededAds({
     bool fromDb = false,
-    required AdStatusEnum status
+    required AdStatusEnum status,
+    AdLocationEnum location = AdLocationEnum.notChosen,
+    AdIndexEnum slot = AdIndexEnum.notChosen,
+    String searchingText = ''
   }) async {
 
     List<AdClass> tempList = [];
@@ -149,13 +154,43 @@ class AdsList implements IEntitiesList<AdClass>{
     }
 
     for (AdClass ad in _currentAdsList){
+      // Проверяем статус
       if (ad.status.status == status){
-        tempList.add(ad);
+        // Если location и slot не заданы, добавляем сразу
+        if (location == AdLocationEnum.notChosen && slot == AdIndexEnum.notChosen){
+          tempList.add(ad);
+        }
+        // Если переданы location и slot, проверяем их совпадение
+        else if (location != AdLocationEnum.notChosen && slot != AdIndexEnum.notChosen) {
+          if (ad.location.location == location && ad.adIndex.index == slot){
+            tempList.add(ad);
+          }
+        }
+        else if (location != AdLocationEnum.notChosen && ad.location.location == location){
+          tempList.add(ad);
+        }
+        else if (slot != AdIndexEnum.notChosen && ad.adIndex.index == slot){
+          tempList.add(ad);
+        }
       }
+    }
+
+    if (searchingText.isNotEmpty){
+      tempList = tempList
+          .where((ad) =>
+          ad.headline.toLowerCase().contains(searchingText.toLowerCase()) ||
+          ad.desc.toLowerCase().contains(searchingText.toLowerCase()) ||
+          ad.location.toString(translate: true).toLowerCase().contains(searchingText.toLowerCase()) ||
+          ad.adIndex.toString(translate: true).toLowerCase().contains(searchingText.toLowerCase()) ||
+          ad.clientPhone.toLowerCase().contains(searchingText.toLowerCase()) ||
+          ad.clientName.toLowerCase().contains(searchingText.toLowerCase())
+      ).toList();
     }
 
     return tempList;
   }
+
+
 
   bool checkActiveAd(AdClass ad){
 
