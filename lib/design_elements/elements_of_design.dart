@@ -221,6 +221,22 @@ class ElementsOfDesign {
     );
   }
 
+  static Tab getTabWithIcon({
+    required IconData icon,
+    required String text
+  }){
+    return Tab(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, size: 15,),
+          const SizedBox(width: 10,),
+          Text(text, style: const TextStyle(fontSize: 13),),
+        ],
+      ),
+    );
+  }
+
   static Widget buildTextField({
     required TextEditingController controller,
     required String labelText,

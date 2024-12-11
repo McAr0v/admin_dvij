@@ -11,10 +11,16 @@ class AdsConstants{
   static const mainPageHeadline = 'На главной странице';
   static const notChosenHeadline = 'Место не выбрано';
 
+  // tabs
+  static const activeTab = 'Активные';
+  static const draftTab = 'Черновики';
+  static const completedTab = 'Завершенные';
+
   // screens
   static const editAd = 'Редактирование рекламы';
   static const createAd = 'Создание рекламы';
   static const createAdProcess = 'Идет создание рекламы';
+  static const loadingAdProcess = 'Идет загрузка объявлений';
   static const deleteAdProcess = 'Идет удаление рекламы';
   static const editAdProcess = 'Сохранение рекламы';
 
@@ -56,5 +62,26 @@ class AdsConstants{
   static const adsForMainAppFolder = 'ads_for_users';
 
   static const String saveSuccess = 'Реклама успешно сохранена!';
+  static const String searchBarHeadline = 'Название, заказчик, слот, локация...';
+
+  // dates
+
+  static const String startDateHeadline = 'Первый день показов';
+  static const String endDateHeadline = 'Последний день показов';
+  static const String deleteAdDesc = 'Удаленную рекламу нельзя будет восстановить';
+  static const String deleteAdHeadline = 'Удалить рекламу';
+
+  // systems
+
+  static const String slotSelectionError = 'Для активации рекламы нужно выбрать слот';
+  static const String placeSelectionError = 'Для активации рекламы нужно выбрать место';
+  static const String startDateSelectionError = 'Для активации рекламы нужно выбрать дату начала показа';
+  static const String endDateSelectionError = 'Для активации рекламы нужно выбрать дату завершения показа';
+  static const String imageSelectionError = 'Для активации рекламы нужно выбрать изображение';
+  static const String slotOccupiedError = 'Этот слот на указанные даты уже занят';
+  static const String customerDataError = 'Для сохранения рекламы нужно указать данные заказчика';
+  static const String titleAndDescriptionError = 'Для сохранения рекламы нужно заполнить заголовок и описание рекламы';
+  static const String emptyAdList = 'Нет объявлений';
+
 
 }

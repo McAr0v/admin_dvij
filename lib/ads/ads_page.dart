@@ -4,7 +4,10 @@ import 'package:admin_dvij/ads/ads_enums_class/ad_index.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_location.dart';
 import 'package:admin_dvij/ads/ads_enums_class/ad_status.dart';
 import 'package:admin_dvij/ads/ads_list_class.dart';
+import 'package:admin_dvij/ads/ads_list_screen.dart';
 import 'package:admin_dvij/ads/filter_picker.dart';
+import 'package:admin_dvij/constants/ads_constants.dart';
+import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
@@ -13,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/screen_constants.dart';
 import '../design/app_colors.dart';
-import '../design_elements/cards_elements.dart';
 
 class AdsPage extends StatefulWidget {
   final int initialIndex;
@@ -29,7 +31,7 @@ class _AdsPageState extends State<AdsPage> {
 
   bool loading = false;
 
-  TextEditingController searchingController = TextEditingController();
+
 
   AdsList adsList = AdsList();
   List<AdClass> activeAdsList = [];
@@ -39,6 +41,7 @@ class _AdsPageState extends State<AdsPage> {
   // Переменные фильтра
   AdIndex filterSlot = AdIndex(index: AdIndexEnum.notChosen);
   AdLocation filterLocation = AdLocation(location: AdLocationEnum.notChosen);
+  TextEditingController searchingController = TextEditingController();
 
   @override
   void initState() {
@@ -66,10 +69,10 @@ class _AdsPageState extends State<AdsPage> {
 
     activeAdsList = await adsList.getNeededAds(
         fromDb: fromDb,
-      status: AdStatusEnum.active,
-      location: location,
-      slot: slot,
-      searchingText: searchingText
+        status: AdStatusEnum.active,
+        location: location,
+        slot: slot,
+        searchingText: searchingText
     );
     draftAdsList = await adsList.getNeededAds(
         fromDb: fromDb,
@@ -109,6 +112,16 @@ class _AdsPageState extends State<AdsPage> {
 
   }
 
+  Future<void> createAd() async{
+
+    final result = await sm.pushToPageWithResult(context: context, page: const AdViewCreateEditScreen(indexTabPage: 0));
+
+    if (result != null){
+      await initializationAndFilter(fromDb: false, slot: filterSlot.index, location: filterLocation.location, searchingText: searchingController.text );
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -116,30 +129,33 @@ class _AdsPageState extends State<AdsPage> {
         length: 3,
         child: Stack(
           children: [
-            if (loading) LoadingScreen(loadingText: 'Идет загрузка рекламы',),
+            if (loading) const LoadingScreen(loadingText: AdsConstants.loadingAdProcess,),
             if (!loading) Scaffold(
               appBar: AppBar(
-                title: Text(
-                  ScreenConstants.adsPage,
-                ),
+                title: const Text(ScreenConstants.adsPage),
                 actions: [
 
                   // КНОПКИ В AppBar
 
-                  // Кнопка "Фильтр"
-
                   Row(
                     children: [
+
+                      // Кнопка сброса фильтра
+
                       if (filterLocation.location != AdLocationEnum.notChosen || filterSlot.index != AdIndexEnum.notChosen)
                         ElementsOfDesign.linkButton(
                             method: () async {
                               await resetFilter();
                             },
-                            text: 'Сбросить',
+                            text: ButtonsConstants.reset,
                             context: context
                         ),
+
                       if (filterLocation.location != AdLocationEnum.notChosen || filterSlot.index != AdIndexEnum.notChosen)
                         const SizedBox(width: 10,),
+
+                      // Кнопка "Фильтр"
+
                       IconButton(
                         onPressed: () async {
                           await filterAds();
@@ -153,6 +169,7 @@ class _AdsPageState extends State<AdsPage> {
                   ),
 
                   // Кнопка "Обновить"
+
                   IconButton(
                     onPressed: () async {
                       await initializationAndFilter(fromDb: true, slot: filterSlot.index, location: filterLocation.location, searchingText: searchingController.text);
@@ -161,143 +178,66 @@ class _AdsPageState extends State<AdsPage> {
                   ),
 
                   // Кнопка "Создать"
+
                   IconButton(
                     onPressed: () async {
-                      final result = await sm.pushToPageWithResult(context: context, page: const AdViewCreateEditScreen(indexTabPage: 0));
-                      if (result != null){
-                        await initializationAndFilter(fromDb: false, slot: filterSlot.index, location: filterLocation.location, searchingText: searchingController.text );
-                      }
+                      await createAd();
                     },
                     icon: const Icon(FontAwesomeIcons.plus, size: 15, color: AppColors.white,),
                   ),
 
-
-
                 ],
-                bottom: const TabBar(
+
+                // ТАБЫ
+
+                bottom: TabBar(
                   tabs: [
-                    Tab(
-                      child: Row(
-                        children: [
-                          Icon(FontAwesomeIcons.fire, size: 15,),
-                          SizedBox(width: 10,),
-                          Text('Активные', style: TextStyle(fontSize: 13),),
-
-                        ],
-                        mainAxisAlignment: MainAxisAlignment.center,
-                      ),
-                    ),
-                    Tab(
-                      child: Row(
-                        children: [
-                          Icon(FontAwesomeIcons.fileLines, size: 15,),
-                          SizedBox(width: 10, ),
-                          Text('Черновики', style: TextStyle(fontSize: 13),),
-
-                        ],
-                        mainAxisAlignment: MainAxisAlignment.center,
-                      ),
-                    ),
-                    Tab(
-                      child: Row(
-                        children: [
-                          Icon(FontAwesomeIcons.circleCheck, size: 15,),
-                          SizedBox(width: 10,),
-                          Text('Завершенные', style: TextStyle(fontSize: 13),),
-
-                        ],
-                        mainAxisAlignment: MainAxisAlignment.center,
-                      ),
-                    ),
+                    ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.fire, text: AdsConstants.activeTab),
+                    ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.fileLines, text: AdsConstants.draftTab),
+                    ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.circleCheck, text: AdsConstants.completedTab),
                   ],
                 ),
               ),
+
+              // СОДЕРЖИМОЕ СТРАНИЦЫ
+
               body: Column(
                 children: [
                   ElementsOfDesign.getSearchBar(
                       context: context,
                       textController: searchingController,
-                      labelText: 'Название, заказчик, слот, локация...',
+                      labelText: AdsConstants.searchBarHeadline,
                       icon: FontAwesomeIcons.searchengin,
                       onChanged: (value) async {
-                        searchingController.text = value;
-
-                        await initializationAndFilter(
-                            fromDb: false,
-                            location: filterLocation.location,
-                          slot: filterSlot.index,
-                          searchingText: value,
-                        );
-
+                        await searchingAction(text: value);
                       },
                       onClean: () async{
-                        searchingController.text = '';
-                        await initializationAndFilter(
-                            fromDb: false,
-                            location: filterLocation.location,
-                            slot: filterSlot.index,
-                            searchingText: searchingController.text,
-                        );
+                        await searchingAction(text: '');
                       }
                   ),
                   Expanded(
                     child: TabBarView(
                         children: [
-                          ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                              itemCount: activeAdsList.length,
-                              itemBuilder: (context, index) {
 
-                                AdClass tempAd = activeAdsList[index];
-
-                                return CardsElements.getCard(
-                                    context: context,
-                                    onTap: () async {
-                                      await editAds(ad: tempAd, tabIndex: 0);
-                                    },
-                                    imageUrl: tempAd.imageUrl,
-                                    widget: tempAd.getInfoWidget(context: context),
-                                  leftTopTag: tempAd.status.getStatusWidget(context: context)
-                                );
-
-                              }
+                          AdsListScreen(
+                              adsList: activeAdsList,
+                              editAds: (index) async {
+                                await editAds(ad: activeAdsList[index], tabIndex: 0);
+                              },
                           ),
-                          ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                              itemCount: draftAdsList.length,
-                              itemBuilder: (context, index) {
 
-                                AdClass tempAd = draftAdsList[index];
-                                return  CardsElements.getCard(
-                                    context: context,
-                                    onTap: () async {
-                                      await editAds(ad: tempAd, tabIndex: 1);
-                                    },
-                                    imageUrl: tempAd.imageUrl,
-                                    widget: tempAd.getInfoWidget(context: context),
-                                    leftTopTag: tempAd.status.getStatusWidget(context: context)
-                                );
-
-                              }
+                          AdsListScreen(
+                            adsList: draftAdsList,
+                            editAds: (index) async {
+                              await editAds(ad: draftAdsList[index], tabIndex: 1);
+                            },
                           ),
-                          ListView.builder(
-                              padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                              itemCount: completedAdsList.length,
-                              itemBuilder: (contextOnCard, index) {
 
-                                AdClass tempAd = completedAdsList[index];
-
-                                return CardsElements.getCard(
-                                    context: context,
-                                    onTap: () async {
-                                      await editAds(ad: tempAd, tabIndex: 2);
-                                    },
-                                    imageUrl: tempAd.imageUrl,
-                                    widget: tempAd.getInfoWidget(context: context),
-                                    leftTopTag: tempAd.status.getStatusWidget(context: context)
-                                );
-
-                              }
+                          AdsListScreen(
+                            adsList: completedAdsList,
+                            editAds: (index) async {
+                              await editAds(ad: completedAdsList[index], tabIndex: 2);
+                            },
                           ),
                         ]
                     ),
@@ -308,6 +248,17 @@ class _AdsPageState extends State<AdsPage> {
             ),
           ],
         )
+    );
+  }
+
+  Future<void> searchingAction({required String text}) async {
+    searchingController.text = text;
+
+    await initializationAndFilter(
+      fromDb: false,
+      location: filterLocation.location,
+      slot: filterSlot.index,
+      searchingText: searchingController.text,
     );
   }
 

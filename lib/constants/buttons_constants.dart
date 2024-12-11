@@ -7,5 +7,6 @@ class ButtonsConstants {
   static const String logIn = 'Войти';
   static const String logOut = 'Выйти';
   static const String changePhoto = 'Изменить фото';
+  static const String reset = 'Сбросить';
 
 }

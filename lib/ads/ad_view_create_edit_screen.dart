@@ -7,7 +7,6 @@ import 'package:admin_dvij/ads/ads_enums_class/location_picker.dart';
 import 'package:admin_dvij/ads/ads_enums_class/slot_picker.dart';
 import 'package:admin_dvij/ads/ads_enums_class/status_picker.dart';
 import 'package:admin_dvij/ads/ads_list_class.dart';
-import 'package:admin_dvij/ads/ads_page.dart';
 import 'package:admin_dvij/constants/ads_constants.dart';
 import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/constants/date_constants.dart';
@@ -43,7 +42,6 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
   bool loading = false;
   bool saving = false;
   bool deleting = false;
-  bool edit = false;
   bool canEdit = false;
 
   bool hasChanges = false;
@@ -55,8 +53,6 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
   AdLocation chosenLocation = AdLocation(location: AdLocationEnum.notChosen);
   AdIndex chosenIndex = AdIndex(index: AdIndexEnum.notChosen);
   AdStatus chosenStatus = AdStatus(status: AdStatusEnum.notChosen);
-
-
 
   File? _imageFile;
 
@@ -173,7 +169,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
       body: Stack(
         children: [
-          if (saving) LoadingScreen(loadingText: widget.ad == null ? AdsConstants.createAdProcess : AdsConstants.createAdProcess,)
+          if (saving) LoadingScreen(loadingText: widget.ad == null ? AdsConstants.createAdProcess : AdsConstants.editAdProcess,)
           else if (loading) const LoadingScreen()
           else if (deleting) const LoadingScreen(loadingText: AdsConstants.deleteAdProcess,)
           else SingleChildScrollView(
@@ -191,7 +187,9 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                           clipBehavior: Clip.antiAlias,
                           child: Stack(
                             children: [
+
                               ElementsOfDesign.getImageFromUrlOrPickedImage(url: ad.imageUrl, imageFile: _imageFile),
+
                               if (canEdit) Positioned(
                                   top: 10,
                                   left: 10,
@@ -203,7 +201,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                                           method: () async {
                                             await _pickImage();
                                           },
-                                          text: 'Редактировать изображение',
+                                          text: ButtonsConstants.changePhoto,
                                           context: context
                                       ),
 
@@ -255,9 +253,6 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                                   await slotPopup();
                                 },
                               ),
-
-
-
                             ]
                         ),
 
@@ -295,7 +290,6 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                                   await _selectEndDate(context);
                                 },
                               ),
-
                             ]
                         ),
 
@@ -359,8 +353,6 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
                         const SizedBox(height: 20,),
 
-
-
                         if (canEdit) ElementsOfDesign.buildAdaptiveRow(
                             isMobile,
                             [
@@ -387,17 +379,15 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                               ),
                             ]
                         ),
-
                       ],
                     ),
-                      ),
+                  ),
                 ],
               ),
             ),
           )
         ],
       ),
-
     );
   }
 
@@ -452,7 +442,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
     final DateTime? picked = await sm.dataPicker(
         context: context,
-        label: 'Первый день показов',
+        label: AdsConstants.startDateHeadline,
         firstDate: DateTime(2024),
         lastDate: DateTime(2050),
         currentDate: currentDate,
@@ -480,7 +470,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
     final DateTime? picked = await sm.dataPicker(
         context: context,
-        label: 'Последний день показов',
+        label: AdsConstants.endDateHeadline,
         firstDate: DateTime(2024),
         lastDate: DateTime(2050),
         currentDate: currentDate,
@@ -545,10 +535,10 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
     bool? result = await ElementsOfDesign.exitDialog(
         context,
-        'Удаленную рекламу нельзя будет восстановить',
+        AdsConstants.deleteAdDesc,
         ButtonsConstants.delete,
         ButtonsConstants.cancel,
-        'Удалить рекламу'
+        AdsConstants.deleteAdHeadline,
     );
 
     if (result != null && result){
@@ -580,44 +570,44 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
     if (tempAd.status.status == AdStatusEnum.active || chosenStatus.status == AdStatusEnum.active){
       if (tempAd.adIndex.index == AdIndexEnum.notChosen){
-        _showSnackBar('Для активации рекламы нужно выбрать слот');
+        _showSnackBar(AdsConstants.slotSelectionError);
         return false;
       }
 
       if (tempAd.location.location == AdLocationEnum.notChosen){
-        _showSnackBar('Для активации рекламы нужно выбрать место');
+        _showSnackBar(AdsConstants.placeSelectionError);
         return false;
       }
 
       if (tempAd.startDate.year == 2100){
-        _showSnackBar('Для активации рекламы нужно выбрать дату начала показа');
+        _showSnackBar(AdsConstants.startDateSelectionError);
         return false;
       }
 
       if (tempAd.endDate.year == 2100){
-        _showSnackBar('Для активации рекламы нужно выбрать дату завершения показа');
+        _showSnackBar(AdsConstants.endDateSelectionError);
         return false;
       }
 
       if (tempAd.imageUrl == SystemConstants.defaultAdImagePath && _imageFile == null) {
-        _showSnackBar('Для активации рекламы нужно выбрать изображение');
+        _showSnackBar(AdsConstants.imageSelectionError);
         return false;
       }
 
       if (!adsList.checkActiveAd(tempAd)){
-        _showSnackBar('Этот слот на указанные даты уже занят');
+        _showSnackBar(AdsConstants.slotOccupiedError);
         return false;
       }
 
     }
 
     if (tempAd.clientName.isEmpty || tempAd.clientPhone.isEmpty){
-      _showSnackBar('Для сохранения рекламы нужно указать данные заказчика');
+      _showSnackBar(AdsConstants.customerDataError);
       return false;
     }
 
     if (tempAd.headline.isEmpty || tempAd.desc.isEmpty) {
-      _showSnackBar('Для сохранения рекламы нужно заполнить заголовок и описание рекламы');
+      _showSnackBar(AdsConstants.titleAndDescriptionError);
       return false;
     }
 
@@ -683,16 +673,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
   }
 
   void navigateToAdsListScreen() {
-
     sm.popBackToPreviousPageWithResult(context: context, result: ad);
-
-    /*if (hasChanges){
-
-    } else {
-      // Метод возвращения на экран списка без результата
-      sm.pushAndDeletePreviousPages(context: context, page: AdsPage(initialIndex: widget.indexTabPage));
-    }*/
-
   }
 
 }
