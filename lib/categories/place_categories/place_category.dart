@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:admin_dvij/categories/place_categories/place_categories_list.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -145,5 +146,9 @@ class PlaceCategory implements IEntity {
         ),
       ),
     );
+  }
+
+  Widget getCategoryWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(context: context, text: name);
   }
 }

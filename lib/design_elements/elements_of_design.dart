@@ -261,6 +261,30 @@ class ElementsOfDesign {
     );
   }
 
+  static Widget getTag({
+    required BuildContext context,
+    Color color = AppColors.brandColor,
+    required String text,
+    IconData? icon,
+    Color textColor = AppColors.greyOnBackground
+  }){
+    return IntrinsicWidth(
+      child: Card(
+        color: color,
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: Row(
+            children: [
+              if (icon != null) Icon(icon, color: textColor, size: 15,),
+              if (icon != null) const SizedBox(width: 10,),
+              Text(text, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: textColor),),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   static Future<bool?> exitDialog(BuildContext context, String message, String confirmText, String cancelText, String headline) async {
     return await showDialog<bool>(
       context: context,

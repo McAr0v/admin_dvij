@@ -1,4 +1,5 @@
 import 'package:admin_dvij/design/app_colors.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:flutter/material.dart';
 
 import '../../constants/ads_constants.dart';
@@ -48,12 +49,11 @@ class AdStatus {
   }
 
   Widget getStatusWidget({required BuildContext context}){
-    return Card(
-      color: switchColorWidget(),
-      child: Padding(
-          padding: const EdgeInsets.all(8),
-        child: Text(toString(translate: true), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: switchTextColorWidget()),),
-      ),
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: toString(translate: true),
+        color: switchColorWidget(),
+        textColor: switchTextColorWidget()
     );
   }
 

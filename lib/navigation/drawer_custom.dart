@@ -3,6 +3,7 @@ import 'package:admin_dvij/ads/ads_page.dart';
 import 'package:admin_dvij/categories/event_categories/event_categories_list_screen.dart';
 import 'package:admin_dvij/categories/place_categories/place_categories_list_screen.dart';
 import 'package:admin_dvij/categories/promo_categories/promo_categories_list_screen.dart';
+import 'package:admin_dvij/places/places_list_screen.dart';
 import 'package:admin_dvij/users/admin_user/admins_list_screen.dart';
 import 'package:admin_dvij/users/admin_user/profile_screen.dart';
 import 'package:admin_dvij/cities/cities_list_screen.dart';
@@ -126,6 +127,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ScreenConstants.adsPage,
                 FontAwesomeIcons.rectangleAd,
                 const AdsPage(),
+                context
+            ),
+            ElementsOfDesign.drawerListElement(
+                ScreenConstants.places,
+                FontAwesomeIcons.house,
+                const PlacesListScreen(),
                 context
             ),
           ],
