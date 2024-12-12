@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
@@ -34,6 +35,7 @@ class SimpleUser extends IEntity{
   Gender gender;
   String avatar;
   DateTime registrationDate;
+  List<PlaceAdmin> placesList;
 
   SimpleUser({
     required this.uid,
@@ -49,6 +51,7 @@ class SimpleUser extends IEntity{
     required this.gender,
     required this.avatar,
     required this.registrationDate,
+    required this.placesList
   });
 
   factory SimpleUser.empty() {
@@ -66,6 +69,7 @@ class SimpleUser extends IEntity{
         whatsapp: '',
         telegram: '',
         instagram: '',
+      placesList: []
 
     );
   }

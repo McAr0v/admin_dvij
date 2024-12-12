@@ -80,6 +80,7 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
 
       if (snapshot != null && snapshot.exists) {
         for(DataSnapshot admin in snapshot.children) {
+          // TODO Вот здесь переделать - передавать папку не users_info, а всю корневую папку UID пользователя
           SimpleUser tempUser = SimpleUser.fromSnapshot(admin.child(SimpleUsersConstants.usersFolderInfo));
           tempUsersList.add(tempUser);
         }
