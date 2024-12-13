@@ -79,10 +79,10 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
       DataSnapshot? snapshot = await database.getInfoFromDb(path);
 
       if (snapshot != null && snapshot.exists) {
-        for(DataSnapshot admin in snapshot.children) {
-          // TODO Вот здесь переделать - передавать папку не users_info, а всю корневую папку UID пользователя
-          SimpleUser tempUser = SimpleUser.fromSnapshot(admin.child(SimpleUsersConstants.usersFolderInfo));
-          tempUsersList.add(tempUser);
+        for(DataSnapshot user in snapshot.children) {
+          if (user.exists){
+            tempUsersList.add(SimpleUser.fromSnapshot(user));
+          }
         }
       }
 
@@ -95,7 +95,7 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
         data.forEach((key, value) {
 
           tempUsersList.add(
-              SimpleUser.fromJson(value[SimpleUsersConstants.usersFolderInfo])
+              SimpleUser.fromJson(value)
           );
         });
       }

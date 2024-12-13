@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
@@ -76,48 +77,62 @@ class SimpleUser extends IEntity{
 
   factory SimpleUser.fromSnapshot(DataSnapshot snapshot){
 
-    DateTime birthDate = DateTime.parse(snapshot.child(DatabaseConstants.birthDate).value.toString());
-    DateTime regDate = DateTime.parse(snapshot.child(DatabaseConstants.registrationDate).value.toString());
+    DataSnapshot infoFolder = snapshot.child(SimpleUsersConstants.usersFolderInfo);
+    DataSnapshot myPlacesFolder = snapshot.child(SimpleUsersConstants.usersMyPlacesFolder);
+
+    DateTime birthDate = DateTime.parse(infoFolder.child(DatabaseConstants.birthDate).value.toString());
+    DateTime regDate = DateTime.parse(infoFolder.child(DatabaseConstants.registrationDate).value.toString());
+
+    List<PlaceAdmin> myPlaces = PlaceAdmin.empty().getPlacesListFromSnapshot(myPlacesFolder);
 
     CitiesList cityList = CitiesList();
-    City city = cityList.getEntityFromList(snapshot.child(DatabaseConstants.city).value.toString());
+    City city = cityList.getEntityFromList(infoFolder.child(DatabaseConstants.city).value.toString());
 
     return SimpleUser(
-        uid: snapshot.child(DatabaseConstants.uid).value.toString(),
-        name: snapshot.child(DatabaseConstants.name).value.toString(),
-        lastName: snapshot.child(DatabaseConstants.lastName).value.toString(),
-        phone: snapshot.child(DatabaseConstants.phone).value.toString(),
-        email: snapshot.child(DatabaseConstants.email).value.toString(),
+        uid: infoFolder.child(DatabaseConstants.uid).value.toString(),
+        name: infoFolder.child(DatabaseConstants.name).value.toString(),
+        lastName: infoFolder.child(DatabaseConstants.lastName).value.toString(),
+        phone: infoFolder.child(DatabaseConstants.phone).value.toString(),
+        email: infoFolder.child(DatabaseConstants.email).value.toString(),
         birthDate: birthDate,
-        avatar: snapshot.child(DatabaseConstants.avatar).value.toString(),
+        avatar: infoFolder.child(DatabaseConstants.avatar).value.toString(),
         registrationDate: regDate,
         city: city,
-        gender: Gender.fromString(snapshot.child(DatabaseConstants.gender).value.toString()),
-        whatsapp: snapshot.child(DatabaseConstants.whatsapp).value.toString(),
-        telegram: snapshot.child(DatabaseConstants.telegram).value.toString(),
-        instagram: snapshot.child(DatabaseConstants.instagram).value.toString()
+        gender: Gender.fromString(infoFolder.child(DatabaseConstants.gender).value.toString()),
+        whatsapp: infoFolder.child(DatabaseConstants.whatsapp).value.toString(),
+        telegram: infoFolder.child(DatabaseConstants.telegram).value.toString(),
+        instagram: infoFolder.child(DatabaseConstants.instagram).value.toString(),
+        placesList: myPlaces
     );
   }
 
   factory SimpleUser.fromJson(Map<String, dynamic> json) {
 
+    // DataSnapshot infoFolder = snapshot.child(SimpleUsersConstants.usersFolderInfo);
+
+    Map<String, dynamic> infoFolder = json[SimpleUsersConstants.usersFolderInfo];
+    Map<String, dynamic> myPlacesFolder = json[SimpleUsersConstants.usersMyPlacesFolder];
+
+    List<PlaceAdmin> myPlaces = PlaceAdmin.empty().getPlacesListFromJson(myPlacesFolder);
+
     CitiesList cityList = CitiesList();
-    City city = cityList.getEntityFromList(json[DatabaseConstants.city] ?? '');
+    City city = cityList.getEntityFromList(infoFolder[DatabaseConstants.city] ?? '');
 
     return SimpleUser(
-        uid: json[DatabaseConstants.uid] ?? '',
-        name: json[DatabaseConstants.name] ?? '',
-        lastName: json[DatabaseConstants.lastName] ?? '',
-        phone: json[DatabaseConstants.phone] ?? '',
-        email: json[DatabaseConstants.email] ?? '',
-        birthDate: DateTime.parse(json[DatabaseConstants.birthDate] ?? '2100-01-01'),
-        avatar: json[DatabaseConstants.avatar] ?? '',
-        registrationDate: DateTime.parse(json[DatabaseConstants.registrationDate] ?? '2100-01-01'),
+        uid: infoFolder[DatabaseConstants.uid] ?? '',
+        name: infoFolder[DatabaseConstants.name] ?? '',
+        lastName: infoFolder[DatabaseConstants.lastName] ?? '',
+        phone: infoFolder[DatabaseConstants.phone] ?? '',
+        email: infoFolder[DatabaseConstants.email] ?? '',
+        birthDate: DateTime.parse(infoFolder[DatabaseConstants.birthDate] ?? '2100-01-01'),
+        avatar: infoFolder[DatabaseConstants.avatar] ?? '',
+        registrationDate: DateTime.parse(infoFolder[DatabaseConstants.registrationDate] ?? '2100-01-01'),
         city: city,
-        gender: Gender.fromString(json[DatabaseConstants.gender] ?? ''),
-        whatsapp: json[DatabaseConstants.whatsapp] ?? '',
-        telegram: json[DatabaseConstants.telegram] ?? '',
-        instagram: json[DatabaseConstants.instagram] ?? ''
+        gender: Gender.fromString(infoFolder[DatabaseConstants.gender] ?? ''),
+        whatsapp: infoFolder[DatabaseConstants.whatsapp] ?? '',
+        telegram: infoFolder[DatabaseConstants.telegram] ?? '',
+        instagram: infoFolder[DatabaseConstants.instagram] ?? '',
+        placesList: myPlaces
     );
   }
 
@@ -364,6 +379,10 @@ class SimpleUser extends IEntity{
                     Text(email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
                     Text(
                       getAdminRole().getNameOrDescOfRole(true),
+                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                    ),
+                    Text(
+                      'Моих заведений - ${placesList.length.toString()}',
                       style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
                     ),
                   ],

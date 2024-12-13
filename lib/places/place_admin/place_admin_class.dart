@@ -30,6 +30,40 @@ class PlaceAdmin{
     );
   }
 
+  List<PlaceAdmin> getPlacesListFromSnapshot(DataSnapshot snapshot){
+
+    List<PlaceAdmin> myPlaces = [];
+
+    for (DataSnapshot idFolders in snapshot.children){
+      if (idFolders.exists){
+        PlaceAdmin tempAdmin = PlaceAdmin.fromSnapshot(idFolders);
+        if (tempAdmin.placeId.isNotEmpty){
+          myPlaces.add(tempAdmin);
+        }
+      }
+    }
+
+    return myPlaces;
+
+  }
+
+  List<PlaceAdmin> getPlacesListFromJson(Map<String, dynamic> json){
+
+    List<PlaceAdmin> myPlaces = [];
+
+    json.forEach((key, idFolder){
+      if (idFolder != null){
+        PlaceAdmin tempAdmin = PlaceAdmin.fromJson(json: idFolder);
+        if (tempAdmin.placeId.isNotEmpty){
+          myPlaces.add(tempAdmin);
+        }
+      }
+    });
+
+    return myPlaces;
+
+  }
+
 
   Map<String, dynamic> getMap(){
     return {
