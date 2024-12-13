@@ -9,6 +9,7 @@ import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/system_methods/methods_for_database.dart';
+import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -151,6 +152,8 @@ class Place implements IEntity{
   @override
   Future<String> deleteFromDb()async {
 
+    SimpleUsersList usersList = SimpleUsersList();
+
     DatabaseClass db = DatabaseClass();
 
     String path = '${PlacesConstants.placesPath}/$id/';
@@ -169,7 +172,7 @@ class Place implements IEntity{
       placesList.deleteEntityFromDownloadedList(id);
     }
 
-    // TODO Сделать удаление записей у админов
+    await usersList.deletePlaceAdminsFromAllUsers(id);
 
     if (eventsList.isNotEmpty){
       // TODO Сделать удаление мероприятий этого заведения
@@ -238,6 +241,8 @@ class Place implements IEntity{
       PlacesList placesList = PlacesList();
       placesList.addToCurrentDownloadedList(this);
     }
+
+    // TODO Сделать публикацию записи у создателя
 
     return result;
   }

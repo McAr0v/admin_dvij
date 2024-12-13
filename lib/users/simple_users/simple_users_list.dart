@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
+import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../../database/database_class.dart';
@@ -43,6 +44,8 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
     }
   }
 
+
+
   @override
   Future<List<SimpleUser>> getDownloadedList({bool fromDb = false}) async{
     if (_currentSimpleUsersList.isEmpty || fromDb) {
@@ -65,6 +68,8 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
     }
     return returnedUser;
   }
+
+
 
   @override
   Future<List<SimpleUser>> getListFromDb() async{
@@ -129,6 +134,21 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
   void setDownloadedList(List<SimpleUser> list) {
     _currentSimpleUsersList = [];
     _currentSimpleUsersList = list;
+  }
+
+  Future<String> deletePlaceAdminsFromAllUsers(String placeId) async{
+
+    String result = '';
+
+    for(SimpleUser tempUser in _currentSimpleUsersList){
+      if (tempUser.checkAdminRoleInUser(placeId)){
+        result = await tempUser.deletePlaceRoleFromUser(placeId);
+        addToCurrentDownloadedList(tempUser);
+      }
+    }
+
+    return result;
+
   }
 
 }

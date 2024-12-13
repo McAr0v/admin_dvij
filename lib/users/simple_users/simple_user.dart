@@ -166,6 +166,8 @@ class SimpleUser extends IEntity{
     return result;
   }
 
+
+
   @override
   Map<String, dynamic> getMap() {
     return <String, dynamic> {
@@ -241,6 +243,8 @@ class SimpleUser extends IEntity{
     return result;
   }
 
+
+
   Future<SimpleUser> getUserFromDownloadedList({required String uid, bool fromDb = false}) async{
 
     SimpleUsersList usersList = SimpleUsersList();
@@ -307,6 +311,71 @@ class SimpleUser extends IEntity{
     SystemMethodsClass sm = SystemMethodsClass();
 
     return sm.calculateYears(birthDate);
+
+  }
+
+  bool checkAdminRoleInUser(String placeId){
+    for (PlaceAdmin admin in placesList){
+      if (admin.placeId == placeId){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<String> deletePlaceRoleFromUser(String placeId) async{
+
+    PlaceAdmin tempAdmin = PlaceAdmin.empty();
+
+    String result = '';
+
+    for (PlaceAdmin admin in placesList){
+      if (admin.placeId == placeId){
+        tempAdmin = admin;
+        break;
+      }
+    }
+
+    if (tempAdmin.placeId.isNotEmpty){
+      result = await tempAdmin.deleteFromDb(uid);
+    }
+
+    if (result == SystemConstants.successConst) {
+      deletePlaceFromMyPlacesList(placeId);
+    }
+
+    return result;
+
+  }
+
+  void deletePlaceFromMyPlacesList(String placeId){
+
+    if (placesList.isNotEmpty){
+      placesList.removeWhere( (admin) => admin.placeId == placeId);
+    }
+
+  }
+
+  Future<String> publishPlaceRoleForCurrentUser (PlaceAdmin placeAdmin) async{
+
+    String result = '';
+
+    result = await placeAdmin.publishToDb(uid);
+
+    if (result == SystemConstants.successConst){
+      // Проверяем, есть ли элемент с таким id
+      int index = placesList.indexWhere((c) => c.placeId == placeAdmin.placeId);
+
+      if (index != -1) {
+        // Если элемент с таким id уже существует, заменяем его
+        placesList[index] = placeAdmin;
+      } else {
+        // Если элемет с таким id не найден, добавляем новый
+        placesList.add(placeAdmin);
+      }
+    }
+
+    return result;
 
   }
 
@@ -403,5 +472,7 @@ class SimpleUser extends IEntity{
       ),
     );
   }
+
+
 
 }
