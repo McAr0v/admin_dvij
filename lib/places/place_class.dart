@@ -78,7 +78,7 @@ class Place implements IEntity{
         whatsapp: '',
         telegram: '',
         instagram: '',
-        imageUrl: SystemConstants.defaultImagePath,
+        imageUrl: SystemConstants.noImagePath,
         openingHours: RegularDate()
     );
   }

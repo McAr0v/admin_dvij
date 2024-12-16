@@ -24,6 +24,7 @@ import '../constants/city_constants.dart';
 import '../constants/screen_constants.dart';
 import '../constants/system_constants.dart';
 import '../database/image_picker.dart';
+import '../dates/regular_date_class.dart';
 import '../design/app_colors.dart';
 import '../design/loading_screen.dart';
 import '../design_elements/elements_of_design.dart';
@@ -62,6 +63,105 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   City chosenCity = City.empty();
   SimpleUser chosenCreator = SimpleUser.empty();
 
+  //
+
+  RegularDate schedule = RegularDate();
+
+  /// Список дней недели
+  final List<String> days = [
+    'Понедельник',
+    'Вторник',
+    'Среда',
+    'Четверг',
+    'Пятница',
+    'Суббота',
+    'Воскресенье'
+  ];
+
+  /// Получаем текущее время для дня
+  TimeOfDay? getStartTime(int index) {
+    switch (index) {
+      case 0:
+        return schedule.mondayStart;
+      case 1:
+        return schedule.tuesdayStart;
+      case 2:
+        return schedule.wednesdayStart;
+      case 3:
+        return schedule.thursdayStart;
+      case 4:
+        return schedule.fridayStart;
+      case 5:
+        return schedule.saturdayStart;
+      case 6:
+        return schedule.sundayStart;
+      default:
+        return null;
+    }
+  }
+
+  TimeOfDay? getEndTime(int index) {
+    switch (index) {
+      case 0:
+        return schedule.mondayEnd;
+      case 1:
+        return schedule.tuesdayEnd;
+      case 2:
+        return schedule.wednesdayEnd;
+      case 3:
+        return schedule.thursdayEnd;
+      case 4:
+        return schedule.fridayEnd;
+      case 5:
+        return schedule.saturdayEnd;
+      case 6:
+        return schedule.sundayEnd;
+      default:
+        return null;
+    }
+  }
+
+  /// Обновляем время
+  void updateTime(int index, bool isStart, TimeOfDay newTime) {
+    setState(() {
+      switch (index) {
+        case 0:
+          isStart ? schedule.mondayStart = newTime : schedule.mondayEnd = newTime;
+          break;
+        case 1:
+          isStart ? schedule.tuesdayStart = newTime : schedule.tuesdayEnd = newTime;
+          break;
+        case 2:
+          isStart ? schedule.wednesdayStart = newTime : schedule.wednesdayEnd = newTime;
+          break;
+        case 3:
+          isStart ? schedule.thursdayStart = newTime : schedule.thursdayEnd = newTime;
+          break;
+        case 4:
+          isStart ? schedule.fridayStart = newTime : schedule.fridayEnd = newTime;
+          break;
+        case 5:
+          isStart ? schedule.saturdayStart = newTime : schedule.saturdayEnd = newTime;
+          break;
+        case 6:
+          isStart ? schedule.sundayStart = newTime : schedule.sundayEnd = newTime;
+          break;
+      }
+    });
+  }
+
+  /// Показ диалога выбора времени
+  Future<void> pickTime(int index, bool isStart) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: getStartTime(index) ?? TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.inputOnly,
+    );
+    if (picked != null) {
+      updateTime(index, isStart, picked);
+    }
+  }
+
 
 
   final TextEditingController nameController = TextEditingController();
@@ -76,7 +176,6 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   final TextEditingController whatsappController = TextEditingController();
   final TextEditingController telegramController = TextEditingController();
   final TextEditingController instagramController = TextEditingController();
-  final TextEditingController imageController = TextEditingController();
 
   @override
   void initState() {
@@ -104,6 +203,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
     if (widget.place != null){
       editPlace = placesList.getEntityFromList(widget.place!.id);
       creator = usersList.getEntityFromList(widget.place!.creatorId);
+      schedule = editPlace.openingHours;
     }
 
     setTextFieldsOnDefault();
@@ -128,6 +228,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
       whatsappController.text = editPlace.whatsapp;
       telegramController.text = editPlace.telegram;
       instagramController.text = editPlace.instagram;
+      schedule = editPlace.openingHours;
 
       chosenCreator = SimpleUser.empty();
       chosenCategory = PlaceCategory.empty();
@@ -362,6 +463,65 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
                       const SizedBox(height: 20,),
 
+                      Column(
+                        children: List.generate(
+                          days.length, // Количество элементов в списке
+                              (index) => ListTile(
+                                contentPadding: EdgeInsets.zero,
+                            //title: Text(days[index]), // Получаем элемент по индексу
+                            subtitle: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+
+
+                                Expanded(
+                                    flex: Platform.isMacOS || Platform.isWindows ? 1 : 2,
+                                    child: Text(
+                                        days[index],
+                                      style: Theme.of(context).textTheme.bodySmall,
+                                    ),
+                                ),
+
+                                Expanded(
+                                  flex: 2,
+                                  child: GestureDetector(
+                                    onTap: () => pickTime(index, true), // Передаем индекс
+                                    child: Card(
+                                      color: AppColors.greyBackground,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
+                                        child: Text(
+                                          'Начало: ${getStartTime(index)?.format(context) ?? '--:--'}',
+                                          style: Theme.of(context).textTheme.bodySmall,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                                SizedBox(width: 10,),
+
+                                Expanded(
+                                  flex: 2,
+                                  child: GestureDetector(
+                                    onTap: () => pickTime(index, false), // Передаем индекс
+                                    child: Card(
+                                      color: AppColors.greyBackground,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
+                                        child: Text(
+                                          'Конец: ${getEndTime(index)?.format(context) ?? '--:--'}',
+                                          style: Theme.of(context).textTheme.bodySmall,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),

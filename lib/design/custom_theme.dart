@@ -156,6 +156,145 @@ class CustomTheme {
             todayBorder: BorderSide(style: BorderStyle.none),
         ),
 
+        timePickerTheme: TimePickerThemeData(
+          cancelButtonStyle: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                return Colors.transparent;
+              },
+            ),
+            padding: MaterialStateProperty.resolveWith<EdgeInsets?>(
+                  (Set<MaterialState> states) {
+                return const EdgeInsets.fromLTRB(20, 10, 0, 20);
+              },
+            ),
+            textStyle: MaterialStateProperty.resolveWith<TextStyle?>(
+                  (Set<MaterialState> states) {
+                return const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'SfProDisplay',
+                    fontWeight: FontWeight.normal,
+                    height: 1.3
+                );
+              },
+            ),
+            foregroundColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                return AppColors.attentionRed;
+              },
+            ),
+            side: MaterialStateProperty.resolveWith<BorderSide?>(
+                  (Set<MaterialState> states) {
+                return const BorderSide(
+                  color: Colors.transparent, // Цвет границы
+                  width: 0.0, // Толщина границы
+                );
+              },
+            ),
+            minimumSize: MaterialStateProperty.resolveWith<Size?>(
+                  (Set<MaterialState> states) {
+                return Size(0, 0); // Задайте минимальную ширину и высоту
+              },
+            ),
+          ),
+          confirmButtonStyle: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                return Colors.transparent;
+              },
+            ),
+            padding: MaterialStateProperty.resolveWith<EdgeInsets?>(
+                  (Set<MaterialState> states) {
+                return const EdgeInsets.fromLTRB(20, 10, 20, 20);
+              },
+            ),
+            textStyle: MaterialStateProperty.resolveWith<TextStyle?>(
+                  (Set<MaterialState> states) {
+                return const TextStyle(
+                    fontSize: 16,
+                    fontFamily: 'SfProDisplay',
+                    fontWeight: FontWeight.normal,
+                    height: 1.3
+                );
+              },
+            ),
+            foregroundColor: MaterialStateProperty.resolveWith<Color?>(
+                  (Set<MaterialState> states) {
+                return Colors.green;
+              },
+            ),
+            side: MaterialStateProperty.resolveWith<BorderSide?>(
+                  (Set<MaterialState> states) {
+                return const BorderSide(
+                  color: Colors.transparent, // Цвет границы
+                  width: 0.0, // Толщина границы
+                );
+              },
+            ),
+            minimumSize: MaterialStateProperty.resolveWith<Size?>(
+                  (Set<MaterialState> states) {
+                return Size(0, 0); // Задайте минимальную ширину и высоту
+              },
+            ),
+          ),
+          // Стиль часов (циферблат)
+          dialBackgroundColor: AppColors.greyOnBackground,
+          dialTextColor: Colors.white,
+          dialHandColor: Colors.green,
+          dialTextStyle: const TextStyle(
+            fontSize: 18,
+            fontFamily: 'SfProDisplay',
+            fontWeight: FontWeight.w500,
+          ),
+
+
+
+          // Стиль разделителей времени (часы и минуты)
+          hourMinuteTextColor: AppColors.white,
+          hourMinuteShape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+            side: const BorderSide(color: Colors.transparent),
+          ),
+          hourMinuteTextStyle: const TextStyle(
+            fontSize: 20,
+            fontFamily: 'SfProDisplay',
+            fontWeight: FontWeight.normal,
+          ),
+          hourMinuteColor: AppColors.greyBackground,
+
+          // Стиль фона заголовка
+          backgroundColor: AppColors.greyOnBackground,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+
+          // Текст подсказки (например, "Выберите время")
+          helpTextStyle: const TextStyle(
+            fontSize: 18,
+            fontFamily: 'SfProDisplay',
+            fontWeight: FontWeight.w400,
+            color: AppColors.white,
+          ),
+          dayPeriodTextColor: AppColors.brandColor,
+          dayPeriodTextStyle: TextStyle(
+            color: AppColors.brandColor
+          ),
+          timeSelectorSeparatorTextStyle: MaterialStateProperty.resolveWith<TextStyle?>(
+                (Set<MaterialState> states) {
+              return TextStyle(
+                fontSize: 30,
+                height: 2.2,
+
+              ); // Задайте минимальную ширину и высоту
+            },
+          ),
+          timeSelectorSeparatorColor: MaterialStateProperty.resolveWith<Color?>(
+                (Set<MaterialState> states) {
+              return AppColors.greyText; // Задайте минимальную ширину и высоту
+            },
+          ),
+        ),
+
         // Стиль кнопки
 
         textButtonTheme: TextButtonThemeData(

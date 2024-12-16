@@ -23,6 +23,7 @@ class SystemConstants {
   static const String defaultImagePath = 'assets/u_user.png';
   static const String defaultAdImagePath = 'https://firebasestorage.googleapis.com/v0/b/dvij-flutter.appspot.com/o/ad_no_image.jpg?alt=media';
   static const String logoSvgPath = 'assets/logo.svg';
+  static const String noImagePath = 'https://firebasestorage.googleapis.com/v0/b/dvij-flutter.appspot.com/o/no_image.jpg?alt=media';
 
   // Сообщения о заполнении полей
   static const String noEmail = 'Поле Email не заполнено';
