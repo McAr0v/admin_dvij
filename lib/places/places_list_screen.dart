@@ -51,8 +51,6 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
 
     placesList = await placesListManager.getNeededPlaces(category: filterCategory, searchingText: searchingController.text);
 
-    print(placesList.length);
-
     setState(() {
       loading = false;
     });

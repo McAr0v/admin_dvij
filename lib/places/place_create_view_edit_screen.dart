@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:admin_dvij/categories/place_categories/place_categories_list.dart';
 import 'package:admin_dvij/categories/place_categories/place_category.dart';
+import 'package:admin_dvij/categories/place_categories/place_category_picker.dart';
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/cities_list_screen.dart';
 import 'package:admin_dvij/cities/city_class.dart';
+import 'package:admin_dvij/cities/city_picker_page.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
@@ -15,10 +17,13 @@ import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 
+import '../constants/buttons_constants.dart';
 import '../constants/city_constants.dart';
 import '../constants/screen_constants.dart';
 import '../constants/system_constants.dart';
+import '../database/image_picker.dart';
 import '../design/app_colors.dart';
 import '../design/loading_screen.dart';
 import '../design_elements/elements_of_design.dart';
@@ -42,6 +47,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   SystemMethodsClass sm = SystemMethodsClass();
   PlaceCategoriesList placeCategoriesList = PlaceCategoriesList();
   CitiesList citiesList = CitiesList();
+  final ImagePickerService imagePickerService = ImagePickerService();
 
   bool loading = false;
   bool saving = false;
@@ -192,13 +198,45 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                   ),
                   child: Column(
                     children: [
+
+                      Card(
+                          clipBehavior: Clip.antiAlias,
+                          child: Stack(
+                            children: [
+
+                              ElementsOfDesign.getImageFromUrlOrPickedImage(url: editPlace.imageUrl, imageFile: _imageFile),
+
+                              if (canEdit) Positioned(
+                                top: 10,
+                                left: 10,
+                                child: Card(
+                                  color: AppColors.greyBackground,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ElementsOfDesign.linkButton(
+                                        method: () async {
+                                          await _pickImage();
+                                        },
+                                        text: ButtonsConstants.changePhoto,
+                                        context: context
+                                    ),
+
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                      ),
+
+                      const SizedBox(height: 20,),
+
                       ElementsOfDesign.buildAdaptiveRow(
                           isMobile,
                           [
                             ElementsOfDesign.buildTextField(
-                                controller: nameController,
-                                labelText: 'Название заведения',
-                                canEdit: canEdit,
+                                controller: createDateController,
+                                labelText: 'Дата создания',
+                                canEdit: false,
                                 icon: FontAwesomeIcons.idBadge,
                                 context: context
                             ),
@@ -213,9 +251,117 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                                   await chooseCreator();
                               }
                             )
-
                           ]
                       ),
+
+                      ElementsOfDesign.buildAdaptiveRow(
+                          isMobile,
+                          [
+                            ElementsOfDesign.buildTextField(
+                                controller: cityController,
+                                labelText: 'Город',
+                                canEdit: canEdit,
+                                icon: FontAwesomeIcons.idBadge,
+                                context: context,
+                                readOnly: true,
+                                onTap: () async {
+                                  await chooseCity();
+                                }
+                            ),
+                            ElementsOfDesign.buildTextField(
+                                controller: categoryController,
+                                labelText: 'Категория',
+                                canEdit: canEdit,
+                                icon: FontAwesomeIcons.idBadge,
+                                context: context,
+                                readOnly: true,
+                                onTap: () async {
+                                  await chooseCategory();
+                                }
+                            )
+                          ]
+                      ),
+                      ElementsOfDesign.buildAdaptiveRow(
+                          isMobile,
+                          [
+                            ElementsOfDesign.buildTextField(
+                                controller: streetController,
+                                labelText: 'Улица',
+                                canEdit: canEdit,
+                                icon: FontAwesomeIcons.idBadge,
+                                context: context
+                            ),
+                            ElementsOfDesign.buildTextField(
+                                controller: houseController,
+                                labelText: 'Номер дома',
+                                canEdit: canEdit,
+                                icon: FontAwesomeIcons.idBadge,
+                                context: context,
+                            )
+                          ]
+                      ),
+
+                      ElementsOfDesign.buildAdaptiveRow(
+                          isMobile,
+                          [
+                            ElementsOfDesign.buildTextField(
+                                controller: phoneController,
+                                labelText: 'Телефон',
+                                canEdit: canEdit,
+                                icon: FontAwesomeIcons.idBadge,
+                                context: context
+                            ),
+                            ElementsOfDesign.buildTextField(
+                              controller: whatsappController,
+                              labelText: 'whatsapp',
+                              canEdit: canEdit,
+                              icon: FontAwesomeIcons.idBadge,
+                              context: context,
+                            )
+                          ]
+                      ),
+
+                      ElementsOfDesign.buildAdaptiveRow(
+                          isMobile,
+                          [
+                            ElementsOfDesign.buildTextField(
+                                controller: telegramController,
+                                labelText: 'Telegram',
+                                canEdit: canEdit,
+                                icon: FontAwesomeIcons.idBadge,
+                                context: context
+                            ),
+                            ElementsOfDesign.buildTextField(
+                              controller: instagramController,
+                              labelText: 'instagram',
+                              canEdit: canEdit,
+                              icon: FontAwesomeIcons.idBadge,
+                              context: context,
+                            )
+                          ]
+                      ),
+
+                      ElementsOfDesign.buildTextField(
+                          controller: nameController,
+                          labelText: 'Название заведения',
+                          canEdit: canEdit,
+                          icon: FontAwesomeIcons.idBadge,
+                          context: context
+                      ),
+
+                      const SizedBox(height: 20,),
+
+                      ElementsOfDesign.buildTextField(
+                        controller: descController,
+                        labelText: 'Описание',
+                        canEdit: canEdit,
+                        icon: FontAwesomeIcons.fileLines,
+                        context: context,
+                        maxLines: null,
+                      ),
+
+                      const SizedBox(height: 20,),
+
                     ],
                   ),
                 ),
@@ -227,6 +373,19 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
     );
   }
 
+  Future<void> _pickImage() async {
+
+    // TODO - сделать подборщика картинок на macOs
+
+    final File? pickedImage = await imagePickerService.pickImage(ImageSource.gallery);
+
+    if (pickedImage != null) {
+      setState(() {
+        _imageFile = pickedImage;
+      });
+    }
+  }
+
   Future<void> chooseCreator() async{
     final results = await sm.getPopup(context: context, page: const CreatorPopup());
     if (results != null){
@@ -234,4 +393,21 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
       creatorController.text = chosenCreator.getFullName();
     }
   }
+
+  Future<void> chooseCity() async{
+    final results = await sm.getPopup(context: context, page: const CityPickerPage());
+    if (results != null){
+      chosenCity = results;
+      cityController.text = chosenCity.name;
+    }
+  }
+
+  Future<void> chooseCategory() async{
+    final results = await sm.getPopup(context: context, page: const PlaceCategoryPicker());
+    if (results != null){
+      chosenCategory = results;
+      categoryController.text = chosenCategory.name;
+    }
+  }
+
 }
