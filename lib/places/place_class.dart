@@ -298,4 +298,17 @@ class Place implements IEntity{
 
     );
   }
+
+  PlaceAdmin getCurrentPlaceAdmin({required List<PlaceAdmin> adminsList}){
+
+    for (PlaceAdmin temp in adminsList){
+      if (temp.placeId == id){
+        return temp;
+      }
+    }
+
+    return PlaceAdmin(placeRole: PlaceRole());
+
+  }
+
 }

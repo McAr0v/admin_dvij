@@ -415,7 +415,7 @@ class SimpleUser extends IEntity{
   Widget getUserCardInList ({
     required BuildContext context,
     required VoidCallback onTap,
-    required VoidCallback createAdminFunc,
+    required VoidCallback? createAdminFunc,
     required AdminUserClass currentAdmin
   }){
 
@@ -458,7 +458,7 @@ class SimpleUser extends IEntity{
                 ),
               ),
 
-              if (getAdminRole().adminRole == AdminRole.notChosen) IconButton(
+              if (getAdminRole().adminRole == AdminRole.notChosen && createAdminFunc != null) IconButton(
                   onPressed: createAdminFunc,
                   icon: const Icon(
                     FontAwesomeIcons.userGear,

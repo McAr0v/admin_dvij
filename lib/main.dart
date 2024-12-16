@@ -10,6 +10,7 @@ import 'package:admin_dvij/categories/promo_categories/promo_categories_list.dar
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/design/custom_theme.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
+import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +46,9 @@ Future<void> main() async {
   AdminUsersListClass adminsList = AdminUsersListClass();
   await adminsList.getListFromDb();
 
+  SimpleUsersList simpleUsersList = SimpleUsersList();
+  await simpleUsersList.getListFromDb();
+
   EventCategoriesList eventCategoriesList = EventCategoriesList();
   await eventCategoriesList.getListFromDb();
 
@@ -55,16 +59,7 @@ Future<void> main() async {
   await promoCategoriesList.getListFromDb();
 
   AdsList adsList = AdsList();
-  List<AdClass> tempAds = await adsList.getListFromDb();
-
-  if (tempAds.isNotEmpty){
-    for (AdClass tempAd in tempAds) {
-      print(tempAd.headline);
-      print('------');
-    }
-  }
-
-
+  await adsList.getListFromDb();
 
   runApp(
       MyApp(currentUser: currentUser,)

@@ -19,7 +19,6 @@ import '../../database/image_picker.dart';
 import '../../design/app_colors.dart';
 import '../../design/loading_screen.dart';
 import '../../design_elements/button_state_enum.dart';
-import '../../design_elements/cards_elements.dart';
 import '../../design_elements/elements_of_design.dart';
 import '../../system_methods/system_methods_class.dart';
 import '../admin_user/admin_user_class.dart';
@@ -67,6 +66,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
   File? _imageFile;
   List<Place> userPlaces = [];
 
+
+  bool showPlaces = false;
 
   bool loading = false;
   bool logOuting = false;
@@ -192,7 +193,7 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                   child: Column(
                     children: [
                       Container(
-                        width: systemMethods.getScreenWidth(),
+                        width: systemMethods.getScreenWidth(neededWidth: 800),
                         padding: const EdgeInsets.all(30),
                         margin: EdgeInsets.symmetric(
                             vertical: Platform.isWindows || Platform.isMacOS ? 20 : 10,
@@ -340,43 +341,6 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                                 ]
                             ),
 
-                            if (userPlaces.isNotEmpty) Text('Заведения пользователя (${userPlaces.length})', style: Theme.of(context).textTheme.titleMedium,),
-
-                            if (userPlaces.isNotEmpty) SizedBox(height: 20,),
-
-                            if (userPlaces.isNotEmpty) Container(
-                              height: 500,
-
-                              child: ListView.builder(
-                                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
-                                  itemCount: userPlaces.length,
-                                  itemBuilder: (context, index) {
-
-                                    Place tempPlace = userPlaces[index];
-
-                                    return Row(
-                                      children: [
-                                        ElementsOfDesign.imageWithTags(
-                                            imageUrl: tempPlace.imageUrl,
-                                            width: Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
-                                            height: 100
-                                        ),
-                                        Expanded(
-                                            child: Column(
-                                              children: [
-                                                Text(tempPlace.name),
-                                                Text(tempPlace.getAddress(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                                              ],
-                                            )
-                                        )
-                                      ],
-                                    );
-
-                                  }
-                              ),
-                            ),
-
-
                             if (canEdit) const SizedBox(height: 20,),
 
                             // Кнопки СОХРАНИТЬ / ОТМЕНИТЬ
@@ -401,7 +365,86 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                                     textOnButton: ButtonsConstants.save,
                                     context: context,
                                   ),
-                                ]),
+                                ]
+                            ),
+
+                            GestureDetector(
+                              onTap: (){
+                                setState(() {
+                                  showPlaces = !showPlaces;
+                                });
+                              },
+                              child: Card(
+                                color: AppColors.greyBackground,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(20.0),
+                                              child: Text('Заведения пользователя (${userPlaces.length})', style: Theme.of(context).textTheme.bodyMedium,),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: (){
+                                                setState(() {
+                                                  showPlaces = !showPlaces;
+                                                });
+                                              },
+                                              icon: Icon(showPlaces ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight, size: 15,)
+                                          )
+                                        ],
+                                      ),
+
+                                      if (userPlaces.isNotEmpty && showPlaces) for (Place temp in userPlaces) Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 5),
+                                        child: Card(
+                                          color: AppColors.greyOnBackground,
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                                            child: Row(
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                ElementsOfDesign.imageWithTags(
+                                                  imageUrl: temp.imageUrl,
+                                                  width: 100, //Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
+                                                  height: 100,
+                                                ),
+                                                const SizedBox(width: 10,),
+                                                Expanded(
+                                                    child: Column(
+                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                      children: [
+                                                        Text(temp.name),
+                                                        Text(temp.getAddress(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                                                        const SizedBox(height: 10),
+                                                        Text(
+                                                          temp.getCurrentPlaceAdmin(adminsList: editUser.placesList).placeRole.toString(needTranslate: true),
+                                                          style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                                        ),
+                                                      ],
+                                                    )
+                                                ),
+                                                //const SizedBox(width: 20,),
+
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+
                           ],
                         ),
                       ),

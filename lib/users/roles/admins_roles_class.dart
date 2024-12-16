@@ -73,9 +73,26 @@ class AdminRoleClass {
     }
   }
 
+  /// Метод выдачи доступа на редактирование пользователей
+  bool accessToEditPlaces(){
+    if (adminRole == AdminRole.notChosen || adminRole == AdminRole.viewer || adminRole == AdminRole.advertiser) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   /// Метод разрешения для создателя редактировать все
   bool accessToAll(){
     if (adminRole == AdminRole.creator) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool accessToEditCreator(){
+    if (adminRole == AdminRole.creator || adminRole == AdminRole.superAdmin) {
       return true;
     } else {
       return false;

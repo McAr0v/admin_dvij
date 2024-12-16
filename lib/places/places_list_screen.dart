@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:admin_dvij/categories/place_categories/place_category.dart';
 import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:admin_dvij/places/place_class.dart';
+import 'package:admin_dvij/places/place_create_view_edit_screen.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../design/app_colors.dart';
@@ -20,6 +24,7 @@ class PlacesListScreen extends StatefulWidget {
 
 class _PlacesListScreenState extends State<PlacesListScreen> {
 
+  SystemMethodsClass sm = SystemMethodsClass();
   PlacesList placesListManager = PlacesList();
   bool loading = false;
 
@@ -105,12 +110,20 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
 
           // Кнопка "Создать"
 
-          /*IconButton(
+          IconButton(
             onPressed: () async {
-              await createAd();
+              final result = await sm.pushToPageWithResult(
+                  context: context,
+                  page: const PlaceCreateViewEditScreen()
+              );
+
+              if (result != null) {
+                await initialization(category: filterCategory, searchingText: searchingController.text);
+              }
+
             },
             icon: const Icon(FontAwesomeIcons.plus, size: 15, color: AppColors.white,),
-          ),*/
+          ),
 
         ],
 
@@ -149,7 +162,17 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
 
                       return CardsElements.getCard(
                           context: context,
-                          onTap: (){},//() => widget.editAds(index), // Передаем index через замыкание
+                          onTap: () async {
+                            final result = await sm.pushToPageWithResult(
+                              context: context,
+                              page: PlaceCreateViewEditScreen(place: tempPlace,)
+                            );
+
+                            if (result != null) {
+                              await initialization(category: filterCategory, searchingText: searchingController.text);
+                            }
+
+                          },//() => widget.editAds(index), // Передаем index через замыкание
                           imageUrl: tempPlace.imageUrl,
                           widget: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
