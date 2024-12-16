@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
-import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../../database/database_class.dart';

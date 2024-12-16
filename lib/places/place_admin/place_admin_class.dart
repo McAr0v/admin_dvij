@@ -1,9 +1,7 @@
 import 'dart:io';
 import 'package:admin_dvij/places/place_admin/place_role_class.dart';
 import 'package:firebase_database/firebase_database.dart';
-
 import '../../constants/simple_users_constants.dart';
-import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 
 class PlaceAdmin{

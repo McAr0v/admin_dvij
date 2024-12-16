@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:admin_dvij/categories/place_categories/place_category.dart';
 import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
+import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:firebase_database/firebase_database.dart';
 
@@ -160,6 +161,25 @@ class PlacesList implements IEntitiesList<Place>{
     }
 
     return tempList;
+  }
+
+  Future<List<Place>> getPlacesListFromSimpleUser({required List<PlaceAdmin> placesList}) async{
+
+    List<Place> returnedList = [];
+
+    if (_currentPlacesList.isEmpty){
+      await getListFromDb();
+    }
+
+    for (PlaceAdmin place in placesList){
+      Place tempPlace = getEntityFromList(place.placeId);
+      if (tempPlace.id == place.placeId){
+        returnedList.add(tempPlace);
+      }
+    }
+
+    return returnedList;
+
   }
 
 }

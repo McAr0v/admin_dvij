@@ -70,7 +70,7 @@ class SimpleUser extends IEntity{
         whatsapp: '',
         telegram: '',
         instagram: '',
-      placesList: []
+        placesList: []
 
     );
   }
@@ -356,7 +356,7 @@ class SimpleUser extends IEntity{
 
   }
 
-  Future<String> publishPlaceRoleForCurrentUser (PlaceAdmin placeAdmin) async{
+  Future<String> publishPlaceRoleForCurrentUser (PlaceAdmin placeAdmin) async {
 
     String result = '';
 

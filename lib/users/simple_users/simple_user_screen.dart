@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/constants/date_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
+import 'package:admin_dvij/places/place_class.dart';
+import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +19,7 @@ import '../../database/image_picker.dart';
 import '../../design/app_colors.dart';
 import '../../design/loading_screen.dart';
 import '../../design_elements/button_state_enum.dart';
+import '../../design_elements/cards_elements.dart';
 import '../../design_elements/elements_of_design.dart';
 import '../../system_methods/system_methods_class.dart';
 import '../admin_user/admin_user_class.dart';
@@ -42,6 +45,7 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
   SystemMethodsClass systemMethods = SystemMethodsClass();
   final ImagePickerService imagePickerService = ImagePickerService();
   SimpleUsersList usersListsClass = SimpleUsersList();
+  PlacesList placesList = PlacesList();
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
@@ -61,6 +65,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
   DateTime selectedBirthDateOnEdit = DateTime(2100);
   Gender chosenGender = Gender();
   File? _imageFile;
+  List<Place> userPlaces = [];
+
 
   bool loading = false;
   bool logOuting = false;
@@ -125,6 +131,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
     currentUserAdmin = await currentUserAdmin.getCurrentUser(fromDb: fromDB);
 
     editUser = await editUser.getUserFromDownloadedList(uid: widget.simpleUser.uid, fromDb: fromDB);
+
+    userPlaces = await placesList.getPlacesListFromSimpleUser(placesList: editUser.placesList);
 
     // Сбрасываем значения переменных для изменений в исходное состояние
     setTextFieldsOnDefault();
@@ -331,6 +339,43 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
 
                                 ]
                             ),
+
+                            if (userPlaces.isNotEmpty) Text('Заведения пользователя (${userPlaces.length})', style: Theme.of(context).textTheme.titleMedium,),
+
+                            if (userPlaces.isNotEmpty) SizedBox(height: 20,),
+
+                            if (userPlaces.isNotEmpty) Container(
+                              height: 500,
+
+                              child: ListView.builder(
+                                  padding: const EdgeInsets.fromLTRB(10, 5, 10, 5),
+                                  itemCount: userPlaces.length,
+                                  itemBuilder: (context, index) {
+
+                                    Place tempPlace = userPlaces[index];
+
+                                    return Row(
+                                      children: [
+                                        ElementsOfDesign.imageWithTags(
+                                            imageUrl: tempPlace.imageUrl,
+                                            width: Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
+                                            height: 100
+                                        ),
+                                        Expanded(
+                                            child: Column(
+                                              children: [
+                                                Text(tempPlace.name),
+                                                Text(tempPlace.getAddress(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                                              ],
+                                            )
+                                        )
+                                      ],
+                                    );
+
+                                  }
+                              ),
+                            ),
+
 
                             if (canEdit) const SizedBox(height: 20,),
 

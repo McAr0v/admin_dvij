@@ -7,8 +7,11 @@ import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
+import 'package:admin_dvij/places/place_admin/place_role_class.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/system_methods/methods_for_database.dart';
+import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -209,6 +212,7 @@ class Place implements IEntity{
   @override
   Future<String> publishToDb(File? imageFile) async{
     DatabaseClass db = DatabaseClass();
+    SimpleUsersList simpleUsersList = SimpleUsersList();
 
     // Если Id не задан
     if (id == '') {
@@ -242,7 +246,18 @@ class Place implements IEntity{
       placesList.addToCurrentDownloadedList(this);
     }
 
-    // TODO Сделать публикацию записи у создателя
+    // Получаем создателя
+    SimpleUser creator = simpleUsersList.getEntityFromList(creatorId);
+
+    // Публикуем запись о заведении у создателя
+    result = await creator.publishPlaceRoleForCurrentUser(
+        PlaceAdmin(
+            placeId: id,
+            placeRole: PlaceRole(
+                role: PlaceUserRoleEnum.creator
+            )
+        )
+    );
 
     return result;
   }
@@ -283,7 +298,4 @@ class Place implements IEntity{
 
     );
   }
-
-
-
 }
