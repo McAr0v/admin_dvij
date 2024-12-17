@@ -1,5 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
+
+import '../design/app_colors.dart';
 
 class RegularDate {
   TimeOfDay? mondayStart;
@@ -93,10 +96,108 @@ class RegularDate {
 
   /// Вспомогательный метод для форматирования времени
   String _formatTime(TimeOfDay? time) {
-    if (time == null) return ''; // Возвращаем пустую строку, если времени нет
+    if (time == null) return 'Не выбрано'; // Возвращаем пустую строку, если времени нет
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
+  /// Список дней недели
+  final List<String> _days = [
+    'Понедельник',
+    'Вторник',
+    'Среда',
+    'Четверг',
+    'Пятница',
+    'Суббота',
+    'Воскресенье'
+  ];
+
+  TimeOfDay? getTime({
+    required int index,
+    required bool isStart
+  }) {
+    switch (index) {
+      case 0:
+        return isStart ? mondayStart : mondayEnd;
+      case 1:
+        return isStart ? tuesdayStart : tuesdayEnd;
+      case 2:
+        return isStart ? wednesdayStart : wednesdayEnd;
+      case 3:
+        return isStart ? thursdayStart : thursdayEnd;
+      case 4:
+        return isStart ? fridayStart : fridayEnd;
+      case 5:
+        return isStart ? saturdayStart : saturdayEnd;
+      case 6:
+        return isStart ? sundayStart : sundayEnd;
+      default:
+        return null;
+    }
+  }
+
+  Column getRegularEditWidget({
+    required BuildContext context,
+    required Function(int index) onTapStart,
+    required Function(int index) onTapEnd,
+  }){
+    return Column(
+      children: List.generate(
+        _days.length, // Количество элементов в списке
+            (index) => ListTile(
+          contentPadding: EdgeInsets.zero,
+          //title: Text(days[index]), // Получаем элемент по индексу
+          subtitle: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
 
 
+              Expanded(
+                flex: Platform.isMacOS || Platform.isWindows ? 1 : 2,
+                child: Text(
+                  _days[index],
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+
+              Expanded(
+                flex: 2,
+                child: GestureDetector(
+                  onTap: () => onTapStart(index), // Передаем индекс
+                  child: Card(
+                    color: AppColors.greyBackground,
+                    child: Padding(
+                      padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
+                      child: Text(
+                        'Начало: ${getTime(index: index, isStart: true)?.format(context) ?? 'Не выбрано'}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 10,),
+
+              Expanded(
+                flex: 2,
+                child: GestureDetector(
+                  onTap: () => onTapEnd(index), // Передаем индекс
+                  child: Card(
+                    color: AppColors.greyBackground,
+                    child: Padding(
+                      padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
+                      child: Text(
+                        'Конец: ${getTime(index: index, isStart: false)?.format(context) ?? 'Не выбрано'}',
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }

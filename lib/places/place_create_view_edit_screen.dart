@@ -1,10 +1,8 @@
 import 'dart:io';
-
 import 'package:admin_dvij/categories/place_categories/place_categories_list.dart';
 import 'package:admin_dvij/categories/place_categories/place_category.dart';
 import 'package:admin_dvij/categories/place_categories/place_category_picker.dart';
 import 'package:admin_dvij/cities/cities_list_class.dart';
-import 'package:admin_dvij/cities/cities_list_screen.dart';
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/cities/city_picker_page.dart';
 import 'package:admin_dvij/places/place_class.dart';
@@ -14,19 +12,17 @@ import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/simple_users/creator_popup.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../constants/buttons_constants.dart';
 import '../constants/city_constants.dart';
-import '../constants/screen_constants.dart';
 import '../constants/system_constants.dart';
 import '../database/image_picker.dart';
 import '../dates/regular_date_class.dart';
 import '../design/app_colors.dart';
 import '../design/loading_screen.dart';
+import '../design_elements/button_state_enum.dart';
 import '../design_elements/elements_of_design.dart';
 
 class PlaceCreateViewEditScreen extends StatefulWidget {
@@ -67,60 +63,6 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
   RegularDate schedule = RegularDate();
 
-  /// Список дней недели
-  final List<String> days = [
-    'Понедельник',
-    'Вторник',
-    'Среда',
-    'Четверг',
-    'Пятница',
-    'Суббота',
-    'Воскресенье'
-  ];
-
-  /// Получаем текущее время для дня
-  TimeOfDay? getStartTime(int index) {
-    switch (index) {
-      case 0:
-        return schedule.mondayStart;
-      case 1:
-        return schedule.tuesdayStart;
-      case 2:
-        return schedule.wednesdayStart;
-      case 3:
-        return schedule.thursdayStart;
-      case 4:
-        return schedule.fridayStart;
-      case 5:
-        return schedule.saturdayStart;
-      case 6:
-        return schedule.sundayStart;
-      default:
-        return null;
-    }
-  }
-
-  TimeOfDay? getEndTime(int index) {
-    switch (index) {
-      case 0:
-        return schedule.mondayEnd;
-      case 1:
-        return schedule.tuesdayEnd;
-      case 2:
-        return schedule.wednesdayEnd;
-      case 3:
-        return schedule.thursdayEnd;
-      case 4:
-        return schedule.fridayEnd;
-      case 5:
-        return schedule.saturdayEnd;
-      case 6:
-        return schedule.sundayEnd;
-      default:
-        return null;
-    }
-  }
-
   /// Обновляем время
   void updateTime(int index, bool isStart, TimeOfDay newTime) {
     setState(() {
@@ -154,7 +96,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   Future<void> pickTime(int index, bool isStart) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: getStartTime(index) ?? TimeOfDay.now(),
+      initialTime: schedule.getTime(index: index, isStart: true) ?? TimeOfDay.now(),
       initialEntryMode: TimePickerEntryMode.inputOnly,
     );
     if (picked != null) {
@@ -202,7 +144,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
     if (widget.place != null){
       editPlace = placesList.getEntityFromList(widget.place!.id);
-      creator = usersList.getEntityFromList(widget.place!.creatorId);
+      creator = usersList.getEntityFromList(editPlace.creatorId);
       schedule = editPlace.openingHours;
     }
 
@@ -251,7 +193,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
         leading: IconButton(
           icon: const Icon(FontAwesomeIcons.chevronLeft, size: 18,),
           onPressed: () {
-            sm.popBackToPreviousPageWithResult(context: context, result: true);
+            navigateToPlacesListScreen();
           },
         ),
 
@@ -463,65 +405,41 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
                       const SizedBox(height: 20,),
 
-                      Column(
-                        children: List.generate(
-                          days.length, // Количество элементов в списке
-                              (index) => ListTile(
-                                contentPadding: EdgeInsets.zero,
-                            //title: Text(days[index]), // Получаем элемент по индексу
-                            subtitle: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
+                      schedule.getRegularEditWidget(
+                          context: context,
+                          onTapStart: (index) => pickTime(index, true),
+                          onTapEnd: (index) => pickTime(index, false)
+                      ),
 
+                      const SizedBox(height: 20,),
 
-                                Expanded(
-                                    flex: Platform.isMacOS || Platform.isWindows ? 1 : 2,
-                                    child: Text(
-                                        days[index],
-                                      style: Theme.of(context).textTheme.bodySmall,
-                                    ),
-                                ),
+                      if (canEdit) ElementsOfDesign.buildAdaptiveRow(
+                          isMobile,
+                          [
+                            ElementsOfDesign.customButton(
+                                method: () async {
+                                  await savePlace();
 
-                                Expanded(
-                                  flex: 2,
-                                  child: GestureDetector(
-                                    onTap: () => pickTime(index, true), // Передаем индекс
-                                    child: Card(
-                                      color: AppColors.greyBackground,
-                                      child: Padding(
-                                        padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
-                                        child: Text(
-                                          'Начало: ${getStartTime(index)?.format(context) ?? '--:--'}',
-                                          style: Theme.of(context).textTheme.bodySmall,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-
-                                SizedBox(width: 10,),
-
-                                Expanded(
-                                  flex: 2,
-                                  child: GestureDetector(
-                                    onTap: () => pickTime(index, false), // Передаем индекс
-                                    child: Card(
-                                      color: AppColors.greyBackground,
-                                      child: Padding(
-                                        padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
-                                        child: Text(
-                                          'Конец: ${getEndTime(index)?.format(context) ?? '--:--'}',
-                                          style: Theme.of(context).textTheme.bodySmall,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                },
+                                textOnButton: ButtonsConstants.save,
+                                context: context
                             ),
-                          ),
-                        ),
-                      )
+
+                            ElementsOfDesign.customButton(
+                                method: (){
+                                  resetChosenOptions();
+                                  setState(() {
+                                    canEdit = false;
+                                  });
+
+                                },
+                                textOnButton: ButtonsConstants.cancel,
+                                context: context,
+                                buttonState: ButtonStateEnum.secondary
+                            ),
+                          ]
+                      ),
+
                     ],
                   ),
                 ),
@@ -531,6 +449,144 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
       ),
 
     );
+  }
+  Place setPlaceBeforeSaving(){
+
+    Place tempPlace = Place.empty();
+
+    if (chosenCategory.id.isNotEmpty){
+      tempPlace.category = chosenCategory;
+    } else {
+      tempPlace.category = editPlace.category;
+    }
+
+    if (chosenCity.id.isNotEmpty){
+      tempPlace.city = chosenCity;
+    } else {
+      tempPlace.city = editPlace.city;
+    }
+
+    if (chosenCreator.uid.isNotEmpty){
+      tempPlace.creatorId = chosenCreator.uid;
+    } else {
+      tempPlace.creatorId = editPlace.creatorId;
+    }
+
+    tempPlace.createDate = editPlace.createDate;
+    tempPlace.street = streetController.text;
+    tempPlace.house = houseController.text;
+    tempPlace.phone = phoneController.text;
+    tempPlace.whatsapp = whatsappController.text;
+    tempPlace.instagram = instagramController.text;
+    tempPlace.telegram = telegramController.text;
+    tempPlace.name = nameController.text;
+    tempPlace.desc = descController.text;
+    tempPlace.openingHours = schedule;
+    tempPlace.imageUrl = editPlace.imageUrl;
+    tempPlace.id = editPlace.id;
+
+    return tempPlace;
+
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  String checkPlace(Place tempPlace){
+
+    if (tempPlace.name.isEmpty){
+      return 'Название не может быть пустым!';
+    }
+    if (tempPlace.desc.isEmpty){
+      return 'Описание не может быть пустым!';
+    }
+    if (tempPlace.creatorId.isEmpty){
+      return 'Нужно обязательно выбрать создателя';
+    }
+
+    if (tempPlace.city.id.isEmpty){
+      return 'Нужно выбрать город';
+    }
+    if (tempPlace.category.id.isEmpty){
+      return 'Нужно выбрать категорию';
+    }
+    if (tempPlace.street.isEmpty){
+      return 'Укажите название улицы';
+    }
+
+    if (tempPlace.house.isEmpty){
+      return 'Укажите номер дома или строения';
+    }
+
+    if (tempPlace.phone.isEmpty){
+      return 'Нужно обязательно заполнить контактный телефон';
+    }
+
+    return SystemConstants.successConst;
+
+  }
+
+  Future<void> savePlace() async{
+    setState(() {
+      saving = true;
+    });
+
+    Place tempPlace = setPlaceBeforeSaving();
+
+
+    if (checkPlace(tempPlace) == SystemConstants.successConst){
+
+      String publishResult = await tempPlace.publishToDb(_imageFile);
+
+      if (publishResult == SystemConstants.successConst) {
+
+        if (chosenCreator.uid.isNotEmpty){
+          creator.deletePlaceRoleFromUser(editPlace.id);
+        }
+
+        await initialization();
+
+
+
+        _showSnackBar('Заведение успешно сохранено!');
+
+        canEdit = false;
+        resetChosenOptions();
+
+        if (widget.place == null){
+          navigateToPlacesListScreen();
+        }
+
+      } else {
+        _showSnackBar(publishResult);
+      }
+    }
+
+    setState(() {
+      saving = false;
+    });
+  }
+
+  void navigateToPlacesListScreen() {
+    sm.popBackToPreviousPageWithResult(context: context, result: editPlace);
+  }
+
+  void resetChosenOptions(){
+    setState(() {
+      chosenCategory = PlaceCategory.empty();
+      chosenCity = City.empty();
+      chosenCreator = SimpleUser.empty();
+      _imageFile = null;
+    });
+
+    setTextFieldsOnDefault();
+
   }
 
   Future<void> _pickImage() async {

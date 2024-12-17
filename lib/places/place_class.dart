@@ -19,7 +19,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../categories/place_categories/place_category.dart';
 import '../cities/city_class.dart';
+import '../constants/ads_constants.dart';
 import '../database/database_class.dart';
+import '../database/image_uploader.dart';
 import '../dates/regular_date_class.dart';
 
 class Place implements IEntity{
@@ -213,6 +215,10 @@ class Place implements IEntity{
   Future<String> publishToDb(File? imageFile) async{
     DatabaseClass db = DatabaseClass();
     SimpleUsersList simpleUsersList = SimpleUsersList();
+    final ImageUploader imageUploader = ImageUploader();
+
+    // Переменная если будет загружаться изображение
+    String? postedImageUrl;
 
     // Если Id не задан
     if (id == '') {
@@ -223,6 +229,18 @@ class Place implements IEntity{
       // генерируем вручную
       id = idPlace ?? 'noId_$name';
     }
+
+    if (imageFile != null){
+
+      postedImageUrl = await imageUploader.uploadImage(
+          entityId: id,
+          pickedFile: imageFile,
+          folder: PlacesConstants.placesPath
+      );
+
+    }
+
+    imageUrl = postedImageUrl ?? imageUrl;
 
     String path = '${PlacesConstants.placesPath}/$id/${PlacesConstants.placeInfoFolder}';
 
