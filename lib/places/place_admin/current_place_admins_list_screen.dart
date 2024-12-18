@@ -1,17 +1,16 @@
-import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
+import 'package:admin_dvij/design/app_colors.dart';
+import 'package:admin_dvij/places/place_admin/add_or_edit_place_admin.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
-import '../constants/system_constants.dart';
-import '../design/app_colors.dart';
-import '../design/loading_screen.dart';
-import '../design_elements/elements_of_design.dart';
-import '../system_methods/system_methods_class.dart';
-import '../users/simple_users/simple_users_list.dart';
+import '../../constants/system_constants.dart';
+import '../../design/loading_screen.dart';
+import '../../system_methods/system_methods_class.dart';
+import '../../users/simple_users/simple_users_list.dart';
+
 
 class CurrentPlaceAdminsListScreen extends StatefulWidget {
   final Place place;
@@ -81,7 +80,7 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
 
           IconButton(
             onPressed: () async {
-
+              await addOrEditAdmin(user: null);
             },
             icon: const Icon(FontAwesomeIcons.plus, size: 15, color: AppColors.white,),
           ),
@@ -109,7 +108,9 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
 
                         return adminsList[index].getPlaceAdminUserCardInList(
                             context: context,
-                            onTap: (){},
+                            onTap: () async {
+                              await addOrEditAdmin(user: adminsList[index]);
+                            },
                             currentAdmin: currentAdmin,
                           placeId: widget.place.id
                         );
@@ -122,6 +123,14 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
       ),
 
     );
+  }
+
+  Future<void> addOrEditAdmin({SimpleUser? user}) async {
+    final results = await sm.pushToPageWithResult(context: context, page: AddOrEditPlaceAdmin(user: user, placeId: widget.place.id,));
+
+    if (results != null){
+      await initialization();
+    }
   }
 
   void navigateBackWithResult() {

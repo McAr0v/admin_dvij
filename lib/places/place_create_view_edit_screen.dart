@@ -5,7 +5,7 @@ import 'package:admin_dvij/categories/place_categories/place_category_picker.dar
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/cities/city_picker_page.dart';
-import 'package:admin_dvij/places/current_place_admins_list_screen.dart';
+import 'package:admin_dvij/places/place_admin/current_place_admins_list_screen.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';

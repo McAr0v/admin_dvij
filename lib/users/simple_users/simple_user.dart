@@ -3,6 +3,7 @@ import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
+import 'package:admin_dvij/places/place_admin/place_role_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
@@ -473,15 +474,15 @@ class SimpleUser extends IEntity{
     );
   }
 
-  String getPlaceRole({required String placeId}){
+  PlaceAdmin getPlaceRole({required String placeId}){
 
     for(PlaceAdmin admin in placesList){
       if (admin.placeId == placeId){
-        return admin.placeRole.toString(needTranslate: true);
+        return admin;
       }
     }
 
-    return '';
+    return PlaceAdmin(placeRole: PlaceRole());
   }
 
   Widget getPlaceAdminUserCardInList ({
@@ -491,46 +492,43 @@ class SimpleUser extends IEntity{
     required String placeId
   }){
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Card(
-        color: AppColors.greyOnBackground,
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Row(
-            children: [
+    return Card(
+      color: AppColors.greyOnBackground,
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Row(
+          children: [
 
-              getAvatar(size: Platform.isWindows || Platform.isMacOS ? 40 : 30),
+            getAvatar(size: Platform.isWindows || Platform.isMacOS ? 40 : 30),
 
-              const SizedBox(width: 20,),
+            const SizedBox(width: 20,),
 
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(getFullName()),
-                    if (currentAdmin.uid == uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
-                    const SizedBox(height: 5,),
-                    Text(email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                    Text(
-                      getPlaceRole(placeId: placeId),
-                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                    ),
-                  ],
-                ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(getFullName()),
+                  if (currentAdmin.uid == uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
+                  const SizedBox(height: 5,),
+                  Text(email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                  Text(
+                    getPlaceRole(placeId: placeId).placeRole.toString(needTranslate: true),
+                    style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                  ),
+                ],
               ),
-              
-              IconButton(
-                  onPressed: onTap, 
-                  icon: const Icon(
-                    FontAwesomeIcons.penToSquare,
-                    size: 15,
-                    color: AppColors.brandColor,
-                  )
-              )
-              
-            ],
-          ),
+            ),
+
+            if (getPlaceRole(placeId: placeId).placeRole.role != PlaceUserRoleEnum.creator) IconButton(
+                onPressed: onTap,
+                icon: const Icon(
+                  FontAwesomeIcons.penToSquare,
+                  size: 15,
+                  color: AppColors.brandColor,
+                )
+            )
+
+          ],
         ),
       ),
     );

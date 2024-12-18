@@ -39,4 +39,12 @@ class PlaceRole {
     }
   }
 
+  List<PlaceRole> getPlacesRolesList(){
+    return [
+      PlaceRole(role: PlaceUserRoleEnum.admin),
+      PlaceRole(role: PlaceUserRoleEnum.org),
+      PlaceRole(role: PlaceUserRoleEnum.reader),
+    ];
+  }
+
 }
