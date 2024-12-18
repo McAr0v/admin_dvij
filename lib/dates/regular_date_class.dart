@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../design/app_colors.dart';
 
@@ -139,66 +140,89 @@ class RegularDate {
     required BuildContext context,
     required Function(int index) onTapStart,
     required Function(int index) onTapEnd,
-    required bool canEdit
+    required bool canEdit,
+    required bool showSchedule,
+    required VoidCallback show
   }){
     return Column(
-      children: List.generate(
-        _days.length, // Количество элементов в списке
-            (index) => ListTile(
-          contentPadding: EdgeInsets.zero,
-          //title: Text(days[index]), // Получаем элемент по индексу
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
+      children: [
+        Row(
+          children: [
+            Expanded(
+                child: Text('Расписание', style: Theme.of(context).textTheme.titleMedium,)
+            ),
+
+            IconButton(
+                onPressed: show,
+                icon: Icon(
+                    showSchedule == true ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight,
+                  size: 15,
+                )
+            )
+
+          ],
+        ),
+
+        if (showSchedule) Column(
+          children: List.generate(
+            _days.length, // Количество элементов в списке
+                (index) => ListTile(
+              contentPadding: EdgeInsets.zero,
+              //title: Text(days[index]), // Получаем элемент по индексу
+              subtitle: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
 
 
-              Expanded(
-                flex: Platform.isMacOS || Platform.isWindows ? 1 : 2,
-                child: Text(
-                  _days[index],
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ),
+                  Expanded(
+                    flex: Platform.isMacOS || Platform.isWindows ? 1 : 2,
+                    child: Text(
+                      _days[index],
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ),
 
-              Expanded(
-                flex: 2,
-                child: GestureDetector(
-                  onTap: canEdit ? () => onTapStart(index) : (){}, // Передаем индекс
-                  child: Card(
-                    color: AppColors.greyBackground,
-                    child: Padding(
-                      padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
-                      child: Text(
-                        'Начало: ${getTime(index: index, isStart: true)?.format(context) ?? 'Не выбрано'}',
-                        style: Theme.of(context).textTheme.bodySmall,
+                  Expanded(
+                    flex: 2,
+                    child: GestureDetector(
+                      onTap: canEdit ? () => onTapStart(index) : (){}, // Передаем индекс
+                      child: Card(
+                        color: AppColors.greyBackground,
+                        child: Padding(
+                          padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
+                          child: Text(
+                            'Начало: ${getTime(index: index, isStart: true)?.format(context) ?? 'Не выбрано'}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ),
 
-              const SizedBox(width: 10,),
+                  const SizedBox(width: 10,),
 
-              Expanded(
-                flex: 2,
-                child: GestureDetector(
-                  onTap: canEdit ? () => onTapEnd(index) : (){}, // Передаем индекс
-                  child: Card(
-                    color: AppColors.greyBackground,
-                    child: Padding(
-                      padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
-                      child: Text(
-                        'Конец: ${getTime(index: index, isStart: false)?.format(context) ?? 'Не выбрано'}',
-                        style: Theme.of(context).textTheme.bodySmall,
+                  Expanded(
+                    flex: 2,
+                    child: GestureDetector(
+                      onTap: canEdit ? () => onTapEnd(index) : (){}, // Передаем индекс
+                      child: Card(
+                        color: AppColors.greyBackground,
+                        child: Padding(
+                          padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
+                          child: Text(
+                            'Конец: ${getTime(index: index, isStart: false)?.format(context) ?? 'Не выбрано'}',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

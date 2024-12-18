@@ -473,6 +473,69 @@ class SimpleUser extends IEntity{
     );
   }
 
+  String getPlaceRole({required String placeId}){
+
+    for(PlaceAdmin admin in placesList){
+      if (admin.placeId == placeId){
+        return admin.placeRole.toString(needTranslate: true);
+      }
+    }
+
+    return '';
+  }
+
+  Widget getPlaceAdminUserCardInList ({
+    required BuildContext context,
+    required VoidCallback onTap,
+    required AdminUserClass currentAdmin,
+    required String placeId
+  }){
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        color: AppColors.greyOnBackground,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
+
+              getAvatar(size: Platform.isWindows || Platform.isMacOS ? 40 : 30),
+
+              const SizedBox(width: 20,),
+
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(getFullName()),
+                    if (currentAdmin.uid == uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
+                    const SizedBox(height: 5,),
+                    Text(email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                    Text(
+                      getPlaceRole(placeId: placeId),
+                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                    ),
+                  ],
+                ),
+              ),
+              
+              IconButton(
+                  onPressed: onTap, 
+                  icon: const Icon(
+                    FontAwesomeIcons.penToSquare,
+                    size: 15,
+                    color: AppColors.brandColor,
+                  )
+              )
+              
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 
 
 }

@@ -559,7 +559,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
       }
 
       setState(() {
-        saving = false;
+        deleting = false;
       });
     }
   }

@@ -49,7 +49,7 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
       loading = true;
     });
 
-    placesList = await placesListManager.getNeededPlaces(category: filterCategory, searchingText: searchingController.text);
+    placesList = await placesListManager.getNeededPlaces(category: filterCategory, searchingText: searchingController.text, fromDb: fromDb);
 
     setState(() {
       loading = false;
