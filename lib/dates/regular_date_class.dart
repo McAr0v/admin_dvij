@@ -139,6 +139,7 @@ class RegularDate {
     required BuildContext context,
     required Function(int index) onTapStart,
     required Function(int index) onTapEnd,
+    required bool canEdit
   }){
     return Column(
       children: List.generate(
@@ -162,7 +163,7 @@ class RegularDate {
               Expanded(
                 flex: 2,
                 child: GestureDetector(
-                  onTap: () => onTapStart(index), // Передаем индекс
+                  onTap: canEdit ? () => onTapStart(index) : (){}, // Передаем индекс
                   child: Card(
                     color: AppColors.greyBackground,
                     child: Padding(
@@ -181,7 +182,7 @@ class RegularDate {
               Expanded(
                 flex: 2,
                 child: GestureDetector(
-                  onTap: () => onTapEnd(index), // Передаем индекс
+                  onTap: canEdit ? () => onTapEnd(index) : (){}, // Передаем индекс
                   child: Card(
                     color: AppColors.greyBackground,
                     child: Padding(

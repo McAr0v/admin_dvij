@@ -63,6 +63,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
   RegularDate schedule = RegularDate();
 
+
   /// Обновляем время
   void updateTime(int index, bool isStart, TimeOfDay newTime) {
     setState(() {
@@ -170,6 +171,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
       whatsappController.text = editPlace.whatsapp;
       telegramController.text = editPlace.telegram;
       instagramController.text = editPlace.instagram;
+
       schedule = editPlace.openingHours;
 
       chosenCreator = SimpleUser.empty();
@@ -408,7 +410,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                       schedule.getRegularEditWidget(
                           context: context,
                           onTapStart: (index) => pickTime(index, true),
-                          onTapEnd: (index) => pickTime(index, false)
+                          onTapEnd: (index) => pickTime(index, false),
+                          canEdit: canEdit
                       ),
 
                       const SizedBox(height: 20,),
