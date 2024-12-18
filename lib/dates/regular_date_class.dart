@@ -91,7 +91,7 @@ class RegularDate {
       "endTime7": _formatTime(sundayEnd),
     };
 
-    return scheduleMap.toString().replaceAll("'", '"');
+    return jsonEncode(scheduleMap);
   }
 
   /// Вспомогательный метод для форматирования времени
