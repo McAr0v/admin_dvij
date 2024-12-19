@@ -487,7 +487,7 @@ class SimpleUser extends IEntity{
 
   Widget getPlaceAdminUserCardInList ({
     required BuildContext context,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
     required AdminUserClass currentAdmin,
     required String placeId
   }){
@@ -519,7 +519,7 @@ class SimpleUser extends IEntity{
               ),
             ),
 
-            if (getPlaceRole(placeId: placeId).placeRole.role != PlaceUserRoleEnum.creator) IconButton(
+            if (onTap != null) IconButton(
                 onPressed: onTap,
                 icon: const Icon(
                   FontAwesomeIcons.penToSquare,
