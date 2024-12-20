@@ -1,3 +1,5 @@
+import 'package:admin_dvij/constants/admin_role_constants.dart';
+import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
@@ -8,14 +10,13 @@ import 'package:admin_dvij/places/place_admin/place_role_picker.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/simple_users/creator_popup.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../../design/app_colors.dart';
 import '../../system_methods/system_methods_class.dart';
 import '../../users/simple_users/simple_user.dart';
 
+/// Если не передать User, будет создание.  Если передать - редактирование
 class AddOrEditPlaceAdmin extends StatefulWidget {
   final SimpleUser? user;
   final String placeId;
@@ -27,16 +28,16 @@ class AddOrEditPlaceAdmin extends StatefulWidget {
 
 class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
   SystemMethodsClass sm = SystemMethodsClass();
+  SimpleUsersList usersListClass = SimpleUsersList();
 
   AdminUserClass currentAdmin = AdminUserClass.empty();
-
-  SimpleUsersList usersListClass = SimpleUsersList();
   List<SimpleUser> usersList = [];
 
   SimpleUser chosenUser = SimpleUser.empty();
   PlaceRole chosenPlaceAdminRole = PlaceRole();
 
   bool loading = false;
+  bool saving = false;
 
   @override
   void initState() {
@@ -50,15 +51,22 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
       loading = true;
     });
 
+    // Если пользователь не задан, то это создание
     if (widget.user == null){
+      // Тогда подгружаем список всех пользователей
       usersList = await usersListClass.getDownloadedList(fromDb: fromDb);
+      // Выбранный пользователь пустой
       chosenUser = SimpleUser.empty();
+      // Выбранная роль - обычный пользователь
       chosenPlaceAdminRole = chosenUser.getPlaceRole(placeId: widget.placeId).placeRole;
     } else {
+      // В выбранного пользователя указываем переданного пользователя
       chosenUser = widget.user!;
+      // В качестве выбранной роли подгружаем из пользователя
       chosenPlaceAdminRole = widget.user!.getPlaceRole(placeId: widget.placeId).placeRole;
     }
 
+    // Подгружаем текущего админа для отображения надписи "Это вы"
     currentAdmin = await currentAdmin.getCurrentUser(fromDb: fromDb);
 
     setState(() {
@@ -72,7 +80,7 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            widget.user == null ? 'Добавление админа' : 'Редактирование ${widget.user!.getFullName()}'
+            widget.user == null ? AdminRoleConstants.addAdmin : '${AdminRoleConstants.editAdmin} ${widget.user!.getFullName()}'
         ),
 
         leading: IconButton(
@@ -84,7 +92,8 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
       ),
       body: Stack(
         children: [
-          if (loading) LoadingScreen()
+          if (loading) const LoadingScreen()
+          else if (saving) const LoadingScreen(loadingText: AdminRoleConstants.savingAdminProcess,)
           else Center(
             child: Column(
               children: [
@@ -93,17 +102,22 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
                   padding: const EdgeInsets.all(30),
                   child: Column(
                     children: [
+
+                      // Карточка пользователя, если это редактирование или создание на этапе выбранного пользователя
                       if (widget.user != null || chosenUser.uid.isNotEmpty) chosenUser.getPlaceAdminUserCardInList(
                           context: context,
-                          onTap: widget.user == null ? () async {
-
+                          // Если создание, то доступна кнопка редактирования, чтобы выбрать пользователя заново
+                          // Если редактирование - сменить пользователя нельзя
+                          onEdit: widget.user == null ? () async {
                             await choseUser();
-
                           } : null,
+                          onDelete: null,
+                          onCardTap: null,
                           currentAdmin: currentAdmin,
                           placeId: widget.placeId
                       ),
 
+                      // Виджет "Пользователь не выбран". Первое что видно при создании
                       if (widget.user == null && chosenUser.uid.isEmpty) Card(
                         color: AppColors.greyOnBackground,
                         child: Padding(
@@ -111,17 +125,20 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
                           child: Row(
                             children: [
                               const Expanded(
-                                  child: Text('Пользователь не выбран'),
                                   flex: 1,
+                                  child: Text(AdminRoleConstants.noChosenUser),
                               ),
                               const SizedBox(height: 20,),
+
+                              // Кнопка "Выбрать пользователя"
+
                               Expanded(
                                 flex: 1,
                                 child: ElementsOfDesign.customButton(
                                     method: () async {
                                       await choseUser();
                                     },
-                                    textOnButton: 'Выбрать пользователя',
+                                    textOnButton: ButtonsConstants.chooseUser,
                                     context: context,
                                     buttonState: ButtonStateEnum.secondary
                                 ),
@@ -133,6 +150,8 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
 
                       const SizedBox(height: 10,),
 
+                      // Виджет выбора роли
+                      // Доступен, если пользователя выбрали и пользователь не является создаталем
                       if (chosenUser.uid.isNotEmpty && chosenPlaceAdminRole.role != PlaceUserRoleEnum.creator) Card(
                         color: AppColors.greyOnBackground,
                         child: Padding(
@@ -155,13 +174,14 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
                                   ],
                                 ),
                               ),
-                              SizedBox(width: 20,),
+
+                              const SizedBox(width: 20,),
 
                               IconButton(
                                   onPressed: () async {
                                     await choseRole();
                                   },
-                                  icon: Icon(FontAwesomeIcons.gear, size: 15,)
+                                  icon: const Icon(FontAwesomeIcons.gear, size: 15,)
                               ),
 
                             ],
@@ -169,21 +189,24 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
                         ),
                       ),
 
+                      // Виджет - предупреждение, что пользователь создатель. Его нельзя менять
+
                       if (chosenPlaceAdminRole.role == PlaceUserRoleEnum.creator) Card(
                         color: AppColors.greyOnBackground,
                         child: Padding(
-                            padding: EdgeInsets.all(20),
+                            padding: const EdgeInsets.all(20),
                             child: Row(
                               children: [
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Это создатель',
+                                      AdminRoleConstants.thisIsCreator,
                                       style: Theme.of(context).textTheme.titleMedium,
                                     ),
+                                    const SizedBox(height: 5,),
                                     Text(
-                                      'Его нельзя изменить',
+                                      AdminRoleConstants.cantChangeCreator,
                                       style: Theme.of(context).textTheme.labelMedium,
                                     ),
                                   ],
@@ -195,6 +218,8 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
 
                       const SizedBox(height: 20,),
 
+                      // Кнопки "Сохранить" и "Отменить".
+                      // Доступны если выбрали пользователя и он не создатель
                       if (chosenPlaceAdminRole.role != PlaceUserRoleEnum.creator && chosenUser.uid.isNotEmpty) Row(
                         children: [
                           Expanded(
@@ -203,7 +228,7 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
                                 method: () async {
                                   await initialization();
                                 },
-                                textOnButton: 'Отменить',
+                                textOnButton: ButtonsConstants.cancel,
                                 context: context,
                                 buttonState: ButtonStateEnum.secondary
                             ),
@@ -217,14 +242,12 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
                                 method: () async {
                                   await saveAdmin();
                                 },
-                                textOnButton: 'Сохранить',
+                                textOnButton: ButtonsConstants.save,
                                 context: context,
                             ),
                           ),
                         ],
                       ),
-
-
                     ]
                   ),
                 )
@@ -237,44 +260,62 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
   }
 
   Future<void> saveAdmin() async {
+
+    // Сохранение доступно, если пользователь выбран
     if (chosenUser.uid.isNotEmpty){
 
+      setState(() {
+        saving = true;
+      });
+
+      // Заполняем переменную администратора заведения
       PlaceAdmin admin = PlaceAdmin(
           placeRole: chosenPlaceAdminRole,
           placeId: widget.placeId
       );
 
-      String result = await chosenUser.publishPlaceRoleForCurrentUser(admin);
+      String result = '';
 
+      // Если пользователю задали админскую роль, публикуем запись
+      if (chosenPlaceAdminRole.role != PlaceUserRoleEnum.reader){
+        result = await chosenUser.publishPlaceRoleForCurrentUser(admin);
+      } else {
+        // Если задали обычного пользователя, удаляем имеющуюся запись
+        result = await chosenUser.deletePlaceRoleFromUser(widget.placeId);
+      }
 
+      // Если результат успешный. возвращаемся на предыдущий экран
       if (result == SystemConstants.successConst){
         navigateBackWithResult();
       }
+
+      setState(() {
+        saving = false;
+      });
 
     }
   }
 
   Future<void> choseRole() async {
-    final result = await sm.getPopup(context: context, page: PlaceRolePicker());
+    final result = await sm.getPopup(context: context, page: const PlaceRolePicker());
     if (result != null){
       setState(() {
         chosenPlaceAdminRole = result;
       });
-
     }
   }
 
   Future<void> choseUser() async {
-    final result = await sm.getPopup(context: context, page: const CreatorPopup());
+    final result = await sm.getPopup(context: context, page: CreatorPopup(placeId: widget.placeId,));
 
-    if (result != null){
+    if (result != null) {
       setState(() {
         chosenUser = result;
-        chosenPlaceAdminRole = chosenUser.getPlaceRole(placeId: widget.placeId).placeRole;
+        chosenPlaceAdminRole = chosenUser
+            .getPlaceRole(placeId: widget.placeId)
+            .placeRole;
       });
     }
-
-
   }
 
   void navigateBackWithResult() {

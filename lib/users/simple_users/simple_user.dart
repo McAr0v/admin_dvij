@@ -339,11 +339,16 @@ class SimpleUser extends IEntity{
 
     if (tempAdmin.placeId.isNotEmpty){
       result = await tempAdmin.deleteFromDb(uid);
+
+      if (result == SystemConstants.successConst) {
+        deletePlaceFromMyPlacesList(placeId);
+      }
+
+    } else {
+      result = SystemConstants.successConst;
     }
 
-    if (result == SystemConstants.successConst) {
-      deletePlaceFromMyPlacesList(placeId);
-    }
+
 
     return result;
 
@@ -487,48 +492,61 @@ class SimpleUser extends IEntity{
 
   Widget getPlaceAdminUserCardInList ({
     required BuildContext context,
-    required VoidCallback? onTap,
+    required VoidCallback? onEdit,
+    required VoidCallback? onDelete,
+    required VoidCallback? onCardTap,
     required AdminUserClass currentAdmin,
     required String placeId
   }){
 
-    return Card(
-      color: AppColors.greyOnBackground,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
+    return GestureDetector(
+      onTap: onCardTap,
+      child: Card(
+        color: AppColors.greyOnBackground,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Row(
+            children: [
 
-            getAvatar(size: Platform.isWindows || Platform.isMacOS ? 40 : 30),
+              getAvatar(size: Platform.isWindows || Platform.isMacOS ? 40 : 30),
 
-            const SizedBox(width: 20,),
+              const SizedBox(width: 20,),
 
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(getFullName()),
-                  if (currentAdmin.uid == uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
-                  const SizedBox(height: 5,),
-                  Text(email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                  Text(
-                    getPlaceRole(placeId: placeId).placeRole.toString(needTranslate: true),
-                    style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                  ),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(getFullName()),
+                    if (currentAdmin.uid == uid) Text(AdminConstants.itsYou, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: Colors.green),),
+                    const SizedBox(height: 5,),
+                    Text(email, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                    Text(
+                      getPlaceRole(placeId: placeId).placeRole.toString(needTranslate: true),
+                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            if (onTap != null) IconButton(
-                onPressed: onTap,
-                icon: const Icon(
-                  FontAwesomeIcons.penToSquare,
-                  size: 15,
-                  color: AppColors.brandColor,
-                )
-            )
+              if (onEdit != null) IconButton(
+                  onPressed: onEdit,
+                  icon: const Icon(
+                    FontAwesomeIcons.penToSquare,
+                    size: 15,
+                    color: AppColors.brandColor,
+                  )
+              ),
+              if (onDelete != null) IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(
+                    FontAwesomeIcons.trash,
+                    size: 15,
+                    color: AppColors.attentionRed,
+                  )
+              )
 
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -22,5 +22,17 @@ class AdminRoleConstants{
   static const notChosenHeadline = 'Неизвестная роль';
   static const notChosenDesc = 'Роль не определена.';
 
+  static const addAdmin = 'Добавление админа';
+  static const editAdmin = 'Редактирование';
+  static const savingAdminProcess = 'Сохранение администратора';
+  static const loadingAdminProcess = 'Загрузка админов';
+  static const deletingAdminProcess = 'Удаление администратора';
+  static const noChosenUser = 'Пользователь не выбран';
+  static const thisIsCreator = 'Это создатель';
+  static const cantChangeCreator = 'Создателя нельзя изменить';
+  static const adminsInChosenPlace = 'Администраторы в';
+  static const deleteAdminDesc = 'Вы не сможете отменить эту операцию. Для восстановления администратора заведения нужно заново добавлять его';
+  static const deleteAdminHeadline = 'Удалить пользователя из администраторов?';
+  static const deleteAdminSuccess = 'Пользователь удален из администраторов';
 
 }

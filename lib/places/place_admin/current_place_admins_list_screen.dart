@@ -1,11 +1,14 @@
+import 'package:admin_dvij/constants/admin_role_constants.dart';
+import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/places/place_admin/add_or_edit_place_admin.dart';
+import 'package:admin_dvij/places/place_admin/place_role_class.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../../constants/system_constants.dart';
 import '../../design/loading_screen.dart';
 import '../../system_methods/system_methods_class.dart';
@@ -29,6 +32,7 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
 
   List<SimpleUser> adminsList = [];
   bool loading = false;
+  bool deleting = false;
 
   @override
   void initState() {
@@ -42,8 +46,10 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
       loading = true;
     });
 
+    // Подгруажем список пользователей-админов для нашего заведения
     adminsList = await usersList.getAdminsFromPlace(placeId: widget.place.id, fromDb: fromDb);
 
+    // Подгружаем текущего админа всего приложения
     currentAdmin = await currentAdmin.getCurrentUser(fromDb: fromDb);
 
     setState(() {
@@ -57,7 +63,7 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'Администраторы в "${widget.place.name}"'
+            '${AdminRoleConstants.adminsInChosenPlace} "${widget.place.name}"'
         ),
 
         leading: IconButton(
@@ -78,6 +84,8 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
             icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
           ),
 
+          // Иконка добавления пользователя
+
           IconButton(
             onPressed: () async {
               await addOrEditAdmin(user: null);
@@ -90,8 +98,11 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
 
       body: Stack(
         children: [
-          if (loading) const LoadingScreen(loadingText: 'Загрузка админов'),
-          if (!loading) Column(
+          if (loading) const LoadingScreen(loadingText: AdminRoleConstants.loadingAdminProcess)
+
+          else if (deleting) const LoadingScreen(loadingText: AdminRoleConstants.deletingAdminProcess)
+
+          else Column(
             children: [
 
               if (adminsList.isEmpty) const Expanded(
@@ -101,6 +112,7 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
               ),
 
               if (adminsList.isNotEmpty) Expanded(
+
                   child: ListView.builder(
                       padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
                       itemCount: adminsList.length,
@@ -108,8 +120,18 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
 
                         return adminsList[index].getPlaceAdminUserCardInList(
                             context: context,
-                            onTap: () async {
+                            // Кнопка редактирования доступна только если пользователь не создатель
+                            onEdit: adminsList[index].getPlaceRole(placeId: widget.place.id).placeRole.role == PlaceUserRoleEnum.creator
+                                ? null
+                                : () async {
                               await addOrEditAdmin(user: adminsList[index]);
+                            },
+                            onCardTap: null,
+                            // Кнопка удаления доступна только если пользователь не создатель
+                            onDelete: adminsList[index].getPlaceRole(placeId: widget.place.id).placeRole.role == PlaceUserRoleEnum.creator
+                                ? null
+                                : () async {
+                              await deleteAdmin(user: adminsList[index]);
                             },
                             currentAdmin: currentAdmin,
                           placeId: widget.place.id
@@ -122,6 +144,46 @@ class _CurrentPlaceAdminsListScreenState extends State<CurrentPlaceAdminsListScr
         ],
       ),
 
+    );
+  }
+
+  Future<void> deleteAdmin({required SimpleUser user}) async {
+
+    setState(() {
+      deleting = true;
+    });
+
+    bool? confirm = await ElementsOfDesign.exitDialog(
+        context,
+        AdminRoleConstants.deleteAdminDesc,
+        ButtonsConstants.delete,
+        ButtonsConstants.cancel,
+        AdminRoleConstants.deleteAdminHeadline
+    );
+
+    if (confirm != null && confirm) {
+      String result = await user.deletePlaceRoleFromUser(widget.place.id);
+
+      await initialization();
+
+      if (result == SystemConstants.successConst){
+        _showSnackBar(AdminRoleConstants.deleteAdminSuccess);
+      }
+    }
+
+    setState(() {
+      deleting = false;
+    });
+
+  }
+
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
     );
   }
 

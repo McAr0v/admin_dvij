@@ -7,7 +7,9 @@ import '../../design/app_colors.dart';
 import '../../design/loading_screen.dart';
 
 class CreatorPopup extends StatefulWidget {
-  const CreatorPopup({Key? key}) : super(key: key);
+  final String? placeId;
+
+  const CreatorPopup({this.placeId, Key? key}) : super(key: key);
 
   @override
   State<CreatorPopup> createState() => _CreatorPopupState();
@@ -96,11 +98,18 @@ class _CreatorPopupState extends State<CreatorPopup> {
                   child: SingleChildScrollView(
                     child: ListBody(
                       children: filteredUsersList.map((SimpleUser user) {
-                        return user.getUserCardInList(
+                        return widget.placeId == null ? user.getUserCardInList(
                             context: context,
                             onTap: () => Navigator.of(context).pop(user),
                             createAdminFunc: (){},
                             currentAdmin: currentAdminUser
+                        ) : user.getPlaceAdminUserCardInList(
+                            context: context,
+                            onEdit: null,
+                            onCardTap: () => Navigator.of(context).pop(user),
+                            onDelete: null,
+                            currentAdmin: currentAdminUser,
+                            placeId: widget.placeId!
                         );
                       }).toList(),
                     ),
