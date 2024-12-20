@@ -136,7 +136,37 @@ class RegularDate {
     }
   }
 
-  Column getRegularEditWidget({
+  bool checkRegularDate(){
+    // Собираем все пары [start, end] в список
+    final schedulePairs = [
+      [mondayStart, mondayEnd],
+      [tuesdayStart, tuesdayEnd],
+      [wednesdayStart, wednesdayEnd],
+      [thursdayStart, thursdayEnd],
+      [fridayStart, fridayEnd],
+      [saturdayStart, saturdayEnd],
+      [sundayStart, sundayEnd],
+    ];
+
+    // Условие 1: Если нет ни одной даты (все null), вернуть false
+    if (schedulePairs.every((pair) => pair[0] == null && pair[1] == null)) {
+      return false;
+    }
+
+    // Условие 2: Если выбран start или end, но пары нет, вернуть false
+    for (var pair in schedulePairs) {
+      final start = pair[0];
+      final end = pair[1];
+      if ((start == null && end != null) || (start != null && end == null)) {
+        return false;
+      }
+    }
+
+    // Если оба условия выполнены, вернуть true
+    return true;
+  }
+
+  Widget getRegularEditWidget({
     required BuildContext context,
     required Function(int index) onTapStart,
     required Function(int index) onTapEnd,
@@ -144,85 +174,88 @@ class RegularDate {
     required bool showSchedule,
     required VoidCallback show
   }){
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-                child: Text('Расписание', style: Theme.of(context).textTheme.titleMedium,)
-            ),
+    return GestureDetector(
+      onTap: show,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                  child: Text('Расписание', style: Theme.of(context).textTheme.titleMedium,)
+              ),
 
-            IconButton(
-                onPressed: show,
-                icon: Icon(
-                    showSchedule == true ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight,
-                  size: 15,
-                )
-            )
+              IconButton(
+                  onPressed: show,
+                  icon: Icon(
+                      showSchedule == true ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight,
+                    size: 15,
+                  )
+              )
 
-          ],
-        ),
+            ],
+          ),
 
-        if (showSchedule) Column(
-          children: List.generate(
-            _days.length, // Количество элементов в списке
-                (index) => ListTile(
-              contentPadding: EdgeInsets.zero,
-              //title: Text(days[index]), // Получаем элемент по индексу
-              subtitle: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
+          if (showSchedule) Column(
+            children: List.generate(
+              _days.length, // Количество элементов в списке
+                  (index) => ListTile(
+                contentPadding: EdgeInsets.zero,
+                //title: Text(days[index]), // Получаем элемент по индексу
+                subtitle: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
 
 
-                  Expanded(
-                    flex: Platform.isMacOS || Platform.isWindows ? 1 : 2,
-                    child: Text(
-                      _days[index],
-                      style: Theme.of(context).textTheme.bodySmall,
+                    Expanded(
+                      flex: Platform.isMacOS || Platform.isWindows ? 1 : 2,
+                      child: Text(
+                        _days[index],
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ),
-                  ),
 
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: canEdit ? () => onTapStart(index) : (){}, // Передаем индекс
-                      child: Card(
-                        color: AppColors.greyBackground,
-                        child: Padding(
-                          padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
-                          child: Text(
-                            'Начало: ${getTime(index: index, isStart: true)?.format(context) ?? 'Не выбрано'}',
-                            style: Theme.of(context).textTheme.bodySmall,
+                    Expanded(
+                      flex: 2,
+                      child: GestureDetector(
+                        onTap: canEdit ? () => onTapStart(index) : (){}, // Передаем индекс
+                        child: Card(
+                          color: AppColors.greyBackground,
+                          child: Padding(
+                            padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
+                            child: Text(
+                              'Начало: ${getTime(index: index, isStart: true)?.format(context) ?? 'Не выбрано'}',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
 
-                  const SizedBox(width: 10,),
+                    const SizedBox(width: 10,),
 
-                  Expanded(
-                    flex: 2,
-                    child: GestureDetector(
-                      onTap: canEdit ? () => onTapEnd(index) : (){}, // Передаем индекс
-                      child: Card(
-                        color: AppColors.greyBackground,
-                        child: Padding(
-                          padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
-                          child: Text(
-                            'Конец: ${getTime(index: index, isStart: false)?.format(context) ?? 'Не выбрано'}',
-                            style: Theme.of(context).textTheme.bodySmall,
+                    Expanded(
+                      flex: 2,
+                      child: GestureDetector(
+                        onTap: canEdit ? () => onTapEnd(index) : (){}, // Передаем индекс
+                        child: Card(
+                          color: AppColors.greyBackground,
+                          child: Padding(
+                            padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
+                            child: Text(
+                              'Конец: ${getTime(index: index, isStart: false)?.format(context) ?? 'Не выбрано'}',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

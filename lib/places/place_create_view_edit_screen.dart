@@ -5,6 +5,8 @@ import 'package:admin_dvij/categories/place_categories/place_category_picker.dar
 import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/cities/city_picker_page.dart';
+import 'package:admin_dvij/constants/places_constants.dart';
+import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/places/place_admin/current_place_admins_list_screen.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
@@ -19,6 +21,7 @@ import 'package:image_picker/image_picker.dart';
 import '../constants/buttons_constants.dart';
 import '../constants/city_constants.dart';
 import '../constants/system_constants.dart';
+import '../constants/users_constants.dart';
 import '../database/image_picker.dart';
 import '../dates/regular_date_class.dart';
 import '../design/app_colors.dart';
@@ -65,47 +68,6 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   RegularDate schedule = RegularDate();
 
 
-  /// Обновляем время
-  void updateTime(int index, bool isStart, TimeOfDay newTime) {
-    setState(() {
-      switch (index) {
-        case 0:
-          isStart ? schedule.mondayStart = newTime : schedule.mondayEnd = newTime;
-          break;
-        case 1:
-          isStart ? schedule.tuesdayStart = newTime : schedule.tuesdayEnd = newTime;
-          break;
-        case 2:
-          isStart ? schedule.wednesdayStart = newTime : schedule.wednesdayEnd = newTime;
-          break;
-        case 3:
-          isStart ? schedule.thursdayStart = newTime : schedule.thursdayEnd = newTime;
-          break;
-        case 4:
-          isStart ? schedule.fridayStart = newTime : schedule.fridayEnd = newTime;
-          break;
-        case 5:
-          isStart ? schedule.saturdayStart = newTime : schedule.saturdayEnd = newTime;
-          break;
-        case 6:
-          isStart ? schedule.sundayStart = newTime : schedule.sundayEnd = newTime;
-          break;
-      }
-    });
-  }
-
-  /// Показ диалога выбора времени
-  Future<void> pickTime(int index, bool isStart) async {
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: schedule.getTime(index: index, isStart: true) ?? TimeOfDay.now(),
-      initialEntryMode: TimePickerEntryMode.inputOnly,
-    );
-    if (picked != null) {
-      updateTime(index, isStart, picked);
-    }
-  }
-
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descController = TextEditingController();
   final TextEditingController creatorController = TextEditingController();
@@ -127,27 +89,33 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
   Future<void> initialization({bool fromDb = false}) async {
 
+    // Подгружаем текущего пользователя
     currentAdminUser = await currentAdminUser.getCurrentUser(fromDb: false);
 
     setState(() {
       loading = true;
     });
 
+    // Подгружаем список заведений и список пользователей
     if (fromDb){
       await placesList.getDownloadedList(fromDb: fromDb);
       await usersList.getDownloadedList(fromDb: fromDb);
     }
 
+    // Если это создание, то устанавливаем режим редактирования и показ расписания сразу
     if (widget.place == null){
       canEdit = true;
+      showSchedule = true;
     }
 
+    // Если редактирование, подгружаем создателя и редактируемое заведение. Устанавливаем расписание
     if (widget.place != null){
       editPlace = placesList.getEntityFromList(widget.place!.id);
       creator = usersList.getEntityFromList(editPlace.creatorId);
       setSchedule();
     }
 
+    // Сбрасываем текстовые поля и выбранные настройки по умолчанию
     setTextFieldsOnDefault();
 
     setState(() {
@@ -156,55 +124,17 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
   }
 
-  void setSchedule(){
-    schedule.mondayStart = editPlace.openingHours.mondayStart;
-    schedule.mondayEnd = editPlace.openingHours.mondayEnd;
-    schedule.tuesdayStart = editPlace.openingHours.tuesdayStart;
-    schedule.tuesdayEnd = editPlace.openingHours.tuesdayEnd;
-    schedule.wednesdayStart = editPlace.openingHours.wednesdayStart;
-    schedule.wednesdayEnd = editPlace.openingHours.wednesdayEnd;
-    schedule.thursdayStart = editPlace.openingHours.thursdayStart;
-    schedule.thursdayEnd = editPlace.openingHours.thursdayEnd;
-    schedule.fridayStart = editPlace.openingHours.fridayStart;
-    schedule.fridayEnd = editPlace.openingHours.fridayEnd;
-    schedule.saturdayStart = editPlace.openingHours.saturdayStart;
-    schedule.saturdayEnd = editPlace.openingHours.saturdayEnd;
-    schedule.sundayStart = editPlace.openingHours.sundayStart;
-    schedule.sundayEnd = editPlace.openingHours.sundayEnd;
-  }
-
-  void setTextFieldsOnDefault(){
-    setState(() {
-      nameController.text = editPlace.name;
-      descController.text = editPlace.desc;
-      creatorController.text = creator.getFullName().isNotEmpty ? creator.getFullName() : 'Выбери создателя';
-      createDateController.text = sm.formatDateTimeToHumanView(editPlace.createDate);
-      categoryController.text = editPlace.category.name.isNotEmpty ? editPlace.category.name : 'Категория не выбрана';
-      cityController.text = editPlace.city.name.isNotEmpty ? editPlace.city.name : CityConstants.cityNotChosen;
-      streetController.text = editPlace.street;
-      houseController.text = editPlace.house;
-      phoneController.text = editPlace.phone;
-      whatsappController.text = editPlace.whatsapp;
-      telegramController.text = editPlace.telegram;
-      instagramController.text = editPlace.instagram;
-      setSchedule();
-
-      chosenCreator = SimpleUser.empty();
-      chosenCategory = PlaceCategory.empty();
-      chosenCity = City.empty();
-
-      _imageFile = null;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+
     final isMobile = MediaQuery.of(context).size.width < 600; // Условие для мобильной версии
 
     return Scaffold(
       appBar: AppBar(
         title: Text(
-            'Просмотр заведения'
+            widget.place != null && widget.place!.name.isNotEmpty
+                ? '${PlacesConstants.watchPlace} "${editPlace.name}"'
+                : PlacesConstants.createPlace
         ),
 
         leading: IconButton(
@@ -218,16 +148,16 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
           // Иконка обновления данных.
 
-          IconButton(
+          if (widget.place != null) IconButton(
             onPressed: () async {
               await initialization(fromDb: true);
             },
             icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
           ),
 
-          // Иконка редактирования. Доступна если у текущего админа есть доступ
+          // Иконка редактирования. Доступна если у текущего админа есть доступ или это не создание заведения
 
-          if (currentAdminUser.adminRole.accessToEditPlaces()) IconButton(
+          if (currentAdminUser.adminRole.accessToEditPlaces() && widget.place != null) IconButton(
             onPressed: () async {
               setState(() {
                 canEdit = true;
@@ -267,42 +197,24 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                   child: Column(
                     children: [
 
-                      Card(
-                          clipBehavior: Clip.antiAlias,
-                          child: Stack(
-                            children: [
-
-                              ElementsOfDesign.getImageFromUrlOrPickedImage(url: editPlace.imageUrl, imageFile: _imageFile),
-
-                              if (canEdit) Positioned(
-                                top: 10,
-                                left: 10,
-                                child: Card(
-                                  color: AppColors.greyBackground,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: ElementsOfDesign.linkButton(
-                                        method: () async {
-                                          await _pickImage();
-                                        },
-                                        text: ButtonsConstants.changePhoto,
-                                        context: context
-                                    ),
-
-                                  ),
-                                ),
-                              ),
-                            ],
-                          )
+                      // Todo - заменить все изображения на этот виджет
+                      ElementsOfDesign.imageForEditViewScreen(
+                          context: context,
+                          imageUrl: editPlace.imageUrl,
+                          imageFile: _imageFile,
+                          canEdit: canEdit,
+                          onEditImage: () async {
+                            await _pickImage();
+                          }
                       ),
 
                       const SizedBox(height: 20,),
 
                       ElementsOfDesign.buildTextField(
                           controller: nameController,
-                          labelText: 'Название заведения',
+                          labelText: PlacesConstants.namePlace,
                           canEdit: canEdit,
-                          icon: FontAwesomeIcons.idBadge,
+                          icon: FontAwesomeIcons.heading,
                           context: context
                       ),
 
@@ -310,9 +222,9 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
                       ElementsOfDesign.buildTextField(
                         controller: descController,
-                        labelText: 'Описание',
+                        labelText: PlacesConstants.descPlace,
                         canEdit: canEdit,
-                        icon: FontAwesomeIcons.fileLines,
+                        icon: FontAwesomeIcons.paragraph,
                         context: context,
                         maxLines: null,
                       ),
@@ -324,9 +236,9 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                           [
                             ElementsOfDesign.buildTextField(
                                 controller: cityController,
-                                labelText: 'Город',
+                                labelText: UserConstants.city,
                                 canEdit: canEdit,
-                                icon: FontAwesomeIcons.idBadge,
+                                icon: FontAwesomeIcons.city,
                                 context: context,
                                 readOnly: true,
                                 onTap: () async {
@@ -335,9 +247,9 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                             ),
                             ElementsOfDesign.buildTextField(
                                 controller: categoryController,
-                                labelText: 'Категория',
+                                labelText: PlacesConstants.categoryPlace,
                                 canEdit: canEdit,
-                                icon: FontAwesomeIcons.idBadge,
+                                icon: FontAwesomeIcons.tag,
                                 context: context,
                                 readOnly: true,
                                 onTap: () async {
@@ -351,16 +263,16 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                           [
                             ElementsOfDesign.buildTextField(
                                 controller: streetController,
-                                labelText: 'Улица',
+                                labelText: PlacesConstants.streetPlace,
                                 canEdit: canEdit,
-                                icon: FontAwesomeIcons.idBadge,
+                                icon: FontAwesomeIcons.road,
                                 context: context
                             ),
                             ElementsOfDesign.buildTextField(
                               controller: houseController,
-                              labelText: 'Номер дома',
+                              labelText: PlacesConstants.homePlace,
                               canEdit: canEdit,
-                              icon: FontAwesomeIcons.idBadge,
+                              icon: FontAwesomeIcons.building,
                               context: context,
                             )
                           ]
@@ -371,16 +283,16 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                           [
                             ElementsOfDesign.buildTextField(
                                 controller: phoneController,
-                                labelText: 'Телефон',
+                                labelText: UserConstants.phone,
                                 canEdit: canEdit,
-                                icon: FontAwesomeIcons.idBadge,
+                                icon: FontAwesomeIcons.phone,
                                 context: context
                             ),
                             ElementsOfDesign.buildTextField(
                               controller: whatsappController,
-                              labelText: 'whatsapp',
+                              labelText: UserConstants.whatsapp,
                               canEdit: canEdit,
-                              icon: FontAwesomeIcons.idBadge,
+                              icon: FontAwesomeIcons.whatsapp,
                               context: context,
                             )
                           ]
@@ -391,16 +303,16 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                           [
                             ElementsOfDesign.buildTextField(
                                 controller: telegramController,
-                                labelText: 'Telegram',
+                                labelText: UserConstants.telegram,
                                 canEdit: canEdit,
-                                icon: FontAwesomeIcons.idBadge,
+                                icon: FontAwesomeIcons.telegram,
                                 context: context
                             ),
                             ElementsOfDesign.buildTextField(
                               controller: instagramController,
-                              labelText: 'instagram',
+                              labelText: UserConstants.instagram,
                               canEdit: canEdit,
-                              icon: FontAwesomeIcons.idBadge,
+                              icon: FontAwesomeIcons.instagram,
                               context: context,
                             )
                           ]
@@ -411,16 +323,16 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                           [
                             ElementsOfDesign.buildTextField(
                                 controller: createDateController,
-                                labelText: 'Дата создания',
+                                labelText: PlacesConstants.createDatePlace,
                                 canEdit: false,
-                                icon: FontAwesomeIcons.idBadge,
+                                icon: FontAwesomeIcons.calendar,
                                 context: context
                             ),
                             ElementsOfDesign.buildTextField(
                                 controller: creatorController,
-                                labelText: 'Создатель',
+                                labelText: PlacesConstants.creatorPlace,
                                 canEdit: canEdit && currentAdminUser.adminRole.accessToEditCreator(),
-                                icon: FontAwesomeIcons.idBadge,
+                                icon: FontAwesomeIcons.signature,
                                 context: context,
                                 readOnly: true,
                                 onTap: () async {
@@ -447,24 +359,22 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
                       if (widget.place != null) GestureDetector(
                         onTap: () async {
-                          final result = await sm.pushToPageWithResult(context: context, page: CurrentPlaceAdminsListScreen(place: editPlace));
-
-                          if (result != null) {
-                            await initialization();
-                          }
+                          await goToAdminsPage();
 
                         },
                         child: Row(
                           children: [
                             Expanded(
                                 child: Text(
-                                  'Администраторы',
+                                  PlacesConstants.adminsPlace,
                                   style: Theme.of(context).textTheme.titleMedium,
                                 ),
                             ),
 
                             IconButton(
-                                onPressed: (){},
+                                onPressed: () async {
+                                  await goToAdminsPage();
+                                },
                                 icon: const Icon(FontAwesomeIcons.chevronRight, size: 15,)
                             )
                           ],
@@ -511,14 +421,63 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
     );
   }
 
+  Future<void> goToAdminsPage() async {
+    final result = await sm.pushToPageWithResult(context: context, page: CurrentPlaceAdminsListScreen(place: editPlace));
+
+    if (result != null) {
+      await initialization();
+    }
+  }
+
+  void setSchedule(){
+    schedule.mondayStart = editPlace.openingHours.mondayStart;
+    schedule.mondayEnd = editPlace.openingHours.mondayEnd;
+    schedule.tuesdayStart = editPlace.openingHours.tuesdayStart;
+    schedule.tuesdayEnd = editPlace.openingHours.tuesdayEnd;
+    schedule.wednesdayStart = editPlace.openingHours.wednesdayStart;
+    schedule.wednesdayEnd = editPlace.openingHours.wednesdayEnd;
+    schedule.thursdayStart = editPlace.openingHours.thursdayStart;
+    schedule.thursdayEnd = editPlace.openingHours.thursdayEnd;
+    schedule.fridayStart = editPlace.openingHours.fridayStart;
+    schedule.fridayEnd = editPlace.openingHours.fridayEnd;
+    schedule.saturdayStart = editPlace.openingHours.saturdayStart;
+    schedule.saturdayEnd = editPlace.openingHours.saturdayEnd;
+    schedule.sundayStart = editPlace.openingHours.sundayStart;
+    schedule.sundayEnd = editPlace.openingHours.sundayEnd;
+  }
+
+  void setTextFieldsOnDefault(){
+    setState(() {
+      nameController.text = editPlace.name;
+      descController.text = editPlace.desc;
+      creatorController.text = creator.getFullName().isNotEmpty ? creator.getFullName() : PlacesConstants.chooseCreatorPlace;
+      createDateController.text = sm.formatDateTimeToHumanView(editPlace.createDate);
+      categoryController.text = editPlace.category.name.isNotEmpty ? editPlace.category.name : PlacesConstants.chooseCategoryPlace;
+      cityController.text = editPlace.city.name.isNotEmpty ? editPlace.city.name : CityConstants.cityNotChosen;
+      streetController.text = editPlace.street;
+      houseController.text = editPlace.house;
+      phoneController.text = editPlace.phone;
+      whatsappController.text = editPlace.whatsapp;
+      telegramController.text = editPlace.telegram;
+      instagramController.text = editPlace.instagram;
+      setSchedule();
+
+      chosenCreator = SimpleUser.empty();
+      chosenCategory = PlaceCategory.empty();
+      chosenCity = City.empty();
+
+      _imageFile = null;
+    });
+  }
+
   Future<void> deletePlace () async {
 
     bool? result = await ElementsOfDesign.exitDialog(
       context,
-      'Если вы удалите заведение, вы так же удалите мероприятия и акции этого заведения. Восстановить данные будет нельзя',
+      PlacesConstants.deletePlaceDesc,
       ButtonsConstants.delete,
       ButtonsConstants.cancel,
-      'Удаление заведения'
+        PlacesConstants.deletePlaceHeadline
     );
 
     if (result != null && result){
@@ -530,7 +489,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
       if (publishResult == SystemConstants.successConst){
 
-        _showSnackBar('Удаление прошло успешно!');
+        _showSnackBar(PlacesConstants.deletePlaceSuccess);
         navigateToPlacesListScreen();
 
       } else {
@@ -583,6 +542,47 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
   }
 
+  /// Обновляем время
+  void updateTime(int index, bool isStart, TimeOfDay newTime) {
+    setState(() {
+      switch (index) {
+        case 0:
+          isStart ? schedule.mondayStart = newTime : schedule.mondayEnd = newTime;
+          break;
+        case 1:
+          isStart ? schedule.tuesdayStart = newTime : schedule.tuesdayEnd = newTime;
+          break;
+        case 2:
+          isStart ? schedule.wednesdayStart = newTime : schedule.wednesdayEnd = newTime;
+          break;
+        case 3:
+          isStart ? schedule.thursdayStart = newTime : schedule.thursdayEnd = newTime;
+          break;
+        case 4:
+          isStart ? schedule.fridayStart = newTime : schedule.fridayEnd = newTime;
+          break;
+        case 5:
+          isStart ? schedule.saturdayStart = newTime : schedule.saturdayEnd = newTime;
+          break;
+        case 6:
+          isStart ? schedule.sundayStart = newTime : schedule.sundayEnd = newTime;
+          break;
+      }
+    });
+  }
+
+  /// Показ диалога выбора времени
+  Future<void> pickTime(int index, bool isStart) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: schedule.getTime(index: index, isStart: true) ?? TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.inputOnly,
+    );
+    if (picked != null) {
+      updateTime(index, isStart, picked);
+    }
+  }
+
   void _showSnackBar(String message){
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -595,31 +595,35 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   String checkPlace(Place tempPlace){
 
     if (tempPlace.name.isEmpty){
-      return 'Название не может быть пустым!';
+      return PlacesConstants.noNameError;
     }
     if (tempPlace.desc.isEmpty){
-      return 'Описание не может быть пустым!';
+      return PlacesConstants.noDescError;
     }
     if (tempPlace.creatorId.isEmpty){
-      return 'Нужно обязательно выбрать создателя';
+      return PlacesConstants.noCreatorError;
     }
 
     if (tempPlace.city.id.isEmpty){
-      return 'Нужно выбрать город';
+      return PlacesConstants.noCityError;
     }
     if (tempPlace.category.id.isEmpty){
-      return 'Нужно выбрать категорию';
+      return PlacesConstants.noCategoryError;
     }
     if (tempPlace.street.isEmpty){
-      return 'Укажите название улицы';
+      return PlacesConstants.noStreetError;
     }
 
     if (tempPlace.house.isEmpty){
-      return 'Укажите номер дома или строения';
+      return PlacesConstants.noHomeError;
     }
 
     if (tempPlace.phone.isEmpty){
-      return 'Нужно обязательно заполнить контактный телефон';
+      return PlacesConstants.noPhoneError;
+    }
+
+    if (!schedule.checkRegularDate()){
+      return PlacesConstants.noScheduleError;
     }
 
     return SystemConstants.successConst;
@@ -648,7 +652,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
 
 
-        _showSnackBar('Заведение успешно сохранено!');
+        _showSnackBar(PlacesConstants.savePlaceSuccess);
 
         canEdit = false;
         setTextFieldsOnDefault();
@@ -661,6 +665,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
       } else {
         _showSnackBar(publishResult);
       }
+    } else {
+      _showSnackBar(checkPlace(tempPlace));
     }
 
     setState(() {

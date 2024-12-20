@@ -165,6 +165,8 @@ class Place implements IEntity{
 
     String result = '';
 
+    // TODO Сделать удаление картинки
+
     if (!Platform.isWindows){
       result =  await db.deleteFromDb(path);
     } else {

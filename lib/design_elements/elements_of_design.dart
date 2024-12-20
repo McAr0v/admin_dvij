@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../constants/buttons_constants.dart';
 import '../constants/system_constants.dart';
 import '../design/app_colors.dart';
 
@@ -112,6 +112,42 @@ class ElementsOfDesign {
         ),
       );
     }
+  }
+
+  static Widget imageForEditViewScreen({
+    required BuildContext context,
+    required String imageUrl,
+    required File? imageFile,
+    required bool canEdit,
+    required VoidCallback onEditImage
+
+  }){
+    return Card(
+        clipBehavior: Clip.antiAlias,
+        child: Stack(
+          children: [
+
+            getImageFromUrlOrPickedImage(url: imageUrl, imageFile: imageFile),
+
+            if (canEdit) Positioned(
+              top: 10,
+              left: 10,
+              child: Card(
+                color: AppColors.greyBackground,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ElementsOfDesign.linkButton(
+                      method: onEditImage,
+                      text: ButtonsConstants.changePhoto,
+                      context: context
+                  ),
+
+                ),
+              ),
+            ),
+          ],
+        )
+    );
   }
 
   static Widget getImageFromUrlOrPickedImage({
