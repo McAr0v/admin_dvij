@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:admin_dvij/constants/admin_role_constants.dart';
 import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
@@ -77,6 +79,7 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600; // Условие для мобильной версии
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -99,7 +102,7 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
               children: [
                 Container(
                   width: sm.getScreenWidth(),
-                  padding: const EdgeInsets.all(30),
+                  padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 30 : 10),
                   child: Column(
                     children: [
 
@@ -117,33 +120,35 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
                           placeId: widget.placeId
                       ),
 
+
+
                       // Виджет "Пользователь не выбран". Первое что видно при создании
                       if (widget.user == null && chosenUser.uid.isEmpty) Card(
                         color: AppColors.greyOnBackground,
                         child: Padding(
                           padding: const EdgeInsets.all(20),
-                          child: Row(
-                            children: [
-                              const Expanded(
-                                  flex: 1,
-                                  child: Text(AdminRoleConstants.noChosenUser),
-                              ),
-                              const SizedBox(height: 20,),
+                          child: ElementsOfDesign.buildAdaptiveRow(
+                              isMobile: isMobile,
+                              bottomPadding: 0,
+                              children: [
 
-                              // Кнопка "Выбрать пользователя"
 
-                              Expanded(
-                                flex: 1,
-                                child: ElementsOfDesign.customButton(
+                                Text(
+                                  AdminRoleConstants.noChosenUser,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+
+                                if (isMobile) const SizedBox(height: 20,),
+
+                                ElementsOfDesign.customButton(
                                     method: () async {
                                       await choseUser();
                                     },
                                     textOnButton: ButtonsConstants.chooseUser,
                                     context: context,
                                     buttonState: ButtonStateEnum.secondary
-                                ),
-                              ),
-                            ],
+                                )
+                              ]
                           ),
                         ),
                       ),

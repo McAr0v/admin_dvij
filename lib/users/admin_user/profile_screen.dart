@@ -269,8 +269,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(height: 40,),
 
                         ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
+                            isMobile: isMobile,
+                            children: [
                               ElementsOfDesign.buildTextField(
                                   controller: nameController,
                                   labelText: UserConstants.name,
@@ -290,8 +290,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
+                            isMobile: isMobile,
+                            children: [
                               ElementsOfDesign.buildTextField(
                                   controller: emailController,
                                   labelText: UserConstants.email,
@@ -311,8 +311,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
+                            isMobile: isMobile,
+                            children: [
                               ElementsOfDesign.buildTextField(
                                   controller: cityController,
                                   labelText: UserConstants.city,
@@ -340,8 +340,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
 
                         ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
+                            isMobile: isMobile,
+                            children: [
                               ElementsOfDesign.buildTextField(
                                 controller: adminRoleController,
                                 labelText: UserConstants.adminRole,
@@ -373,8 +373,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         // Кнопки СОХРАНИТЬ / ОТМЕНИТЬ
 
                         if (canEdit) ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
+                            isMobile: isMobile,
+                            children: [
                               ElementsOfDesign.customButton(
                                   method: (){
                                     canEdit = false;

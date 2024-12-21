@@ -89,19 +89,23 @@ class ElementsOfDesign {
     }
   }
 
-  static Widget buildAdaptiveRow(bool isMobile, List<Widget> children) {
+  static Widget buildAdaptiveRow({
+    required bool isMobile,
+    required List<Widget> children,
+    double bottomPadding = 20
+      }) {
     if (isMobile) {
       return Column(
         children: children
             .map((child) => Padding(
-          padding: const EdgeInsets.only(bottom: 20),
+          padding: EdgeInsets.only(bottom: bottomPadding),
           child: child,
         ))
             .toList(),
       );
     } else {
       return Padding(
-        padding: const EdgeInsets.only(bottom: 20),
+        padding: EdgeInsets.only(bottom: bottomPadding),
         child: Row(
           children: [
             for (int i = 0; i < children.length; i++) ...[

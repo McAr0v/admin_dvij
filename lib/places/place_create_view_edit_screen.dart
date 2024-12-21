@@ -6,7 +6,6 @@ import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/cities/city_picker_page.dart';
 import 'package:admin_dvij/constants/places_constants.dart';
-import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/places/place_admin/current_place_admins_list_screen.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
@@ -185,7 +184,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
               child: Center(
                 child: Container(
                   width: sm.getScreenWidth(neededWidth: 800),
-                  padding: const EdgeInsets.all(30),
+                  padding: EdgeInsets.all(isMobile ? 20 : 30),
                   margin: EdgeInsets.symmetric(
                       vertical: Platform.isWindows || Platform.isMacOS ? 20 : 10,
                       horizontal: Platform.isWindows || Platform.isMacOS ? 0 : 10
@@ -232,8 +231,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                       const SizedBox(height: 20,),
 
                       ElementsOfDesign.buildAdaptiveRow(
-                          isMobile,
-                          [
+                          isMobile: isMobile,
+                          children: [
                             ElementsOfDesign.buildTextField(
                                 controller: cityController,
                                 labelText: UserConstants.city,
@@ -259,8 +258,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                           ]
                       ),
                       ElementsOfDesign.buildAdaptiveRow(
-                          isMobile,
-                          [
+                          isMobile: isMobile,
+                          children: [
                             ElementsOfDesign.buildTextField(
                                 controller: streetController,
                                 labelText: PlacesConstants.streetPlace,
@@ -279,8 +278,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                       ),
 
                       ElementsOfDesign.buildAdaptiveRow(
-                          isMobile,
-                          [
+                          isMobile: isMobile,
+                          children: [
                             ElementsOfDesign.buildTextField(
                                 controller: phoneController,
                                 labelText: UserConstants.phone,
@@ -299,8 +298,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                       ),
 
                       ElementsOfDesign.buildAdaptiveRow(
-                          isMobile,
-                          [
+                          isMobile: isMobile,
+                          children: [
                             ElementsOfDesign.buildTextField(
                                 controller: telegramController,
                                 labelText: UserConstants.telegram,
@@ -319,8 +318,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                       ),
 
                       ElementsOfDesign.buildAdaptiveRow(
-                          isMobile,
-                          [
+                          isMobile: isMobile,
+                          children: [
                             ElementsOfDesign.buildTextField(
                                 controller: createDateController,
                                 labelText: PlacesConstants.createDatePlace,
@@ -384,8 +383,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                       const SizedBox(height: 20,),
 
                       if (canEdit) ElementsOfDesign.buildAdaptiveRow(
-                          isMobile,
-                          [
+                          isMobile: isMobile,
+                          children: [
                             ElementsOfDesign.customButton(
                                 method: () async {
                                   await savePlace();
@@ -692,7 +691,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   }
 
   Future<void> chooseCreator() async{
-    final results = await sm.getPopup(context: context, page: const CreatorPopup());
+    final results = await sm.getPopup(context: context, page: CreatorPopup(placeId: editPlace.id,));
     if (results != null){
       chosenCreator = results;
       creatorController.text = chosenCreator.getFullName();

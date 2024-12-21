@@ -224,8 +224,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                             const SizedBox(height: 40,),
 
                             ElementsOfDesign.buildAdaptiveRow(
-                                isMobile,
-                                [
+                                isMobile: isMobile,
+                                children: [
                                   ElementsOfDesign.buildTextField(
                                       controller: nameController,
                                       labelText: UserConstants.name,
@@ -245,8 +245,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                             ),
 
                             ElementsOfDesign.buildAdaptiveRow(
-                                isMobile,
-                                [
+                                isMobile: isMobile,
+                                children: [
                                   ElementsOfDesign.buildTextField(
                                       controller: emailController,
                                       labelText: UserConstants.email,
@@ -266,8 +266,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                             ),
 
                             ElementsOfDesign.buildAdaptiveRow(
-                                isMobile,
-                                [
+                                isMobile: isMobile,
+                                children: [
                                   ElementsOfDesign.buildTextField(
                                       controller: whatsappController,
                                       labelText: UserConstants.whatsapp,
@@ -287,8 +287,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                             ),
 
                             ElementsOfDesign.buildAdaptiveRow(
-                                isMobile,
-                                [
+                                isMobile: isMobile,
+                                children: [
                                   ElementsOfDesign.buildTextField(
                                       controller: instagramController,
                                       labelText: UserConstants.instagram,
@@ -312,8 +312,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                             ),
 
                             ElementsOfDesign.buildAdaptiveRow(
-                                isMobile,
-                                [
+                                isMobile: isMobile,
+                                children: [
                                   ElementsOfDesign.buildTextField(
                                     controller: cityController,
                                     labelText: UserConstants.city,
@@ -346,8 +346,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                             // Кнопки СОХРАНИТЬ / ОТМЕНИТЬ
 
                             if (canEdit) ElementsOfDesign.buildAdaptiveRow(
-                                isMobile,
-                                [
+                                isMobile: isMobile,
+                                children: [
                                   ElementsOfDesign.customButton(
                                       method: (){
                                         canEdit = false;

@@ -216,8 +216,8 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
 
                         ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
+                            isMobile: isMobile,
+                            children: [
 
                               ElementsOfDesign.buildTextField(
                                 controller: _statusController,
@@ -257,8 +257,8 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                         ),
 
                         ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
+                            isMobile: isMobile,
+                            children: [
                               ElementsOfDesign.buildTextField(
                                 controller: _orderDateController,
                                 labelText: AdsConstants.orderDateAdField,
@@ -294,8 +294,8 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                         ),
 
                         ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
+                            isMobile: isMobile,
+                            children: [
                               ElementsOfDesign.buildTextField(
                                   controller: _clientNameController,
                                   labelText: AdsConstants.clientNameAdField,
@@ -354,8 +354,8 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
                         const SizedBox(height: 20,),
 
                         if (canEdit) ElementsOfDesign.buildAdaptiveRow(
-                            isMobile,
-                            [
+                            isMobile: isMobile,
+                            children: [
                               ElementsOfDesign.customButton(
                                   method: () async {
                                     await saveAd();
