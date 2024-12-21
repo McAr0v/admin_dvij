@@ -118,6 +118,24 @@ class ElementsOfDesign {
     }
   }
 
+  static Widget checkBox({
+    required String text,
+    required bool isChecked,
+    required ValueChanged<bool?> onChanged,
+    required BuildContext context
+  }){
+    return Row(
+      children: [
+        Checkbox(
+          value: isChecked,
+          onChanged: onChanged,
+        ),
+        const SizedBox(width: 10,),
+        Text(text, style: Theme.of(context).textTheme.bodyMedium,),
+      ],
+    );
+  }
+
   static Widget imageForEditViewScreen({
     required BuildContext context,
     required String imageUrl,

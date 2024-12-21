@@ -3,6 +3,7 @@ import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/constants/date_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/places/place_class.dart';
+import 'package:admin_dvij/places/place_create_view_edit_screen.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
@@ -403,37 +404,50 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
 
                                       if (userPlaces.isNotEmpty && showPlaces) for (Place temp in userPlaces) Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 5),
-                                        child: Card(
-                                          color: AppColors.greyOnBackground,
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                                            child: Row(
-                                              crossAxisAlignment: CrossAxisAlignment.center,
-                                              mainAxisAlignment: MainAxisAlignment.center,
-                                              children: [
-                                                ElementsOfDesign.imageWithTags(
-                                                  imageUrl: temp.imageUrl,
-                                                  width: 100, //Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
-                                                  height: 100,
-                                                ),
-                                                const SizedBox(width: 10,),
-                                                Expanded(
-                                                    child: Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text(temp.name),
-                                                        Text(temp.getAddress(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                                                        const SizedBox(height: 10),
-                                                        Text(
-                                                          temp.getCurrentPlaceAdmin(adminsList: editUser.placesList).placeRole.toString(needTranslate: true),
-                                                          style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                                                        ),
-                                                      ],
-                                                    )
-                                                ),
-                                                //const SizedBox(width: 20,),
+                                        child: GestureDetector(
+                                          onTap: ()async {
+                                            final result = await systemMethods.pushToPageWithResult(
+                                                context: context,
+                                                page: PlaceCreateViewEditScreen(place: temp,)
+                                            );
 
-                                              ],
+                                            if (result != null){
+                                              await getUsersInfo();
+                                            }
+
+                                          },
+                                          child: Card(
+                                            color: AppColors.greyOnBackground,
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                                              child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  ElementsOfDesign.imageWithTags(
+                                                    imageUrl: temp.imageUrl,
+                                                    width: 100, //Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
+                                                    height: 100,
+                                                  ),
+                                                  const SizedBox(width: 10,),
+                                                  Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(temp.name),
+                                                          Text(temp.getAddress(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                                                          const SizedBox(height: 10),
+                                                          Text(
+                                                            temp.getCurrentPlaceAdmin(adminsList: editUser.placesList).placeRole.toString(needTranslate: true),
+                                                            style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                                          ),
+                                                        ],
+                                                      )
+                                                  ),
+                                                  //const SizedBox(width: 20,),
+
+                                                ],
+                                              ),
                                             ),
                                           ),
                                         ),

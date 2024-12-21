@@ -320,7 +320,7 @@ class Place implements IEntity{
     return ElementsOfDesign.getTag(
         context: context,
         text: eventsList.length.toString(),
-        icon: FontAwesomeIcons.evernote,
+        icon: FontAwesomeIcons.cakeCandles,
         color: AppColors.greyBackground,
         textColor: AppColors.white
 
@@ -331,7 +331,7 @@ class Place implements IEntity{
     return ElementsOfDesign.getTag(
         context: context,
         text: promosList.length.toString(),
-        icon: FontAwesomeIcons.evernote,
+        icon: FontAwesomeIcons.fire,
         color: AppColors.greyBackground,
         textColor: AppColors.white
 

@@ -221,10 +221,6 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                                   tempPlace.getPromosCounter(context: context)
                                 ]
                               )
-
-
-
-
                             ],
                           ),
                           leftTopTag: tempPlace.category.getCategoryWidget(context: context)
@@ -249,8 +245,8 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
 
     if (result != null){
       filterCategory = result[0];
-      filterHaveEvents = result[0];
-      filterHavePromos = result[0];
+      filterHaveEvents = result[1];
+      filterHavePromos = result[2];
 
       await initialization(
           category: filterCategory,

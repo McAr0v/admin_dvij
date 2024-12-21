@@ -1,12 +1,14 @@
 import 'package:admin_dvij/categories/place_categories/place_category.dart';
+import 'package:admin_dvij/categories/place_categories/place_category_picker.dart';
 import 'package:admin_dvij/constants/filter_constants.dart';
 import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import '../constants/buttons_constants.dart';
+import '../design_elements/button_state_enum.dart';
 import '../design_elements/elements_of_design.dart';
+import '../system_methods/system_methods_class.dart';
 
 class PlaceFilterPicker extends StatefulWidget {
   final PlaceCategory placeCategory;
@@ -91,13 +93,13 @@ class _PlaceFilterPickerState extends State<PlaceFilterPicker> {
                   onTap: () async {
                     final result = await systemMethodsClass.getPopup(
                         context: context,
-                        page: const LocationPicker()
+                        page: const PlaceCategoryPicker()
                     );
 
                     if (result != null){
                       setState(() {
-                        chosenLocation = result;
-                        locationController.text = chosenLocation.toString(translate: true);
+                        chosenCategory = result;
+                        categoryController.text = chosenCategory.name;
                       });
 
                     }
@@ -107,27 +109,30 @@ class _PlaceFilterPickerState extends State<PlaceFilterPicker> {
 
               const SizedBox(height: 20,),
 
-              ElementsOfDesign.buildTextField(
-                  controller: slotController,
-                  labelText: AdsConstants.slotAdField,
-                  canEdit: true,
-                  icon: FontAwesomeIcons.hashtag,
-                  context: context,
-                  onTap: () async {
-                    final result = await systemMethodsClass.getPopup(
-                        context: context,
-                        page: const SlotPicker()
-                    );
+             ElementsOfDesign.checkBox(
+                 text: FilterConstants.haveEvents,
+                 isChecked: chosenHaveEvents,
+                 onChanged: (value){
+                   setState(() {
+                     chosenHaveEvents = !chosenHaveEvents;
+                   });
 
-                    if (result != null){
-                      setState(() {
-                        chosenIndex = result;
-                        slotController.text = chosenIndex.toString(translate: true);
-                      });
+                 },
+                 context: context
+             ),
 
-                    }
+              const SizedBox(height: 20,),
+
+              ElementsOfDesign.checkBox(
+                  text: FilterConstants.havePromos,
+                  isChecked: chosenHavePromos,
+                  onChanged: (value){
+                    setState(() {
+                      chosenHavePromos = !chosenHavePromos;
+                    });
+
                   },
-                  readOnly: true
+                  context: context
               ),
 
               const SizedBox(height: 20,),
@@ -137,7 +142,7 @@ class _PlaceFilterPickerState extends State<PlaceFilterPicker> {
                   Expanded(
                       child: ElementsOfDesign.customButton(
                           method: (){
-                            systemMethodsClass.popBackToPreviousPageWithResult(context: context, result: [chosenLocation, chosenIndex]);
+                            systemMethodsClass.popBackToPreviousPageWithResult(context: context, result: [chosenCategory, chosenHaveEvents, chosenHavePromos]);
                           },
                           textOnButton: ButtonsConstants.ok,
                           context: context
