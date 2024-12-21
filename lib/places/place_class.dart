@@ -19,7 +19,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../categories/place_categories/place_category.dart';
 import '../cities/city_class.dart';
-import '../constants/ads_constants.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
 import '../dates/regular_date_class.dart';
@@ -158,6 +157,7 @@ class Place implements IEntity{
   Future<String> deleteFromDb()async {
 
     SimpleUsersList usersList = SimpleUsersList();
+    final ImageUploader imageUploader = ImageUploader();
 
     DatabaseClass db = DatabaseClass();
 
@@ -165,7 +165,10 @@ class Place implements IEntity{
 
     String result = '';
 
-    // TODO Сделать удаление картинки
+    await imageUploader.removeImage(
+        folder: PlacesConstants.placesPath,
+        entityId: id
+    );
 
     if (!Platform.isWindows){
       result =  await db.deleteFromDb(path);
@@ -284,6 +287,22 @@ class Place implements IEntity{
 
   String getAddress(){
     return '${city.name}, $street $house';
+  }
+
+  bool haveEventsOrPromos({bool isEvent = true}){
+    if (isEvent){
+      if (eventsList.isNotEmpty){
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      if (promosList.isNotEmpty){
+        return true;
+      } else {
+        return false;
+      }
+    }
   }
 
   Widget getFavCounter({required BuildContext context}){

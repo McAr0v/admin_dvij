@@ -132,6 +132,8 @@ class PlacesList implements IEntitiesList<Place>{
   Future<List<Place>> getNeededPlaces({
     bool fromDb = false,
     required PlaceCategory category,
+    required bool filterHaveEvents,
+    required bool filterHavePromos,
     String searchingText = ''
   }) async {
 
@@ -142,10 +144,27 @@ class PlacesList implements IEntitiesList<Place>{
     }
 
     for (Place place in _currentPlacesList){
+      // Если категория не выбрана
       if (category.id.isEmpty){
-        tempList.add(place);
-      } else if (place.category.id == category.id){
-        tempList.add(place);
+
+        if (_checkFilterHaveEventsOrPromos(
+            filterHaveEvents: filterHaveEvents,
+            filterHavePromos: filterHavePromos,
+            place: place)
+        ) {
+          tempList.add(place);
+        }
+
+      }
+      // Если выбрана категория
+      else if (place.category.id == category.id){
+        if (_checkFilterHaveEventsOrPromos(
+            filterHaveEvents: filterHaveEvents,
+            filterHavePromos: filterHavePromos,
+            place: place)
+        ) {
+          tempList.add(place);
+        }
       }
     }
 
@@ -161,6 +180,37 @@ class PlacesList implements IEntitiesList<Place>{
     }
 
     return tempList;
+  }
+
+  bool _checkFilterHaveEventsOrPromos({
+    required bool filterHaveEvents,
+    required bool filterHavePromos,
+    required Place place
+  }){
+    // Если не выбранны флажки на "Есть мероприятия" и "Есть акции"
+    if (!filterHaveEvents && !filterHavePromos){
+      return true;
+    }
+    // Если выбраны флажки и на "Есть мероприятия" и на "есть акции"
+    else if (filterHaveEvents && filterHavePromos){
+      if (place.haveEventsOrPromos(isEvent: true) && place.haveEventsOrPromos(isEvent: false)){
+        return true;
+      }
+    }
+    // Если выбран только флажок "Есть акции"
+    else if (!filterHaveEvents && filterHavePromos){
+      if (place.haveEventsOrPromos(isEvent: false)){
+        return true;
+      }
+    }
+
+    // Если выбран только флажок "Есть мероприятия"
+    else if (filterHaveEvents && !filterHavePromos){
+      if (place.haveEventsOrPromos(isEvent: true)){
+        return true;
+      }
+    }
+    return false;
   }
 
   Future<List<Place>> getPlacesListFromSimpleUser({required List<PlaceAdmin> placesList}) async{

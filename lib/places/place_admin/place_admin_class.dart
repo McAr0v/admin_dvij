@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:admin_dvij/constants/database_constants.dart';
 import 'package:admin_dvij/places/place_admin/place_role_class.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../../constants/simple_users_constants.dart';
@@ -16,15 +17,15 @@ class PlaceAdmin{
 
   factory PlaceAdmin.fromSnapshot(DataSnapshot snapshot){
     return PlaceAdmin(
-        placeRole: PlaceRole.fromString(roleString: snapshot.child('roleId').value.toString()),
-        placeId: snapshot.child('placeId').value.toString()
+        placeRole: PlaceRole.fromString(roleString: snapshot.child(DatabaseConstants.roleId).value.toString()),
+        placeId: snapshot.child(DatabaseConstants.placeId).value.toString()
     );
   }
 
   factory PlaceAdmin.fromJson({required Map<String, dynamic> json}){
     return PlaceAdmin(
-        placeRole: PlaceRole.fromString(roleString: json['roleId'] ?? ''),
-        placeId: json['placeId'] ?? ''
+        placeRole: PlaceRole.fromString(roleString: json[DatabaseConstants.roleId] ?? ''),
+        placeId: json[DatabaseConstants.placeId] ?? ''
     );
   }
 
@@ -66,8 +67,8 @@ class PlaceAdmin{
 
   Map<String, dynamic> getMap(){
     return {
-      'roleId': placeRole.toString(),
-      'placeId': placeId
+      DatabaseConstants.roleId: placeRole.toString(),
+      DatabaseConstants.placeId: placeId
     };
   }
 

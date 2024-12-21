@@ -1,45 +1,46 @@
-import 'package:admin_dvij/ads/ads_enums_class/ad_index.dart';
-import 'package:admin_dvij/ads/ads_enums_class/location_picker.dart';
-import 'package:admin_dvij/ads/ads_enums_class/slot_picker.dart';
-import 'package:admin_dvij/constants/ads_constants.dart';
-import 'package:admin_dvij/constants/buttons_constants.dart';
+import 'package:admin_dvij/categories/place_categories/place_category.dart';
 import 'package:admin_dvij/constants/filter_constants.dart';
+import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
-import 'package:admin_dvij/design_elements/button_state_enum.dart';
-import 'package:admin_dvij/design_elements/elements_of_design.dart';
-import 'package:admin_dvij/system_methods/system_methods_class.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'ads_enums_class/ad_location.dart';
 
-class FilterPicker extends StatefulWidget {
-  final AdIndex slot;
-  final AdLocation location;
+import '../design_elements/elements_of_design.dart';
 
-  const FilterPicker({required this.location, required this.slot, Key? key}) : super(key: key);
+class PlaceFilterPicker extends StatefulWidget {
+  final PlaceCategory placeCategory;
+  final bool haveEvents;
+  final bool havePromos;
+
+  const PlaceFilterPicker({
+    required this.placeCategory,
+    required this.havePromos,
+    required this.haveEvents,
+    super.key
+  });
 
   @override
-  State<FilterPicker> createState() => _FilterPickerState();
+  State<PlaceFilterPicker> createState() => _PlaceFilterPickerState();
 }
 
-class _FilterPickerState extends State<FilterPicker> {
+class _PlaceFilterPickerState extends State<PlaceFilterPicker> {
 
   SystemMethodsClass systemMethodsClass = SystemMethodsClass();
+  TextEditingController categoryController = TextEditingController();
 
-  AdLocation chosenLocation = AdLocation(location: AdLocationEnum.notChosen);
-  AdIndex chosenIndex = AdIndex(index: AdIndexEnum.notChosen);
-
-  TextEditingController locationController = TextEditingController();
-  TextEditingController slotController = TextEditingController();
+  PlaceCategory chosenCategory = PlaceCategory.empty();
+  bool chosenHaveEvents = false;
+  bool chosenHavePromos = false;
 
   @override
   void initState() {
 
-    chosenLocation = widget.location;
-    chosenIndex = widget.slot;
+    chosenCategory = widget.placeCategory;
+    chosenHaveEvents = widget.haveEvents;
+    chosenHavePromos = widget.havePromos;
 
-    locationController.text = chosenLocation.toString(translate: true);
-    slotController.text = chosenIndex.toString(translate: true);
+    categoryController.text = chosenCategory.name.isNotEmpty? chosenCategory.name : PlacesConstants.chooseCategoryPlace;
 
     super.initState();
   }
@@ -61,14 +62,16 @@ class _FilterPickerState extends State<FilterPicker> {
                 children: [
                   Expanded(child: Text(FilterConstants.filterName, style: Theme.of(context).textTheme.titleLarge,),),
                   const SizedBox(width: 20,),
-                  if (chosenLocation.location != AdLocationEnum.notChosen || chosenIndex.index != AdIndexEnum.notChosen)
+                  if (chosenCategory.name.isNotEmpty || chosenHavePromos || chosenHaveEvents)
                     ElementsOfDesign.linkButton(
                         method: (){
                           setState(() {
-                            chosenLocation = AdLocation(location: AdLocationEnum.notChosen);
-                            chosenIndex = AdIndex(index: AdIndexEnum.notChosen);
-                            locationController.text = chosenLocation.toString(translate: true);
-                            slotController.text = chosenIndex.toString(translate: true);
+                            chosenCategory = PlaceCategory.empty();
+                            categoryController.text = chosenCategory.name.isNotEmpty? chosenCategory.name : PlacesConstants.chooseCategoryPlace;
+
+                            chosenHaveEvents = false;
+                            chosenHavePromos = false;
+
                           });
                         },
                         text: FilterConstants.clearFilter,
@@ -80,10 +83,10 @@ class _FilterPickerState extends State<FilterPicker> {
               const SizedBox(height: 20,),
 
               ElementsOfDesign.buildTextField(
-                  controller: locationController,
-                  labelText: AdsConstants.locationAdField,
+                  controller: categoryController,
+                  labelText: PlacesConstants.categoryPlace,
                   canEdit: true,
-                  icon: FontAwesomeIcons.locationPin,
+                  icon: FontAwesomeIcons.tag,
                   context: context,
                   onTap: () async {
                     final result = await systemMethodsClass.getPopup(
@@ -99,7 +102,7 @@ class _FilterPickerState extends State<FilterPicker> {
 
                     }
                   },
-                readOnly: true
+                  readOnly: true
               ),
 
               const SizedBox(height: 20,),
@@ -132,13 +135,13 @@ class _FilterPickerState extends State<FilterPicker> {
               Row(
                 children: [
                   Expanded(
-                    child: ElementsOfDesign.customButton(
-                        method: (){
-                          systemMethodsClass.popBackToPreviousPageWithResult(context: context, result: [chosenLocation, chosenIndex]);
-                        },
-                        textOnButton: ButtonsConstants.ok,
-                        context: context
-                    )
+                      child: ElementsOfDesign.customButton(
+                          method: (){
+                            systemMethodsClass.popBackToPreviousPageWithResult(context: context, result: [chosenLocation, chosenIndex]);
+                          },
+                          textOnButton: ButtonsConstants.ok,
+                          context: context
+                      )
                   ),
                   const SizedBox(width: 20,),
                   Expanded(
@@ -148,7 +151,7 @@ class _FilterPickerState extends State<FilterPicker> {
                           },
                           textOnButton: ButtonsConstants.cancel,
                           context: context,
-                        buttonState: ButtonStateEnum.secondary
+                          buttonState: ButtonStateEnum.secondary
                       )
                   ),
                 ],

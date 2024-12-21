@@ -18,9 +18,9 @@ class AppColors {
   static const Color slot2Color = Color(0xFF90A4AE); // Светло-серый — 2 слот
   static const Color slot3Color = Color(0xFFB0BEC5); // Очень светлый серый — 3 слот
 
-  static Color eventLocationColor = Color(0xFF2196F3); // Синий — Мероприятия
-  static Color placesLocationColor = Color(0xFFFF9800); // Оранжевый — Заведения
-  static Color promotionLocationColor = Color(0xFF4CAF50); // Зеленый — Акции
-  static Color mainPageLocationColor = Color(0xFF9C27B0); // Фиолетовый — Главная страница
+  static Color eventLocationColor = const Color(0xFF2196F3); // Синий — Мероприятия
+  static Color placesLocationColor = const Color(0xFFFF9800); // Оранжевый — Заведения
+  static Color promotionLocationColor = const Color(0xFF4CAF50); // Зеленый — Акции
+  static Color mainPageLocationColor = const Color(0xFF9C27B0); // Фиолетовый — Главная страница
 
 }

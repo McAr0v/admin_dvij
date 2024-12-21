@@ -38,6 +38,8 @@ class DatabaseConstants {
   static const String eventId = 'eventId';
   static const String promos = 'promos';
   static const String promoId = 'promoId';
+  static const String placeId = 'placeId';
+  static const String roleId = 'roleId';
   static const String addedToFavourites = 'addedToFavourites';
 
 

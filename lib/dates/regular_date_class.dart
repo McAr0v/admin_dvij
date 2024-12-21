@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:admin_dvij/constants/regular_date_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../design/app_colors.dart';
 
 class RegularDate {
@@ -56,40 +56,40 @@ class RegularDate {
     }
 
     return RegularDate(
-      mondayStart: parseTime(jsonData['startTime1']),
-      mondayEnd: parseTime(jsonData['endTime1']),
-      tuesdayStart: parseTime(jsonData['startTime2']),
-      tuesdayEnd: parseTime(jsonData['endTime2']),
-      wednesdayStart: parseTime(jsonData['startTime3']),
-      wednesdayEnd: parseTime(jsonData['endTime3']),
-      thursdayStart: parseTime(jsonData['startTime4']),
-      thursdayEnd: parseTime(jsonData['endTime4']),
-      fridayStart: parseTime(jsonData['startTime5']),
-      fridayEnd: parseTime(jsonData['endTime5']),
-      saturdayStart: parseTime(jsonData['startTime6']),
-      saturdayEnd: parseTime(jsonData['endTime6']),
-      sundayStart: parseTime(jsonData['startTime7']),
-      sundayEnd: parseTime(jsonData['endTime7']),
+      mondayStart: parseTime(jsonData[RegularDateConstants.startTime1Id]),
+      mondayEnd: parseTime(jsonData[RegularDateConstants.endTime1Id]),
+      tuesdayStart: parseTime(jsonData[RegularDateConstants.startTime2Id]),
+      tuesdayEnd: parseTime(jsonData[RegularDateConstants.endTime2Id]),
+      wednesdayStart: parseTime(jsonData[RegularDateConstants.startTime3Id]),
+      wednesdayEnd: parseTime(jsonData[RegularDateConstants.endTime3Id]),
+      thursdayStart: parseTime(jsonData[RegularDateConstants.startTime4Id]),
+      thursdayEnd: parseTime(jsonData[RegularDateConstants.endTime4Id]),
+      fridayStart: parseTime(jsonData[RegularDateConstants.startTime5Id]),
+      fridayEnd: parseTime(jsonData[RegularDateConstants.endTime5Id]),
+      saturdayStart: parseTime(jsonData[RegularDateConstants.startTime6Id]),
+      saturdayEnd: parseTime(jsonData[RegularDateConstants.endTime6Id]),
+      sundayStart: parseTime(jsonData[RegularDateConstants.startTime7Id]),
+      sundayEnd: parseTime(jsonData[RegularDateConstants.endTime7Id]),
     );
   }
 
   /// Метод для преобразования в строку JSON
   String toJsonString() {
     final Map<String, String> scheduleMap = {
-      "startTime1": _formatTime(mondayStart),
-      "endTime1": _formatTime(mondayEnd),
-      "startTime2": _formatTime(tuesdayStart),
-      "endTime2": _formatTime(tuesdayEnd),
-      "startTime3": _formatTime(wednesdayStart),
-      "endTime3": _formatTime(wednesdayEnd),
-      "startTime4": _formatTime(thursdayStart),
-      "endTime4": _formatTime(thursdayEnd),
-      "startTime5": _formatTime(fridayStart),
-      "endTime5": _formatTime(fridayEnd),
-      "startTime6": _formatTime(saturdayStart),
-      "endTime6": _formatTime(saturdayEnd),
-      "startTime7": _formatTime(sundayStart),
-      "endTime7": _formatTime(sundayEnd),
+      RegularDateConstants.startTime1Id: _formatTime(mondayStart),
+      RegularDateConstants.endTime1Id: _formatTime(mondayEnd),
+      RegularDateConstants.startTime2Id: _formatTime(tuesdayStart),
+      RegularDateConstants.endTime2Id: _formatTime(tuesdayEnd),
+      RegularDateConstants.startTime3Id: _formatTime(wednesdayStart),
+      RegularDateConstants.endTime3Id: _formatTime(wednesdayEnd),
+      RegularDateConstants.startTime4Id: _formatTime(thursdayStart),
+      RegularDateConstants.endTime4Id: _formatTime(thursdayEnd),
+      RegularDateConstants.startTime5Id: _formatTime(fridayStart),
+      RegularDateConstants.endTime5Id: _formatTime(fridayEnd),
+      RegularDateConstants.startTime6Id: _formatTime(saturdayStart),
+      RegularDateConstants.endTime6Id: _formatTime(saturdayEnd),
+      RegularDateConstants.startTime7Id: _formatTime(sundayStart),
+      RegularDateConstants.endTime7Id: _formatTime(sundayEnd),
     };
 
     return jsonEncode(scheduleMap);
@@ -97,19 +97,19 @@ class RegularDate {
 
   /// Вспомогательный метод для форматирования времени
   String _formatTime(TimeOfDay? time) {
-    if (time == null) return 'Не выбрано'; // Возвращаем пустую строку, если времени нет
+    if (time == null) return RegularDateConstants.notChosen; // Возвращаем пустую строку, если времени нет
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
   /// Список дней недели
   final List<String> _days = [
-    'Понедельник',
-    'Вторник',
-    'Среда',
-    'Четверг',
-    'Пятница',
-    'Суббота',
-    'Воскресенье'
+    RegularDateConstants.monday,
+    RegularDateConstants.tuesday,
+    RegularDateConstants.wednesday,
+    RegularDateConstants.thursday,
+    RegularDateConstants.friday,
+    RegularDateConstants.saturday,
+    RegularDateConstants.sunday
   ];
 
   TimeOfDay? getTime({
@@ -170,6 +170,7 @@ class RegularDate {
     required BuildContext context,
     required Function(int index) onTapStart,
     required Function(int index) onTapEnd,
+    required Function(int index) onClean,
     required bool canEdit,
     required bool showSchedule,
     required VoidCallback show
@@ -181,7 +182,7 @@ class RegularDate {
           Row(
             children: [
               Expanded(
-                  child: Text('Расписание', style: Theme.of(context).textTheme.titleMedium,)
+                  child: Text(RegularDateConstants.scheduleHeadline, style: Theme.of(context).textTheme.titleMedium,)
               ),
 
               IconButton(
@@ -205,6 +206,13 @@ class RegularDate {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
 
+                    if (
+                        getTime(index: index, isStart: true) != null
+                        && getTime(index: index, isStart: false) != null && canEdit
+                    ) IconButton(
+                        onPressed: canEdit ? () => onClean(index) : (){},
+                        icon: const Icon(FontAwesomeIcons.x, size: 15,)
+                    ),
 
                     Expanded(
                       flex: Platform.isMacOS || Platform.isWindows ? 1 : 2,
@@ -223,7 +231,7 @@ class RegularDate {
                           child: Padding(
                             padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
                             child: Text(
-                              'Начало: ${getTime(index: index, isStart: true)?.format(context) ?? 'Не выбрано'}',
+                              '${RegularDateConstants.startHeadline}: ${getTime(index: index, isStart: true)?.format(context) ?? RegularDateConstants.notChosen}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ),
@@ -242,7 +250,7 @@ class RegularDate {
                           child: Padding(
                             padding: EdgeInsets.all(Platform.isMacOS || Platform.isWindows ? 15.0 : 10),
                             child: Text(
-                              'Конец: ${getTime(index: index, isStart: false)?.format(context) ?? 'Не выбрано'}',
+                              '${RegularDateConstants.endHeadline}: ${getTime(index: index, isStart: false)?.format(context) ?? RegularDateConstants.notChosen}',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ),

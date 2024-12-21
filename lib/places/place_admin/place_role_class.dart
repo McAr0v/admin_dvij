@@ -1,3 +1,5 @@
+import 'package:admin_dvij/constants/place_role_constants.dart';
+
 enum PlaceUserRoleEnum {
   admin,
   org,
@@ -13,9 +15,9 @@ class PlaceRole {
   factory PlaceRole.fromString({required String roleString}){
 
     switch (roleString) {
-      case 'admin': return PlaceRole(role: PlaceUserRoleEnum.admin);
-      case 'org': return PlaceRole(role: PlaceUserRoleEnum.org);
-      case 'creator': return PlaceRole(role: PlaceUserRoleEnum.creator);
+      case PlaceRoleConstants.admin: return PlaceRole(role: PlaceUserRoleEnum.admin);
+      case PlaceRoleConstants.org: return PlaceRole(role: PlaceUserRoleEnum.org);
+      case PlaceRoleConstants.creator: return PlaceRole(role: PlaceUserRoleEnum.creator);
       default: return PlaceRole(role: PlaceUserRoleEnum.reader);
     }
   }
@@ -23,19 +25,19 @@ class PlaceRole {
   @override
   String toString({bool needTranslate = false}) {
     switch (role) {
-      case PlaceUserRoleEnum.admin: return !needTranslate ? 'admin' : 'Администратор';
-      case PlaceUserRoleEnum.org: return !needTranslate ? 'org' : 'Организатор';
-      case PlaceUserRoleEnum.creator: return !needTranslate ? 'creator' : 'Создатель';
-      case PlaceUserRoleEnum.reader: return !needTranslate ? 'reader' : 'Обычный пользователь';
+      case PlaceUserRoleEnum.admin: return !needTranslate ? PlaceRoleConstants.admin : PlaceRoleConstants.adminHeadline;
+      case PlaceUserRoleEnum.org: return !needTranslate ? PlaceRoleConstants.org : PlaceRoleConstants.orgHeadline;
+      case PlaceUserRoleEnum.creator: return !needTranslate ? PlaceRoleConstants.creator : PlaceRoleConstants.creatorHeadline;
+      case PlaceUserRoleEnum.reader: return !needTranslate ? PlaceRoleConstants.reader : PlaceRoleConstants.readerHeadline;
     }
   }
 
   String getDesc(){
     switch (role) {
-      case PlaceUserRoleEnum.admin: return 'Может редактировать место, добавлять управляющих и менять роли';
-      case PlaceUserRoleEnum.org: return 'Может добавлять мероприятия и акции от имени заведения';
-      case PlaceUserRoleEnum.creator: return 'Полный доступ ко всем функциям. Единственный кто может удалить место';
-      case PlaceUserRoleEnum.reader: return 'Обычный пользователь, который может только читать данные о заведении';
+      case PlaceUserRoleEnum.admin: return PlaceRoleConstants.adminDesc;
+      case PlaceUserRoleEnum.org: return PlaceRoleConstants.orgDesc;
+      case PlaceUserRoleEnum.creator: return PlaceRoleConstants.creatorDesc;
+      case PlaceUserRoleEnum.reader: return PlaceRoleConstants.readerDesc;
     }
   }
 

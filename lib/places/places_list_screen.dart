@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:admin_dvij/categories/place_categories/place_category.dart';
 import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/constants/screen_constants.dart';
@@ -7,10 +5,12 @@ import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/places/place_create_view_edit_screen.dart';
+import 'package:admin_dvij/places/place_filter_picker.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../constants/buttons_constants.dart';
 import '../design/app_colors.dart';
 import '../design_elements/cards_elements.dart';
 import '../design_elements/elements_of_design.dart';
@@ -29,6 +29,8 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
   bool loading = false;
 
   PlaceCategory filterCategory = PlaceCategory.empty();
+  bool filterHaveEvents = false;
+  bool filterHavePromos = false;
 
   List<Place> placesList = [];
 
@@ -36,20 +38,28 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
 
   @override
   void initState() {
-    initialization(category: filterCategory);
+    initialization(category: filterCategory, filterHavePromos: filterHavePromos, filterHaveEvents: filterHaveEvents);
     super.initState();
   }
 
   Future<void> initialization({
     bool fromDb = false,
     required PlaceCategory category,
+    required bool filterHaveEvents,
+    required bool filterHavePromos,
     String searchingText = ''
   }) async {
     setState(() {
       loading = true;
     });
 
-    placesList = await placesListManager.getNeededPlaces(category: filterCategory, searchingText: searchingController.text, fromDb: fromDb);
+    placesList = await placesListManager.getNeededPlaces(
+        category: filterCategory,
+        searchingText: searchingController.text,
+        fromDb: fromDb,
+        filterHaveEvents: filterHaveEvents,
+        filterHavePromos: filterHavePromos
+    );
 
     setState(() {
       loading = false;
@@ -66,12 +76,12 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
 
           // КНОПКИ В AppBar
 
-          /*Row(
+          Row(
             children: [
 
               // Кнопка сброса фильтра
 
-              if (filterLocation.location != AdLocationEnum.notChosen || filterSlot.index != AdIndexEnum.notChosen)
+              if (filterHavePromos || filterHaveEvents || filterCategory.id.isNotEmpty)
                 ElementsOfDesign.linkButton(
                     method: () async {
                       await resetFilter();
@@ -80,28 +90,34 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                     context: context
                 ),
 
-              if (filterLocation.location != AdLocationEnum.notChosen || filterSlot.index != AdIndexEnum.notChosen)
+              if (filterHavePromos || filterHaveEvents || filterCategory.id.isNotEmpty)
                 const SizedBox(width: 10,),
 
               // Кнопка "Фильтр"
 
               IconButton(
                 onPressed: () async {
-                  await filterAds();
+                  await filterPlaces();
                 },
                 icon: Icon(
                   FontAwesomeIcons.filter,
                   size: 15,
-                  color: filterLocation.location != AdLocationEnum.notChosen || filterSlot.index != AdIndexEnum.notChosen ? AppColors.brandColor : AppColors.white,),
+                  color: filterHavePromos || filterHaveEvents || filterCategory.id.isNotEmpty ? AppColors.brandColor : AppColors.white,),
               ),
             ],
-          ),*/
+          ),
 
           // Кнопка "Обновить"
 
           IconButton(
             onPressed: () async {
-              await initialization(fromDb: true, searchingText: searchingController.text, category: filterCategory);
+              await initialization(
+                  fromDb: true,
+                  searchingText: searchingController.text,
+                  category: filterCategory,
+                  filterHaveEvents: filterHaveEvents,
+                  filterHavePromos: filterHavePromos
+              );
             },
             icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
           ),
@@ -116,7 +132,12 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
               );
 
               if (result != null) {
-                await initialization(category: filterCategory, searchingText: searchingController.text);
+                await initialization(
+                    category: filterCategory,
+                    searchingText: searchingController.text,
+                  filterHavePromos: filterHavePromos,
+                  filterHaveEvents: filterHaveEvents
+                );
               }
 
             },
@@ -167,7 +188,12 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
                             );
 
                             if (result != null) {
-                              await initialization(category: filterCategory, searchingText: searchingController.text);
+                              await initialization(
+                                  category: filterCategory,
+                                  searchingText: searchingController.text,
+                                filterHaveEvents: filterHaveEvents,
+                                filterHavePromos: filterHavePromos
+                              );
                             }
 
                           },//() => widget.editAds(index), // Передаем index через замыкание
@@ -214,6 +240,42 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
     );
   }
 
+  Future<void> filterPlaces() async{
+
+    final result = await sm.getPopup(
+        context: context,
+        page: PlaceFilterPicker(placeCategory: filterCategory, havePromos: filterHavePromos, haveEvents: filterHaveEvents)
+    );
+
+    if (result != null){
+      filterCategory = result[0];
+      filterHaveEvents = result[0];
+      filterHavePromos = result[0];
+
+      await initialization(
+          category: filterCategory,
+          searchingText: searchingController.text,
+          filterHavePromos: filterHavePromos,
+          filterHaveEvents: filterHaveEvents
+      );
+    }
+
+  }
+
+  Future<void> resetFilter() async{
+    filterCategory = PlaceCategory.empty();
+    filterHaveEvents = false;
+    filterHavePromos = false;
+    searchingController.text = '';
+
+    await initialization(
+        category: filterCategory,
+        filterHaveEvents: filterHaveEvents,
+        filterHavePromos: filterHavePromos,
+        searchingText: searchingController.text
+    );
+  }
+
   Future<void> searchingAction({required String text}) async {
     searchingController.text = text;
 
@@ -221,6 +283,8 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
       fromDb: false,
       category: filterCategory,
       searchingText: searchingController.text,
+      filterHaveEvents: filterHaveEvents,
+      filterHavePromos: filterHavePromos
     );
   }
 

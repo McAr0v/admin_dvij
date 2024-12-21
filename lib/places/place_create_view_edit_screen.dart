@@ -351,7 +351,11 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                             setState(() {
                               showSchedule = !showSchedule;
                             });
-                        }
+                        },
+                        onClean: (index) {
+                          updateTime(index, true, null);
+                          updateTime(index, false, null);
+                        },
                       ),
 
                       if (widget.place != null) const SizedBox(height: 20,),
@@ -542,7 +546,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   }
 
   /// Обновляем время
-  void updateTime(int index, bool isStart, TimeOfDay newTime) {
+  void updateTime(int index, bool isStart, TimeOfDay? newTime) {
     setState(() {
       switch (index) {
         case 0:
@@ -575,7 +579,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: schedule.getTime(index: index, isStart: true) ?? TimeOfDay.now(),
-      initialEntryMode: TimePickerEntryMode.inputOnly,
+      initialEntryMode: TimePickerEntryMode.dial,
     );
     if (picked != null) {
       updateTime(index, isStart, picked);
