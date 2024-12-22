@@ -1,4 +1,6 @@
+import 'package:admin_dvij/dates/date_type.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/price_type/price_type_class.dart';
 
 import '../categories/event_categories/event_category.dart';
 import '../cities/city_class.dart';
@@ -7,7 +9,7 @@ import '../dates/regular_date_class.dart';
 class EventClass implements IEntity{
 
   String id;
-  DateTypeEnum dateType;
+  DateType dateType;
   String headline;
   String desc;
   String creatorId;
@@ -22,7 +24,7 @@ class EventClass implements IEntity{
   String instagram;
   String imageUrl;
   String placeId;
-  PriceTypeOption priceType;
+  PriceType priceType;
   String price;
   OnceDate onceDay;
   LongDate longDays;
