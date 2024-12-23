@@ -41,6 +41,7 @@ class DatabaseConstants {
   static const String placeId = 'placeId';
   static const String roleId = 'roleId';
   static const String addedToFavourites = 'addedToFavourites';
+  static const String price = 'price';
 
 
 }
