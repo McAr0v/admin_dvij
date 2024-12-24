@@ -153,7 +153,7 @@ class EventClass implements IEntity{
         headline: infoFolder[DatabaseConstants.headline] ?? '',
         desc: infoFolder[DatabaseConstants.desc] ?? '',
         creatorId: infoFolder[DatabaseConstants.creatorId] ?? '',
-        createDate: DateTime.parse(infoFolder[DatabaseConstants.street] ?? ''),
+        createDate: DateTime.parse(infoFolder[DatabaseConstants.createDate] ?? ''),
         category: eventCategoriesList.getEntityFromList(infoFolder[DatabaseConstants.category] ?? ''),
         city: citiesList.getEntityFromList(infoFolder[DatabaseConstants.city] ?? ''),
         street: infoFolder[DatabaseConstants.street] ?? '',

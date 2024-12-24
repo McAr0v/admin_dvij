@@ -120,11 +120,7 @@ class SimpleUser extends IEntity{
 
     MethodsForDatabase methodsForDatabase = MethodsForDatabase();
 
-    Map<String, dynamic> eventsFolder = {};
-
-    if (json.containsKey(DatabaseConstants.myEvents) && json[DatabaseConstants.myEvents] != null){
-      eventsFolder = json[DatabaseConstants.myEvents];
-    }
+    Map<String, dynamic>? eventsFolder = json[DatabaseConstants.myEvents];
 
     Map<String, dynamic> infoFolder = json[SimpleUsersConstants.usersFolderInfo];
     Map<String, dynamic> myPlacesFolder = json[SimpleUsersConstants.usersMyPlacesFolder];
@@ -149,7 +145,7 @@ class SimpleUser extends IEntity{
         telegram: infoFolder[DatabaseConstants.telegram] ?? '',
         instagram: infoFolder[DatabaseConstants.instagram] ?? '',
         placesList: myPlaces,
-        myEvents: methodsForDatabase.getStringFromKeyFromJson(json: eventsFolder, inputKey: DatabaseConstants.eventId)
+        myEvents: eventsFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: eventsFolder, inputKey: DatabaseConstants.eventId) : []
     );
   }
 
