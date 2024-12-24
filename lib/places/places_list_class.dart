@@ -29,6 +29,8 @@ class PlacesList implements IEntitiesList<Place>{
     _currentPlacesList.sortPlaces(true);
   }
 
+
+
   @override
   bool checkEntityNameInList(String entity) {
     if (_currentPlacesList.any((element) => element.id.toLowerCase() == entity.toLowerCase())) {
@@ -231,6 +233,8 @@ class PlacesList implements IEntitiesList<Place>{
     return returnedList;
 
   }
+
+
 
 }
 

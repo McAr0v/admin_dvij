@@ -26,8 +26,6 @@ class MethodsForDatabase{
 
     if (json.isNotEmpty){
 
-
-
       json.forEach((key, value) {
         String? tempValue = value[inputKey];
         if (tempValue != null && tempValue.isNotEmpty){

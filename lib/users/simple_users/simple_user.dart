@@ -20,6 +20,7 @@ import '../../database/database_class.dart';
 import '../../database/image_uploader.dart';
 import '../../design/app_colors.dart';
 import '../../design_elements/elements_of_design.dart';
+import '../../system_methods/methods_for_database.dart';
 import '../../system_methods/system_methods_class.dart';
 import '../genders/gender_class.dart';
 
@@ -38,6 +39,7 @@ class SimpleUser extends IEntity{
   String avatar;
   DateTime registrationDate;
   List<PlaceAdmin> placesList;
+  List<String> myEvents;
 
   SimpleUser({
     required this.uid,
@@ -53,7 +55,8 @@ class SimpleUser extends IEntity{
     required this.gender,
     required this.avatar,
     required this.registrationDate,
-    required this.placesList
+    required this.placesList,
+    this.myEvents = const []
   });
 
   factory SimpleUser.empty() {
@@ -71,12 +74,17 @@ class SimpleUser extends IEntity{
         whatsapp: '',
         telegram: '',
         instagram: '',
-        placesList: []
+        placesList: [],
+        myEvents: []
 
     );
   }
 
   factory SimpleUser.fromSnapshot(DataSnapshot snapshot){
+
+    MethodsForDatabase methodsForDatabase = MethodsForDatabase();
+
+    DataSnapshot eventsFolder = snapshot.child(DatabaseConstants.myEvents);
 
     DataSnapshot infoFolder = snapshot.child(SimpleUsersConstants.usersFolderInfo);
     DataSnapshot myPlacesFolder = snapshot.child(SimpleUsersConstants.usersMyPlacesFolder);
@@ -103,13 +111,20 @@ class SimpleUser extends IEntity{
         whatsapp: infoFolder.child(DatabaseConstants.whatsapp).value.toString(),
         telegram: infoFolder.child(DatabaseConstants.telegram).value.toString(),
         instagram: infoFolder.child(DatabaseConstants.instagram).value.toString(),
-        placesList: myPlaces
+        placesList: myPlaces,
+        myEvents: methodsForDatabase.getStringFromKeyFromSnapshot(snapshot: eventsFolder, key: DatabaseConstants.eventId),
     );
   }
 
   factory SimpleUser.fromJson(Map<String, dynamic> json) {
 
-    // DataSnapshot infoFolder = snapshot.child(SimpleUsersConstants.usersFolderInfo);
+    MethodsForDatabase methodsForDatabase = MethodsForDatabase();
+
+    Map<String, dynamic> eventsFolder = {};
+
+    if (json.containsKey(DatabaseConstants.myEvents) && json[DatabaseConstants.myEvents] != null){
+      eventsFolder = json[DatabaseConstants.myEvents];
+    }
 
     Map<String, dynamic> infoFolder = json[SimpleUsersConstants.usersFolderInfo];
     Map<String, dynamic> myPlacesFolder = json[SimpleUsersConstants.usersMyPlacesFolder];
@@ -133,7 +148,8 @@ class SimpleUser extends IEntity{
         whatsapp: infoFolder[DatabaseConstants.whatsapp] ?? '',
         telegram: infoFolder[DatabaseConstants.telegram] ?? '',
         instagram: infoFolder[DatabaseConstants.instagram] ?? '',
-        placesList: myPlaces
+        placesList: myPlaces,
+        myEvents: methodsForDatabase.getStringFromKeyFromJson(json: eventsFolder, inputKey: DatabaseConstants.eventId)
     );
   }
 
@@ -362,6 +378,65 @@ class SimpleUser extends IEntity{
 
   }
 
+  Future<String> deleteEventFromMyEvents({required String eventId}) async{
+    String result = '';
+
+    DatabaseClass db = DatabaseClass();
+
+    String path = '${SimpleUsersConstants.usersPath}/$uid/${DatabaseConstants.myEvents}/$eventId';
+
+    if (Platform.isWindows){
+      result = await db.deleteFromDbForWindows(path);
+    } else {
+      result = await db.deleteFromDb(path);
+    }
+
+    if (result == SystemConstants.successConst){
+      myEvents.removeWhere((c) => c == eventId);
+    }
+
+    return result;
+  }
+
+  Future <String> addEventToMyEvents({required String eventId}) async {
+    String result = '';
+
+    DatabaseClass db = DatabaseClass();
+
+    String path = '${SimpleUsersConstants.usersPath}/$uid/${DatabaseConstants.myEvents}/$eventId';
+
+    Map <String, dynamic> data = <String, dynamic> {
+      DatabaseConstants.eventId: eventId,
+    };
+
+    if (Platform.isWindows){
+      result = await db.publishToDBForWindows(path, data);
+    } else {
+      result = await db.publishToDB(path, data);
+    }
+
+    if (result == SystemConstants.successConst){
+
+      if (myEvents.isNotEmpty){
+
+        // Если есть, проверяем, есть ли уже у списка мероприятий это мероприятие
+        int eventIndex = myEvents.indexWhere((c) => c == eventId);
+
+        // Если нет, добавляем
+        if (eventIndex == -1){
+          myEvents.add(eventId);
+        }
+      } else {
+        // Если список мероприятий заведения пустой, добавляем мероприятие
+        myEvents.add(eventId);
+      }
+
+    }
+
+    return result;
+
+  }
+
   Future<String> publishPlaceRoleForCurrentUser (PlaceAdmin placeAdmin) async {
 
     String result = '';
@@ -458,6 +533,10 @@ class SimpleUser extends IEntity{
                     ),
                     Text(
                       'Моих заведений - ${placesList.length.toString()}',
+                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                    ),
+                    Text(
+                      'Моих мероприятий - ${myEvents.length.toString()}',
                       style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
                     ),
                   ],

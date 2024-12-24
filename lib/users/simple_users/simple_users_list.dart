@@ -71,6 +71,7 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
 
 
 
+
   @override
   Future<List<SimpleUser>> getListFromDb() async{
     DatabaseClass database = DatabaseClass();

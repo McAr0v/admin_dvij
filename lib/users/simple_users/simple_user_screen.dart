@@ -69,6 +69,7 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
 
 
   bool showPlaces = false;
+  bool showEvents = false;
 
   bool loading = false;
   bool logOuting = false;
@@ -452,6 +453,97 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                                           ),
                                         ),
                                       ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 10,),
+
+                            GestureDetector(
+                              onTap: (){
+                                setState(() {
+                                  showPlaces = !showPlaces;
+                                });
+                              },
+                              child: Card(
+                                color: AppColors.greyBackground,
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+
+                                      Row(
+                                        children: [
+                                          Expanded(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(20.0),
+                                              child: Text('Мероприятия пользователя (${editUser.myEvents.length})', style: Theme.of(context).textTheme.bodyMedium,),
+                                            ),
+                                          ),
+                                          IconButton(
+                                              onPressed: (){
+                                                setState(() {
+                                                  showEvents = !showEvents;
+                                                });
+                                              },
+                                              icon: Icon(showEvents ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight, size: 15,)
+                                          )
+                                        ],
+                                      ),
+
+                                      /*if (userPlaces.isNotEmpty && showPlaces) for (Place temp in userPlaces) Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 5),
+                                        child: GestureDetector(
+                                          onTap: ()async {
+                                            final result = await systemMethods.pushToPageWithResult(
+                                                context: context,
+                                                page: PlaceCreateViewEditScreen(place: temp,)
+                                            );
+
+                                            if (result != null){
+                                              await getUsersInfo();
+                                            }
+
+                                          },
+                                          child: Card(
+                                            color: AppColors.greyOnBackground,
+                                            child: Padding(
+                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                                              child: Row(
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: [
+                                                  ElementsOfDesign.imageWithTags(
+                                                    imageUrl: temp.imageUrl,
+                                                    width: 100, //Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
+                                                    height: 100,
+                                                  ),
+                                                  const SizedBox(width: 10,),
+                                                  Expanded(
+                                                      child: Column(
+                                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                                        children: [
+                                                          Text(temp.name),
+                                                          Text(temp.getAddress(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                                                          const SizedBox(height: 10),
+                                                          Text(
+                                                            temp.getCurrentPlaceAdmin(adminsList: editUser.placesList).placeRole.toString(needTranslate: true),
+                                                            style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                                          ),
+                                                        ],
+                                                      )
+                                                  ),
+                                                  //const SizedBox(width: 20,),
+
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),*/
                                     ],
                                   ),
                                 ),

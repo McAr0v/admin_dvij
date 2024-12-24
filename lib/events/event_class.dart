@@ -6,7 +6,10 @@ import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/dates/date_type.dart';
 import 'package:admin_dvij/events/events_list_class.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/price_type/price_type_class.dart';
+import 'package:admin_dvij/users/simple_users/simple_user.dart';
+import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../categories/event_categories/event_category.dart';
 import '../cities/city_class.dart';
@@ -17,6 +20,7 @@ import '../dates/irregular_date.dart';
 import '../dates/long_date.dart';
 import '../dates/once_date.dart';
 import '../dates/regular_date_class.dart';
+import '../places/place_class.dart';
 import '../system_methods/methods_for_database.dart';
 
 class EventClass implements IEntity{
@@ -173,6 +177,11 @@ class EventClass implements IEntity{
   @override
   Future<String> deleteFromDb() async {
 
+    SimpleUsersList simpleUsersList = SimpleUsersList();
+
+    SimpleUser creator = simpleUsersList.getEntityFromList(creatorId);
+
+    PlacesList placesList = PlacesList();
     final ImageUploader imageUploader = ImageUploader();
 
     DatabaseClass db = DatabaseClass();
@@ -192,7 +201,18 @@ class EventClass implements IEntity{
       result = await db.deleteFromDbForWindows(path);
     }
 
-    // Todo - Удалить запись у заведения, если мероприятие от заведения
+    // Если мероприятие от заведения
+    if (placeId.isNotEmpty){
+      // Удаляем в заведении нашe мероприятие
+      Place place = placesList.getEntityFromList(placeId);
+      await place.deleteEventFromPlace(eventId: id);
+      placesList.addToCurrentDownloadedList(place);
+    }
+
+    if (creator.uid.isNotEmpty){
+      await creator.deleteEventFromMyEvents(eventId: id);
+      simpleUsersList.addToCurrentDownloadedList(creator);
+    }
 
     if (result == SystemConstants.successConst) {
       // Если удаление прошло успешно, удаляем из общего списка
@@ -233,6 +253,10 @@ class EventClass implements IEntity{
 
   @override
   Future<String> publishToDb(File? imageFile) async{
+    SimpleUsersList simpleUsersList = SimpleUsersList();
+    SimpleUser creator = simpleUsersList.getEntityFromList(creatorId);
+    PlacesList placesList = PlacesList();
+
     DatabaseClass db = DatabaseClass();
     final ImageUploader imageUploader = ImageUploader();
 
@@ -277,7 +301,18 @@ class EventClass implements IEntity{
 
     }
 
-    // Todo - Сделать запись у заведения, если мероприятие от заведения
+    // Если мероприятие от заведения
+    if (placeId.isNotEmpty){
+      // Удаляем в заведении нашe мероприятие
+      Place place = placesList.getEntityFromList(placeId);
+      await place.addEventToPlace(eventId: id);
+      placesList.addToCurrentDownloadedList(place);
+    }
+
+    if (creator.uid.isNotEmpty){
+      await creator.addEventToMyEvents(eventId: id);
+      simpleUsersList.addToCurrentDownloadedList(creator);
+    }
 
     if (result == SystemConstants.successConst) {
       // Если результат успешный, добавляем в общий сохраненный список

@@ -289,6 +289,59 @@ class Place implements IEntity{
     return '${city.name}, $street $house';
   }
 
+  Future<void> addEventToPlace ({required String eventId}) async {
+
+    DatabaseClass db = DatabaseClass();
+
+    String path = '${PlacesConstants.placesPath}/$id/${DatabaseConstants.events}/$eventId';
+
+    String result = '';
+
+    Map <String, dynamic> data = <String, dynamic> {
+      DatabaseConstants.eventId: eventId,
+    };
+
+    if (Platform.isWindows){
+      result = await db.publishToDBForWindows(path, data);
+    } else {
+      result = await db.publishToDB(path, data);
+    }
+
+    // Проверяем, есть ли у этого заведения мероприятия
+    if (eventsList.isNotEmpty){
+
+      // Если есть, проверяем, есть ли уже у списка мероприятий это мероприятие
+      int eventIndex = eventsList.indexWhere((c) => c == eventId);
+
+      // Если нет, добавляем
+      if (eventIndex == -1){
+        eventsList.add(eventId);
+      }
+    } else {
+      // Если список мероприятий заведения пустой, добавляем мероприятие
+      eventsList.add(eventId);
+    }
+  }
+
+  Future<void> deleteEventFromPlace({required String eventId}) async {
+
+    DatabaseClass db = DatabaseClass();
+
+    String path = '${PlacesConstants.placesPath}/$id/${DatabaseConstants.events}/$eventId';
+
+    String result = '';
+
+    if (Platform.isWindows){
+      result = await db.deleteFromDbForWindows(path);
+    } else {
+      result = await db.deleteFromDb(path);
+    }
+
+    if (result == SystemConstants.successConst){
+      eventsList.removeWhere((c) => c == eventId);
+    }
+  }
+
   bool haveEventsOrPromos({bool isEvent = true}){
     if (isEvent){
       if (eventsList.isNotEmpty){
