@@ -11,6 +11,8 @@ import 'package:admin_dvij/price_type/price_type_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../categories/event_categories/event_category.dart';
 import '../cities/city_class.dart';
 import '../constants/database_constants.dart';
@@ -20,6 +22,8 @@ import '../dates/irregular_date.dart';
 import '../dates/long_date.dart';
 import '../dates/once_date.dart';
 import '../dates/regular_date_class.dart';
+import '../design/app_colors.dart';
+import '../design_elements/elements_of_design.dart';
 import '../places/place_class.dart';
 import '../system_methods/methods_for_database.dart';
 
@@ -223,6 +227,8 @@ class EventClass implements IEntity{
     return result;
   }
 
+
+
   @override
   Map<String, dynamic> getMap() {
     return <String, dynamic> {
@@ -321,6 +327,79 @@ class EventClass implements IEntity{
     }
 
     return result;
+  }
+
+  Widget getFavCounter({required BuildContext context}){
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: favUsersIds.length.toString(),
+        icon: FontAwesomeIcons.heart,
+        color: AppColors.greyBackground,
+        textColor: AppColors.white
+
+    );
+  }
+
+  Widget getPriceWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: priceType.getHumanViewPrice(price: price),
+        icon: FontAwesomeIcons.tengeSign,
+        color: AppColors.greyBackground,
+        textColor: AppColors.white
+
+    );
+  }
+
+  Widget getDateTypeWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: dateType.toString(translate: true),
+        icon: FontAwesomeIcons.calendar,
+        color: AppColors.greyBackground,
+        textColor: AppColors.white
+
+    );
+  }
+
+  Widget getEventsDatesWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: getDatesToHumanView(),
+        icon: FontAwesomeIcons.calendar,
+        color: AppColors.greyBackground,
+        textColor: AppColors.white
+    );
+  }
+
+  Widget getEventsTimeWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: getTimeToHumanView(),
+        icon: FontAwesomeIcons.clock,
+        color: AppColors.greyBackground,
+        textColor: AppColors.white
+    );
+  }
+
+  String getDatesToHumanView(){
+    if (dateType.dateType == DateTypeEnum.once){
+      return onceDay.getHumanViewDate();
+    } else if (dateType.dateType == DateTypeEnum.long){
+      return longDays.getHumanViewDate();
+    } else {
+      return 'В разные дни, по расписанию';
+    }
+  }
+
+  String getTimeToHumanView(){
+    if (dateType.dateType == DateTypeEnum.once){
+      return onceDay.getTimePeriod();
+    } else if (dateType.dateType == DateTypeEnum.long){
+      return longDays.getTimePeriod();
+    } else {
+      return 'По расписанию';
+    }
   }
 
 }

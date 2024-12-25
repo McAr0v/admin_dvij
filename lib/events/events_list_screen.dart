@@ -171,6 +171,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
 
                           },
                           imageUrl: tempEvent.imageUrl,
+                        leftTopTag: tempEvent.category.getCategoryWidget(context: context),
                           widget: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -185,12 +186,20 @@ class _EventsListScreenState extends State<EventsListScreen> {
                               ),
 
                               const SizedBox(height: 10,),
+
+                              tempEvent.getFavCounter(context: context),
+
+                              tempEvent.getPriceWidget(context: context),
                               
-                              Text(tempEvent.category.name)
+                              tempEvent.getDateTypeWidget(context: context),
+                              
+                              tempEvent.getEventsDatesWidget(context: context),
+                              
+                              tempEvent.getEventsTimeWidget(context: context)
 
                               /*Row(
                                   children: [
-                                    tempEvent.getFavCounter(context: context),
+                                    
                                     tempEvent.getEventsCounter(context: context),
                                     tempEvent.getPromosCounter(context: context)
                                   ]
