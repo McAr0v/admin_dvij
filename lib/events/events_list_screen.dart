@@ -172,6 +172,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                           },
                           imageUrl: tempEvent.imageUrl,
                         leftTopTag: tempEvent.category.getCategoryWidget(context: context),
+                        leftBottomTag: tempEvent.inPlaceWidget(context: context),
                           widget: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -187,15 +188,35 @@ class _EventsListScreenState extends State<EventsListScreen> {
 
                               const SizedBox(height: 10,),
 
-                              tempEvent.getFavCounter(context: context),
+                              Wrap(
+                                alignment: WrapAlignment.start,
+                                spacing: 10, // Горизонтальное расстояние между элементами
+                                runSpacing: 10, // Вертикальное расстояние между строками
+                                children: [
+                                  tempEvent.getEventStatusWidget(context: context),
+                                  tempEvent.getFavCounter(context: context),
+                                  tempEvent.getPriceWidget(context: context),
 
-                              tempEvent.getPriceWidget(context: context),
-                              
-                              tempEvent.getDateTypeWidget(context: context),
-                              
-                              tempEvent.getEventsDatesWidget(context: context),
-                              
-                              tempEvent.getEventsTimeWidget(context: context)
+                                ],
+                              ),
+
+                              const SizedBox(height: 10,),
+
+                              Wrap(
+                                alignment: WrapAlignment.start,
+                                spacing: 10, // Горизонтальное расстояние между элементами
+                                runSpacing: 10, // Вертикальное расстояние между строками
+                                children: [
+
+                                  tempEvent.getDateTypeWidget(context: context),
+
+                                  tempEvent.getEventsDatesWidget(context: context),
+
+                                  tempEvent.getEventsTimeWidget(context: context)
+                                ],
+                              ),
+
+
 
                               /*Row(
                                   children: [

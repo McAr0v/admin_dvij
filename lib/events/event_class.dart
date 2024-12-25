@@ -382,11 +382,47 @@ class EventClass implements IEntity{
     );
   }
 
+  bool isFinished(){
+    switch (dateType.dateType) {
+      case DateTypeEnum.once : return onceDay.isFinished();
+      case DateTypeEnum.long : return longDays.isFinished();
+      case DateTypeEnum.regular : return false;
+      case DateTypeEnum.irregular: return irregularDays.isFinished();
+    }
+  }
+
+  Widget getEventStatusWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: isFinished() ? 'Завершено' : 'Активно',
+        icon: isFinished() ? FontAwesomeIcons.flagCheckered : FontAwesomeIcons.circleDot,
+        color: isFinished() ?  AppColors.greyBackground : AppColors.success,
+        textColor: AppColors.white
+    );
+  }
+
+  Widget? inPlaceWidget({required BuildContext context}){
+    if (placeId.isNotEmpty) {
+      return ElementsOfDesign.getTag(
+          context: context,
+          text: 'От заведения',
+          icon: FontAwesomeIcons.locationPin,
+          color: AppColors.greyBackground,
+          textColor: AppColors.white
+      );
+    } else {
+      return null;
+    }
+
+  }
+
   String getDatesToHumanView(){
     if (dateType.dateType == DateTypeEnum.once){
       return onceDay.getHumanViewDate();
     } else if (dateType.dateType == DateTypeEnum.long){
       return longDays.getHumanViewDate();
+    } else if (dateType.dateType == DateTypeEnum.regular) {
+      return regularDays.getHumanViewDate();
     } else {
       return 'В разные дни, по расписанию';
     }

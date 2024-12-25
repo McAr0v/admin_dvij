@@ -4,6 +4,7 @@ import 'package:admin_dvij/constants/regular_date_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../design/app_colors.dart';
+import '../system_methods/system_methods_class.dart';
 
 class RegularDate {
   TimeOfDay? mondayStart;
@@ -266,4 +267,25 @@ class RegularDate {
       ),
     );
   }
+
+  /// Возвращает дату в формате: 1 января 2025 года
+  String getHumanViewDate() {
+
+    final Map<String, bool> days = {
+      'Пн': mondayStart != null && mondayEnd != null,
+      'Вт': tuesdayStart != null && tuesdayEnd != null,
+      'Ср': wednesdayStart != null && wednesdayEnd != null,
+      'Чт': thursdayStart != null && thursdayEnd != null,
+      'Пт': fridayStart != null && fridayEnd != null,
+      'Сб': saturdayStart != null && saturdayEnd != null,
+      'Вс': sundayStart != null && sundayEnd != null,
+    };
+
+    // Собираем список активных дней
+    return days.entries
+        .where((entry) => entry.value) // Фильтруем только дни, где `true`
+        .map((entry) => entry.key) // Берём название дня
+        .join(', '); // Объединяем в строку через запятую
+  }
+
 }
