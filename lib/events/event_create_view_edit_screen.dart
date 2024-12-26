@@ -8,6 +8,7 @@ import 'package:admin_dvij/events/event_class.dart';
 import 'package:admin_dvij/events/events_list_class.dart';
 import 'package:admin_dvij/places/place_picker.dart';
 import 'package:admin_dvij/price_type/price_type_class.dart';
+import 'package:admin_dvij/price_type/price_type_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -59,21 +60,22 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   bool canEdit = false;
   bool showSchedule = false;
 
-
-
   File? _imageFile;
 
   EventClass editEvent = EventClass.empty();
+
   SimpleUser creator = SimpleUser.empty();
+  SimpleUser chosenCreator = SimpleUser.empty();
 
   EventCategory chosenCategory = EventCategory.empty();
   City chosenCity = City.empty();
-  SimpleUser chosenCreator = SimpleUser.empty();
 
-  bool inPlace = false;
+
+  Place placeFromEvent = Place.empty();
   Place chosenPlace = Place.empty();
 
   AddressType addressType = AddressType();
+  AddressType chosenAddressType = AddressType();
 
 
   RegularDate schedule = RegularDate();
@@ -137,7 +139,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     // Если редактирование, подгружаем создателя и редактируемое заведение. Устанавливаем расписание
     if (widget.event != null){
       editEvent = eventsList.getEntityFromList(widget.event!.id);
-      creator = usersList.getEntityFromList(editEvent.creatorId);
 
       // TODO Сделать прогрузку расписания
       //setSchedule();
@@ -173,24 +174,25 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   void setTextFieldsOnDefault(){
     setState(() {
 
+      creator = usersList.getEntityFromList(editEvent.creatorId);
+      placeFromEvent = placesList.getEntityFromList(editEvent.placeId);
+
       chosenCreator = SimpleUser.empty();
       chosenCategory = EventCategory.empty();
       chosenCity = City.empty();
+      chosenPlace = Place.empty();
+      chosenAddressType = AddressType();
+      chosenPriceType = PriceType();
 
       if (editEvent.placeId.isNotEmpty){
         addressType = AddressType(addressTypeEnum: AddressTypeEnum.place);
-        inPlace = true;
-        chosenPlace = placesList.getEntityFromList(editEvent.placeId);
-        placeController.text = placesList.getEntityFromList(editEvent.placeId).name;
+        placeController.text = placeFromEvent.name;
         addressTypeController.text = addressType.toString();
       } else {
-        addressType = AddressType();
+        addressType = AddressType(addressTypeEnum: AddressTypeEnum.address);
         placeController.text = 'Выбери заведение';
         addressTypeController.text = addressType.toString();
       }
-
-
-      chosenPriceType = editEvent.priceType;
 
       headlineController.text = editEvent.headline;
       descController.text = editEvent.desc;
@@ -205,8 +207,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
       telegramController.text = editEvent.telegram;
       instagramController.text = editEvent.instagram;
 
-      chosenPriceType = editEvent.priceType;
-      priceTypeController.text = chosenPriceType.toString(translate: true);
+      priceTypeController.text = editEvent.priceType.toString(translate: true);
       freePriceController.text = 'Бесплатно';
 
       if (editEvent.priceType.priceType == PriceTypeEnum.fixed){
@@ -224,8 +225,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
       }
 
       //setSchedule();
-
-
 
       _imageFile = null;
     });
@@ -273,6 +272,17 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     }
   }
 
+  Future<void> choosePriceType() async{
+    final results = await sm.getPopup(context: context, page: const PriceTypePicker());
+    if (results != null){
+      setState(() {
+        chosenPriceType = results;
+        priceTypeController.text = chosenPriceType.toString(translate: true);
+      });
+
+    }
+  }
+
   Future<void> chooseAddressType() async{
     final results = await sm.getPopup(context: context, page: const AddressTypePicker());
     if (results != null){
@@ -281,20 +291,21 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
         addressType = results;
         addressTypeController.text = addressType.toString();
         if (addressType.addressTypeEnum == AddressTypeEnum.place){
-          inPlace = true;
-          if (chosenPlace.id.isNotEmpty){
-            placeController.text = chosenPlace.name;
-            streetController.text = chosenPlace.street;
-            houseController.text = chosenPlace.house;
-            chosenCity = chosenPlace.city;
-            cityController.text = chosenCity.name;
-          }
+          placeController.text = chosenPlace.name;
+          streetController.text = chosenPlace.street;
+          houseController.text = chosenPlace.house;
+          chosenCity = chosenPlace.city;
+          cityController.text = chosenCity.name;
         } else {
-          inPlace = false;
+          cityController.text = editEvent.city.name;
+          chosenCity = City.empty();
+          cityController.text = 'Выбери город';
+          streetController.text = editEvent.street;
+          houseController.text = editEvent.house;
+          chosenPlace = Place.empty();
+          placeController.text = 'Выбери заведение';
         }
       });
-
-
     }
   }
 
@@ -451,7 +462,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                               ),
 
 
-                              if (inPlace) ElementsOfDesign.buildTextField(
+                              if (getAddressType() == AddressTypeEnum.place) ElementsOfDesign.buildTextField(
                                   controller: placeController,
                                   labelText: 'Название заведения',
                                   canEdit: canEdit,
@@ -463,7 +474,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   }
                               ),
 
-                              if (!inPlace) ElementsOfDesign.buildTextField(
+                              if (getAddressType() == AddressTypeEnum.address) ElementsOfDesign.buildTextField(
                                   controller: streetController,
                                   labelText: 'Улица',
                                   canEdit: canEdit,
@@ -471,7 +482,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   context: context
                               ),
 
-                              if (!inPlace) ElementsOfDesign.buildTextField(
+                              if (getAddressType() == AddressTypeEnum.address) ElementsOfDesign.buildTextField(
                                   controller: houseController,
                                   labelText: 'Номер дома',
                                   canEdit: canEdit,
@@ -495,11 +506,11 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   context: context,
                                   readOnly: true,
                                   onTap: () async {
-                                    //await chooseCategory();
+                                    await choosePriceType();
                                   }
                               ),
 
-                              if (chosenPriceType.priceType == PriceTypeEnum.free) ElementsOfDesign.buildTextField(
+                              if (getPriceType() == PriceTypeEnum.free) ElementsOfDesign.buildTextField(
                                   controller: freePriceController,
                                   labelText: 'Цена',
                                   canEdit: false,
@@ -507,7 +518,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   context: context
                               ),
 
-                              if (chosenPriceType.priceType == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
+                              if (getPriceType() == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
                                   controller: rangeStartPriceController,
                                   labelText: 'Минимальная цена билетов',
                                   canEdit: canEdit,
@@ -515,14 +526,14 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   context: context
                               ),
 
-                              if (chosenPriceType.priceType == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
+                              if (getPriceType() == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
                                   controller: rangeEndPriceController,
                                   labelText: 'Максимальная цена билетов',
                                   canEdit: canEdit,
                                   icon: FontAwesomeIcons.dollarSign,
                                   context: context
                               ),
-                              if (chosenPriceType.priceType == PriceTypeEnum.fixed) ElementsOfDesign.buildTextField(
+                              if (getPriceType() == PriceTypeEnum.fixed) ElementsOfDesign.buildTextField(
                                   controller: fixedPriceController,
                                   labelText: 'Цена билетов',
                                   canEdit: canEdit,
@@ -655,4 +666,21 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
     );
   }
+
+  AddressTypeEnum getAddressType(){
+    if (chosenAddressType.addressTypeEnum == AddressTypeEnum.notChosen){
+      return addressType.addressTypeEnum;
+    } else {
+      return chosenAddressType.addressTypeEnum;
+    }
+  }
+
+  PriceTypeEnum getPriceType(){
+    if (chosenPriceType.priceType == PriceTypeEnum.notChosen){
+      return editEvent.priceType.priceType;
+    } else {
+      return chosenPriceType.priceType;
+    }
+  }
+
 }

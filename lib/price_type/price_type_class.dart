@@ -3,14 +3,15 @@ import 'package:admin_dvij/constants/price_type_constants.dart';
 enum PriceTypeEnum {
   free,
   fixed,
-  range
+  range,
+  notChosen
 }
 
 class PriceType {
 
   PriceTypeEnum priceType;
 
-  PriceType({this.priceType = PriceTypeEnum.free});
+  PriceType({this.priceType = PriceTypeEnum.notChosen});
 
   factory PriceType.fromString({required String enumString}){
     switch (enumString){
@@ -30,6 +31,7 @@ class PriceType {
         return !translate ? PriceTypeConstants.fixedId : PriceTypeConstants.fixeHeadline;
       case PriceTypeEnum.range:
         return !translate ? PriceTypeConstants.rangeId : PriceTypeConstants.rangeHeadline;
+      default: return '';
     }
   }
 
@@ -45,6 +47,7 @@ class PriceType {
         List<String> temp = price.split('-');
         return 'от ${temp[0]} ${PriceTypeConstants.tenge} - до ${temp[1]} ${PriceTypeConstants.tenge}';
       }
+      default: return '';
     }
   }
 
@@ -53,6 +56,7 @@ class PriceType {
       case PriceTypeEnum.free: return '';
       case PriceTypeEnum.fixed: return fixedPrice;
       case PriceTypeEnum.range: return '$startPrice-$endPrice';
+      case PriceTypeEnum.notChosen: return '';
     }
   }
 
@@ -68,6 +72,14 @@ class PriceType {
     } else {
       return prices[1];
     }
+  }
+
+  List<PriceType> getPriceTypesList(){
+    return [
+      PriceType(priceType: PriceTypeEnum.free),
+      PriceType(priceType: PriceTypeEnum.fixed),
+      PriceType(priceType: PriceTypeEnum.range),
+    ];
   }
 
 }
