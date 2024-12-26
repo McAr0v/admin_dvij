@@ -4,9 +4,9 @@ import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 
 class OnceDate {
-  final DateTime? date;
-  final TimeOfDay? startTime;
-  final TimeOfDay? endTime;
+  DateTime? date;
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
 
   OnceDate({
     required this.date,

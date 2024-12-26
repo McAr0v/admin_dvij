@@ -3,12 +3,18 @@ import 'package:admin_dvij/address/address_or_place_class.dart';
 import 'package:admin_dvij/address/address_type_picker.dart';
 import 'package:admin_dvij/categories/event_categories/event_category.dart';
 import 'package:admin_dvij/constants/events_constants.dart';
+import 'package:admin_dvij/dates/date_type.dart';
+import 'package:admin_dvij/dates/date_type_picker.dart';
+import 'package:admin_dvij/dates/irregular_date.dart';
+import 'package:admin_dvij/dates/long_date.dart';
+import 'package:admin_dvij/dates/once_date.dart';
 import 'package:admin_dvij/events/event_category_picker.dart';
 import 'package:admin_dvij/events/event_class.dart';
 import 'package:admin_dvij/events/events_list_class.dart';
 import 'package:admin_dvij/places/place_picker.dart';
 import 'package:admin_dvij/price_type/price_type_class.dart';
 import 'package:admin_dvij/price_type/price_type_picker.dart';
+import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
@@ -16,7 +22,6 @@ import '../cities/city_class.dart';
 import '../cities/city_picker_page.dart';
 import '../constants/buttons_constants.dart';
 import '../constants/city_constants.dart';
-import '../constants/places_constants.dart';
 import '../constants/system_constants.dart';
 import '../constants/users_constants.dart';
 import '../database/image_picker.dart';
@@ -53,6 +58,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   SimpleUsersList usersList = SimpleUsersList();
   SystemMethodsClass sm = SystemMethodsClass();
   final ImagePickerService imagePickerService = ImagePickerService();
+  DateMethods dateMethods = DateMethods();
 
   bool loading = false;
   bool saving = false;
@@ -77,8 +83,12 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   AddressType addressType = AddressType();
   AddressType chosenAddressType = AddressType();
 
+  DateType chosenDateType = DateType();
 
+  OnceDate onceDate = OnceDate.empty();
+  LongDate longDate = LongDate.empty();
   RegularDate schedule = RegularDate();
+  IrregularDate irregularDate = IrregularDate.empty();
 
   // Prices
   PriceType chosenPriceType = PriceType();
@@ -106,6 +116,13 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   final TextEditingController rangeStartPriceController = TextEditingController();
   final TextEditingController rangeEndPriceController = TextEditingController();
   final TextEditingController freePriceController = TextEditingController();
+
+
+  final TextEditingController dateTypeController = TextEditingController();
+
+  final TextEditingController onceDateDateController = TextEditingController();
+  final TextEditingController onceDateStartTimeController = TextEditingController();
+  final TextEditingController onceDateEndTimeController = TextEditingController();
 
   @override
   void initState() {
@@ -139,13 +156,9 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     // Если редактирование, подгружаем создателя и редактируемое заведение. Устанавливаем расписание
     if (widget.event != null){
       editEvent = eventsList.getEntityFromList(widget.event!.id);
-
-      // TODO Сделать прогрузку расписания
-      //setSchedule();
     }
 
     // Сбрасываем текстовые поля и выбранные настройки по умолчанию
-    // TODO Сделать сброс текстовых полей
     setTextFieldsOnDefault();
 
     setState(() {
@@ -183,6 +196,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
       chosenPlace = Place.empty();
       chosenAddressType = AddressType();
       chosenPriceType = PriceType();
+      chosenDateType = DateType();
 
       if (editEvent.placeId.isNotEmpty){
         addressType = AddressType(addressTypeEnum: AddressTypeEnum.place);
@@ -194,6 +208,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
         addressTypeController.text = addressType.toString();
       }
 
+      dateTypeController.text = editEvent.dateType.toString(translate: true);
       headlineController.text = editEvent.headline;
       descController.text = editEvent.desc;
       creatorController.text = creator.getFullName().isNotEmpty ? creator.getFullName() : EventsConstants.chooseCreator;
@@ -224,10 +239,49 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
         rangeEndPriceController.text = '';
       }
 
-      //setSchedule();
+      setSchedule();
+      setOnceDate();
+      setLongDate();
+      setIrregularDate();
 
       _imageFile = null;
     });
+  }
+
+  void setIrregularDate(){
+    irregularDate.dates = [];
+    irregularDate.dates = editEvent.irregularDays.dates;
+  }
+
+  void setLongDate(){
+    longDate.startDate = editEvent.longDays.startDate;
+    longDate.endDate = editEvent.longDays.endDate;
+    longDate.startTime = editEvent.longDays.startTime;
+    longDate.endTime = editEvent.longDays.endTime;
+  }
+
+  void setOnceDate(){
+    onceDate.date = editEvent.onceDay.date;
+    onceDate.startTime = editEvent.onceDay.startTime;
+    onceDate.endTime = editEvent.onceDay.endTime;
+
+  }
+
+  void setSchedule(){
+    schedule.mondayStart = editEvent.regularDays.mondayStart;
+    schedule.mondayEnd = editEvent.regularDays.mondayEnd;
+    schedule.tuesdayStart = editEvent.regularDays.tuesdayStart;
+    schedule.tuesdayEnd = editEvent.regularDays.tuesdayEnd;
+    schedule.wednesdayStart = editEvent.regularDays.wednesdayStart;
+    schedule.wednesdayEnd = editEvent.regularDays.wednesdayEnd;
+    schedule.thursdayStart = editEvent.regularDays.thursdayStart;
+    schedule.thursdayEnd = editEvent.regularDays.thursdayEnd;
+    schedule.fridayStart = editEvent.regularDays.fridayStart;
+    schedule.fridayEnd = editEvent.regularDays.fridayEnd;
+    schedule.saturdayStart = editEvent.regularDays.saturdayStart;
+    schedule.saturdayEnd = editEvent.regularDays.saturdayEnd;
+    schedule.sundayStart = editEvent.regularDays.sundayStart;
+    schedule.sundayEnd = editEvent.regularDays.sundayEnd;
   }
 
   Future<void> chooseCreator() async{
@@ -278,6 +332,17 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
       setState(() {
         chosenPriceType = results;
         priceTypeController.text = chosenPriceType.toString(translate: true);
+      });
+
+    }
+  }
+
+  Future<void> chooseDateType() async{
+    final results = await sm.getPopup(context: context, page: const DateTypePicker());
+    if (results != null){
+      setState(() {
+        chosenDateType = results;
+        dateTypeController.text = chosenDateType.toString(translate: true);
       });
 
     }
@@ -608,22 +673,87 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                             ]
                         ),
 
-                        /*schedule.getRegularEditWidget(
+                        ElementsOfDesign.buildTextField(
+                            controller: dateTypeController,
+                            labelText: 'Тип дат проведения',
+                            canEdit: canEdit,
+                            icon: FontAwesomeIcons.calendar,
+                            context: context,
+                          readOnly: true,
+                          onTap: () async {
+                              await chooseDateType();
+                          }
+                        ),
+
+                        const SizedBox(height: 10,),
+
+                        if (getDateType() == DateTypeEnum.regular) schedule.getRegularEditWidget(
                           context: context,
                           onTapStart: (index) => pickTime(index, true),
                           onTapEnd: (index) => pickTime(index, false),
                           canEdit: canEdit,
-                          showSchedule: showSchedule,
+                          showSchedule: true, //showSchedule,
                           show: (){
                             setState(() {
-                              showSchedule = !showSchedule;
+                              //showSchedule = !showSchedule;
                             });
                           },
                           onClean: (index) {
                             updateTime(index, true, null);
                             updateTime(index, false, null);
                           },
-                        ),*/
+                        ),
+
+                        if (getDateType() == DateTypeEnum.once) Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Дата
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text("Дата:", style: TextStyle(fontSize: 16)),
+                                    Text(
+                                      onceDate.date != null
+                                          ? sm.formatDateTimeToHumanView(onceDate.date!)
+                                          : "Выбрать дату",
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+
+                                // Время начала
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text("Время начала:", style: TextStyle(fontSize: 16)),
+                                    Text(
+                                      onceDate.startTime != null
+                                          ? "${onceDate.startTime!.hour.toString().padLeft(2, '0')}:${onceDate.startTime!.minute.toString().padLeft(2, '0')}"
+                                          : "Выбрать время",
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+
+                                // Время завершения
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text("Время завершения:", style: TextStyle(fontSize: 16)),
+                                    Text(
+                                      onceDate.endTime != null
+                                          ? "${onceDate.endTime!.hour.toString().padLeft(2, '0')}:${onceDate.endTime!.minute.toString().padLeft(2, '0')}"
+                                          : "Выбрать время",
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
 
 
 
@@ -667,6 +797,47 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     );
   }
 
+  /// Обновляем время
+  void updateTime(int index, bool isStart, TimeOfDay? newTime) {
+    setState(() {
+      switch (index) {
+        case 0:
+          isStart ? schedule.mondayStart = newTime : schedule.mondayEnd = newTime;
+          break;
+        case 1:
+          isStart ? schedule.tuesdayStart = newTime : schedule.tuesdayEnd = newTime;
+          break;
+        case 2:
+          isStart ? schedule.wednesdayStart = newTime : schedule.wednesdayEnd = newTime;
+          break;
+        case 3:
+          isStart ? schedule.thursdayStart = newTime : schedule.thursdayEnd = newTime;
+          break;
+        case 4:
+          isStart ? schedule.fridayStart = newTime : schedule.fridayEnd = newTime;
+          break;
+        case 5:
+          isStart ? schedule.saturdayStart = newTime : schedule.saturdayEnd = newTime;
+          break;
+        case 6:
+          isStart ? schedule.sundayStart = newTime : schedule.sundayEnd = newTime;
+          break;
+      }
+    });
+  }
+
+  /// Показ диалога выбора времени
+  Future<void> pickTime(int index, bool isStart) async {
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: schedule.getTime(index: index, isStart: true) ?? TimeOfDay.now(),
+      initialEntryMode: TimePickerEntryMode.dial,
+    );
+    if (picked != null) {
+      updateTime(index, isStart, picked);
+    }
+  }
+
   AddressTypeEnum getAddressType(){
     if (chosenAddressType.addressTypeEnum == AddressTypeEnum.notChosen){
       return addressType.addressTypeEnum;
@@ -680,6 +851,14 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
       return editEvent.priceType.priceType;
     } else {
       return chosenPriceType.priceType;
+    }
+  }
+
+  DateTypeEnum getDateType(){
+    if (chosenDateType.dateType == DateTypeEnum.notChosen){
+      return editEvent.dateType.dateType;
+    } else {
+      return chosenDateType.dateType;
     }
   }
 

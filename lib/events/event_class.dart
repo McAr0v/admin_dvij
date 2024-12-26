@@ -388,6 +388,7 @@ class EventClass implements IEntity{
       case DateTypeEnum.long : return longDays.isFinished();
       case DateTypeEnum.regular : return false;
       case DateTypeEnum.irregular: return irregularDays.isFinished();
+      case DateTypeEnum.notChosen: return true;
     }
   }
 

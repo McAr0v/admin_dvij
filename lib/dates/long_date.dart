@@ -5,10 +5,10 @@ import '../system_methods/system_methods_class.dart';
 
 class LongDate {
 
-  final DateTime? startDate;
-  final DateTime? endDate;
-  final TimeOfDay? startTime;
-  final TimeOfDay? endTime;
+  DateTime? startDate;
+  DateTime? endDate;
+  TimeOfDay? startTime;
+  TimeOfDay? endTime;
 
   LongDate({
     required this.startDate,
