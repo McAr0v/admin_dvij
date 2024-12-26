@@ -16,4 +16,7 @@ class CategoriesConstants{
   static const String inputEditCategoryDesc = 'Измени название категории и нажми кнопку "Сохранить"';
   static const String noCategoryName = 'Введите название категории!';
   static const String categoryAlreadyExists = 'Такая категория уже есть!';
+  static const String categoryNotChosen = 'Категория не выбрана';
+  static const String chooseCategory = 'Выбери категорию';
+
 }

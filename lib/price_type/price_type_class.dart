@@ -55,4 +55,19 @@ class PriceType {
       case PriceTypeEnum.range: return '$startPrice-$endPrice';
     }
   }
+
+  String getRangePrices({
+    bool isStart = true,
+    required String price
+  }){
+
+    List<String> prices = price.split('-');
+
+    if (isStart){
+      return prices[0];
+    } else {
+      return prices[1];
+    }
+  }
+
 }

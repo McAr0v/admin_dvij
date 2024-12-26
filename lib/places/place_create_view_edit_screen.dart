@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'package:admin_dvij/categories/place_categories/place_categories_list.dart';
 import 'package:admin_dvij/categories/place_categories/place_category.dart';
 import 'package:admin_dvij/categories/place_categories/place_category_picker.dart';
-import 'package:admin_dvij/cities/cities_list_class.dart';
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/cities/city_picker_page.dart';
 import 'package:admin_dvij/constants/places_constants.dart';
@@ -45,8 +43,6 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   PlacesList placesList = PlacesList();
   SimpleUsersList usersList = SimpleUsersList();
   SystemMethodsClass sm = SystemMethodsClass();
-  PlaceCategoriesList placeCategoriesList = PlaceCategoriesList();
-  CitiesList citiesList = CitiesList();
   final ImagePickerService imagePickerService = ImagePickerService();
 
   bool loading = false;
@@ -88,12 +84,14 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
   Future<void> initialization({bool fromDb = false}) async {
 
-    // Подгружаем текущего пользователя
-    currentAdminUser = await currentAdminUser.getCurrentUser(fromDb: false);
+
 
     setState(() {
       loading = true;
     });
+
+    // Подгружаем текущего пользователя
+    currentAdminUser = await currentAdminUser.getCurrentUser(fromDb: false);
 
     // Подгружаем список заведений и список пользователей
     if (fromDb){

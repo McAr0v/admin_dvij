@@ -82,8 +82,26 @@ class AdminRoleClass {
     }
   }
 
+  /// Метод выдачи доступа на редактирование заведений
+  bool accessToEditEvents(){
+    if (adminRole == AdminRole.notChosen || adminRole == AdminRole.viewer || adminRole == AdminRole.advertiser) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   /// Метод выдачи доступа на удаление заведений
   bool accessToDeletePlaces(){
+    if (adminRole == AdminRole.creator || adminRole == AdminRole.superAdmin) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /// Метод выдачи доступа на удаление мероприятий
+  bool accessToDeleteEvents(){
     if (adminRole == AdminRole.creator || adminRole == AdminRole.superAdmin) {
       return true;
     } else {

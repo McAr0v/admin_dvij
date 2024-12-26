@@ -1,24 +1,22 @@
-import 'package:admin_dvij/categories/place_categories/place_categories_list.dart';
-import 'package:admin_dvij/categories/place_categories/place_category.dart';
-import 'package:admin_dvij/design/app_colors.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:admin_dvij/categories/event_categories/event_categories_list.dart';
+import 'package:admin_dvij/categories/event_categories/event_category.dart';
 import 'package:flutter/material.dart';
+import '../constants/system_constants.dart';
+import '../design/app_colors.dart';
+import '../design/loading_screen.dart';
 
-import '../../constants/system_constants.dart';
-import '../../design/loading_screen.dart';
-
-class PlaceCategoryPicker extends StatefulWidget {
-  const PlaceCategoryPicker({Key? key}) : super(key: key);
+class EventCategoryPicker extends StatefulWidget {
+  const EventCategoryPicker({Key? key}) : super(key: key);
 
   @override
-  State<PlaceCategoryPicker> createState() => _PlaceCategoryPickerState();
+  State<EventCategoryPicker> createState() => _EventCategoryPickerState();
 }
 
-class _PlaceCategoryPickerState extends State<PlaceCategoryPicker> {
+class _EventCategoryPickerState extends State<EventCategoryPicker> {
   TextEditingController searchController = TextEditingController();
-  List<PlaceCategory> filteredCategories = [];
-  List<PlaceCategory> currentCategoriesList = [];
-  PlaceCategoriesList categoriesList = PlaceCategoriesList();
+  List<EventCategory> filteredCategories = [];
+  List<EventCategory> currentCategoriesList = [];
+  EventCategoriesList categoriesList = EventCategoriesList();
 
   bool loading = false;
 
@@ -39,11 +37,11 @@ class _PlaceCategoryPickerState extends State<PlaceCategoryPicker> {
     });
   }
 
-  void updateFilteredCategories(String query) {
+  void updateFilteredCities(String query) {
     setState(() {
       filteredCategories = currentCategoriesList
-          .where((city) =>
-          city.name.toLowerCase().contains(query.toLowerCase()))
+          .where((category) =>
+          category.name.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
   }
@@ -72,7 +70,7 @@ class _PlaceCategoryPickerState extends State<PlaceCategoryPicker> {
                     hintText: 'Название категории',
                   ),
                   onChanged: (value) {
-                    updateFilteredCategories(value);
+                    updateFilteredCities(value);
                   },
                 ),
               ),
@@ -84,7 +82,7 @@ class _PlaceCategoryPickerState extends State<PlaceCategoryPicker> {
               if (filteredCategories.isNotEmpty) Expanded(
                   child: SingleChildScrollView(
                     child: ListBody(
-                      children: filteredCategories.map((PlaceCategory category) {
+                      children: filteredCategories.map((EventCategory category) {
                         return GestureDetector(
                           onTap: () {
                             Navigator.of(context).pop(category);

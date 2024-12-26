@@ -16,4 +16,5 @@ class CityConstants {
   static const String cityAlreadyExists = 'Такой город уже есть!';
   static const String citySearch = 'Поиск города...';
   static const String cityNotChosen = 'Город не выбран';
+  static const String chooseCity = 'Выберите город';
 }

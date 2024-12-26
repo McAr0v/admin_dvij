@@ -95,7 +95,7 @@ class EventClass implements IEntity{
         whatsapp: '',
         telegram: '',
         instagram: '',
-        imageUrl: SystemConstants.defaultImagePath,
+        imageUrl: SystemConstants.noImagePath,
         placeId: '',
         priceType: PriceType(),
         price: '',
