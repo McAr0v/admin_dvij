@@ -5,7 +5,11 @@ import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/database/database_class.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/database_constants.dart';
+import '../constants/users_constants.dart';
+import '../design_elements/elements_of_design.dart';
 
 
 class City implements IEntity<City>{
@@ -30,6 +34,30 @@ class City implements IEntity<City>{
 
   factory City.empty(){
     return City(id: '', name: '');
+  }
+
+  factory City.setCity({required City city}){
+    return City(id: city.id, name: city.name);
+  }
+
+  Widget getCityWidget({
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onTap
+  }){
+
+    TextEditingController cityController = TextEditingController();
+    cityController.text = name.isNotEmpty ? name : CityConstants.cityNotChosen;
+
+    return ElementsOfDesign.buildTextField(
+        controller: cityController,
+        labelText: UserConstants.city,
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.city,
+        context: context,
+        readOnly: true,
+        onTap: onTap
+    );
   }
 
   @override

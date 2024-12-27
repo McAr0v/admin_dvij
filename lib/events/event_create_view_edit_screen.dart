@@ -14,14 +14,12 @@ import 'package:admin_dvij/events/events_list_class.dart';
 import 'package:admin_dvij/places/place_picker.dart';
 import 'package:admin_dvij/price_type/price_type_class.dart';
 import 'package:admin_dvij/price_type/price_type_picker.dart';
-import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import '../cities/city_class.dart';
 import '../cities/city_picker_page.dart';
 import '../constants/buttons_constants.dart';
-import '../constants/city_constants.dart';
 import '../constants/system_constants.dart';
 import '../constants/users_constants.dart';
 import '../database/image_picker.dart';
@@ -58,29 +56,24 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   SimpleUsersList usersList = SimpleUsersList();
   SystemMethodsClass sm = SystemMethodsClass();
   final ImagePickerService imagePickerService = ImagePickerService();
-  DateMethods dateMethods = DateMethods();
 
   bool loading = false;
   bool saving = false;
   bool deleting = false;
   bool canEdit = false;
-  bool showSchedule = false;
 
   File? _imageFile;
 
   EventClass editEvent = EventClass.empty();
-
   SimpleUser creator = SimpleUser.empty();
-  SimpleUser chosenCreator = SimpleUser.empty();
 
   EventCategory chosenCategory = EventCategory.empty();
   City chosenCity = City.empty();
 
-
-  Place placeFromEvent = Place.empty();
   Place chosenPlace = Place.empty();
 
   AddressType addressType = AddressType();
+
   AddressType chosenAddressType = AddressType();
 
   DateType chosenDateType = DateType();
@@ -95,10 +88,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
   final TextEditingController headlineController = TextEditingController();
   final TextEditingController descController = TextEditingController();
-  final TextEditingController creatorController = TextEditingController();
   final TextEditingController createDateController = TextEditingController();
-  final TextEditingController categoryController = TextEditingController();
-  final TextEditingController cityController = TextEditingController();
   final TextEditingController streetController = TextEditingController();
   final TextEditingController houseController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -106,23 +96,10 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   final TextEditingController telegramController = TextEditingController();
   final TextEditingController instagramController = TextEditingController();
 
-  final TextEditingController placeController = TextEditingController();
-  final TextEditingController addressTypeController = TextEditingController();
-
-
-
-  final TextEditingController priceTypeController = TextEditingController();
   final TextEditingController fixedPriceController = TextEditingController();
   final TextEditingController rangeStartPriceController = TextEditingController();
   final TextEditingController rangeEndPriceController = TextEditingController();
   final TextEditingController freePriceController = TextEditingController();
-
-
-  final TextEditingController dateTypeController = TextEditingController();
-
-  final TextEditingController onceDateDateController = TextEditingController();
-  final TextEditingController onceDateStartTimeController = TextEditingController();
-  final TextEditingController onceDateEndTimeController = TextEditingController();
 
   @override
   void initState() {
@@ -150,7 +127,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     // Если это создание, то устанавливаем режим редактирования и показ расписания сразу
     if (widget.event == null){
       canEdit = true;
-      showSchedule = true;
     }
 
     // Если редактирование, подгружаем создателя и редактируемое заведение. Устанавливаем расписание
@@ -188,33 +164,23 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     setState(() {
 
       creator = usersList.getEntityFromList(editEvent.creatorId);
-      placeFromEvent = placesList.getEntityFromList(editEvent.placeId);
+      chosenPlace = placesList.getEntityFromList(editEvent.placeId);
 
-      chosenCreator = SimpleUser.empty();
-      chosenCategory = EventCategory.empty();
-      chosenCity = City.empty();
-      chosenPlace = Place.empty();
-      chosenAddressType = AddressType();
-      chosenPriceType = PriceType();
-      chosenDateType = DateType();
+      chosenCategory = EventCategory.setCategory(category: editEvent.category);
+      chosenCity = City.setCity(city: editEvent.city);
+
+      chosenPriceType = PriceType.setPriceType(priceType: editEvent.priceType);
+      chosenDateType = DateType.setDateType(dateType: editEvent.dateType);
 
       if (editEvent.placeId.isNotEmpty){
         addressType = AddressType(addressTypeEnum: AddressTypeEnum.place);
-        placeController.text = placeFromEvent.name;
-        addressTypeController.text = addressType.toString();
       } else {
         addressType = AddressType(addressTypeEnum: AddressTypeEnum.address);
-        placeController.text = 'Выбери заведение';
-        addressTypeController.text = addressType.toString();
       }
 
-      dateTypeController.text = editEvent.dateType.toString(translate: true);
       headlineController.text = editEvent.headline;
       descController.text = editEvent.desc;
-      creatorController.text = creator.getFullName().isNotEmpty ? creator.getFullName() : EventsConstants.chooseCreator;
       createDateController.text = sm.formatDateTimeToHumanView(editEvent.createDate);
-      categoryController.text = editEvent.category.name.isNotEmpty ? editEvent.category.name : EventsConstants.chooseCategory;
-      cityController.text = editEvent.city.name.isNotEmpty ? editEvent.city.name : CityConstants.cityNotChosen;
       streetController.text = editEvent.street;
       houseController.text = editEvent.house;
       phoneController.text = editEvent.phone;
@@ -222,7 +188,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
       telegramController.text = editEvent.telegram;
       instagramController.text = editEvent.instagram;
 
-      priceTypeController.text = editEvent.priceType.toString(translate: true);
       freePriceController.text = 'Бесплатно';
 
       if (editEvent.priceType.priceType == PriceTypeEnum.fixed){
@@ -239,60 +204,23 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
         rangeEndPriceController.text = '';
       }
 
-      setSchedule();
-      setOnceDate();
-      setLongDate();
-      setIrregularDate();
+      schedule = RegularDate.setSchedule(fromDate: editEvent.regularDays);
+      onceDate = OnceDate.setOnceDay(fromDate: editEvent.onceDay);
+      longDate = LongDate.setLongDate(fromDate: editEvent.longDays);
+      irregularDate = IrregularDate.setIrregularDates(fromDate: editEvent.irregularDays);
 
       _imageFile = null;
     });
   }
 
-  void setIrregularDate(){
-    irregularDate.dates = [];
-    irregularDate.dates = editEvent.irregularDays.dates;
-  }
-
-  void setLongDate(){
-    longDate.startDate = editEvent.longDays.startDate;
-    longDate.endDate = editEvent.longDays.endDate;
-    longDate.startTime = editEvent.longDays.startTime;
-    longDate.endTime = editEvent.longDays.endTime;
-  }
-
-  void setOnceDate(){
-    onceDate.date = editEvent.onceDay.date;
-    onceDate.startTime = editEvent.onceDay.startTime;
-    onceDate.endTime = editEvent.onceDay.endTime;
-
-  }
-
-  void setSchedule(){
-    schedule.mondayStart = editEvent.regularDays.mondayStart;
-    schedule.mondayEnd = editEvent.regularDays.mondayEnd;
-    schedule.tuesdayStart = editEvent.regularDays.tuesdayStart;
-    schedule.tuesdayEnd = editEvent.regularDays.tuesdayEnd;
-    schedule.wednesdayStart = editEvent.regularDays.wednesdayStart;
-    schedule.wednesdayEnd = editEvent.regularDays.wednesdayEnd;
-    schedule.thursdayStart = editEvent.regularDays.thursdayStart;
-    schedule.thursdayEnd = editEvent.regularDays.thursdayEnd;
-    schedule.fridayStart = editEvent.regularDays.fridayStart;
-    schedule.fridayEnd = editEvent.regularDays.fridayEnd;
-    schedule.saturdayStart = editEvent.regularDays.saturdayStart;
-    schedule.saturdayEnd = editEvent.regularDays.saturdayEnd;
-    schedule.sundayStart = editEvent.regularDays.sundayStart;
-    schedule.sundayEnd = editEvent.regularDays.sundayEnd;
-  }
 
   Future<void> chooseCreator() async{
     final results = await sm.getPopup(context: context, page: const CreatorPopup());
     if (results != null){
-      chosenCreator = results;
-      creatorController.text = chosenCreator.getFullName();
-      if (!chosenCreator.checkAdminRoleInUser(chosenPlace.id)){
+      creator = results;
+      if (!creator.checkAdminRoleInUser(chosenPlace.id)){
         setState(() {
           chosenPlace = Place.empty();
-          placeController.text = 'Выбери заведение';
         });
       }
     }
@@ -301,28 +229,30 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   Future<void> chooseCity() async{
     final results = await sm.getPopup(context: context, page: const CityPickerPage());
     if (results != null){
-      chosenCity = results;
-      cityController.text = chosenCity.name;
+      setState(() {
+        chosenCity = results;
+      });
     }
   }
 
   Future<void> chooseCategory() async{
     final results = await sm.getPopup(context: context, page: const EventCategoryPicker());
     if (results != null){
-      chosenCategory = results;
-      categoryController.text = chosenCategory.name;
+      setState(() {
+        chosenCategory = results;
+      });
     }
   }
 
   Future<void> choosePlace() async{
-    final results = await sm.getPopup(context: context, page: PlacePicker(creatorId: chosenCreator.uid.isNotEmpty ? chosenCreator.uid : creator.uid));
+    final results = await sm.getPopup(context: context, page: PlacePicker(creatorId: creator.uid.isNotEmpty ? creator.uid : creator.uid));
     if (results != null){
-      chosenPlace = results;
-      placeController.text = chosenPlace.name;
-      streetController.text = chosenPlace.street;
-      houseController.text = chosenPlace.house;
-      chosenCity = chosenPlace.city;
-      cityController.text = chosenCity.name;
+      setState(() {
+        chosenPlace = results;
+        streetController.text = chosenPlace.street;
+        houseController.text = chosenPlace.house;
+        chosenCity = chosenPlace.city;
+      });
     }
   }
 
@@ -331,7 +261,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     if (results != null){
       setState(() {
         chosenPriceType = results;
-        priceTypeController.text = chosenPriceType.toString(translate: true);
       });
 
     }
@@ -342,7 +271,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     if (results != null){
       setState(() {
         chosenDateType = results;
-        dateTypeController.text = chosenDateType.toString(translate: true);
       });
 
     }
@@ -354,21 +282,15 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
       setState(() {
         addressType = results;
-        addressTypeController.text = addressType.toString();
         if (addressType.addressTypeEnum == AddressTypeEnum.place){
-          placeController.text = chosenPlace.name;
           streetController.text = chosenPlace.street;
           houseController.text = chosenPlace.house;
           chosenCity = chosenPlace.city;
-          cityController.text = chosenCity.name;
         } else {
-          cityController.text = editEvent.city.name;
           chosenCity = City.empty();
-          cityController.text = 'Выбери город';
           streetController.text = editEvent.street;
           houseController.text = editEvent.house;
           chosenPlace = Place.empty();
-          placeController.text = 'Выбери заведение';
         }
       });
     }
@@ -484,17 +406,13 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                             isMobile: isMobile,
                             children: [
 
-                              ElementsOfDesign.buildTextField(
-                                  controller: categoryController,
-                                  labelText: EventsConstants.eventCategory,
+                              chosenCategory.getCategoryFieldWidget(
                                   canEdit: canEdit,
-                                  icon: FontAwesomeIcons.tag,
                                   context: context,
-                                  readOnly: true,
                                   onTap: () async {
                                     await chooseCategory();
                                   }
-                              )
+                              ),
                             ]
                         ),
 
@@ -502,44 +420,31 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                         ElementsOfDesign.buildAdaptiveRow(
                             isMobile: isMobile,
                             children: [
-                              if (canEdit) ElementsOfDesign.buildTextField(
-                                  controller: addressTypeController,
-                                  labelText: 'Где проводится',
+                              if (canEdit) addressType.getAddressTypeFieldWidget(
                                   canEdit: canEdit,
-                                  icon: FontAwesomeIcons.city,
                                   context: context,
-                                  readOnly: true,
                                   onTap: () async {
                                     await chooseAddressType();
                                   }
                               ),
 
-                              ElementsOfDesign.buildTextField(
-                                  controller: cityController,
-                                  labelText: UserConstants.city,
+                              chosenCity.getCityWidget(
                                   canEdit: canEdit && addressType.addressTypeEnum == AddressTypeEnum.address,
-                                  icon: FontAwesomeIcons.city,
                                   context: context,
-                                  readOnly: true,
                                   onTap: () async {
                                     await chooseCity();
                                   }
                               ),
 
-
-                              if (getAddressType() == AddressTypeEnum.place) ElementsOfDesign.buildTextField(
-                                  controller: placeController,
-                                  labelText: 'Название заведения',
+                              if (addressType.addressTypeEnum == AddressTypeEnum.place) chosenPlace.getPlaceWidgetField(
                                   canEdit: canEdit,
-                                  icon: FontAwesomeIcons.house,
                                   context: context,
-                                  readOnly: true,
                                   onTap: () async {
                                     await choosePlace();
                                   }
                               ),
 
-                              if (getAddressType() == AddressTypeEnum.address) ElementsOfDesign.buildTextField(
+                              if (addressType.addressTypeEnum == AddressTypeEnum.address) ElementsOfDesign.buildTextField(
                                   controller: streetController,
                                   labelText: 'Улица',
                                   canEdit: canEdit,
@@ -547,7 +452,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   context: context
                               ),
 
-                              if (getAddressType() == AddressTypeEnum.address) ElementsOfDesign.buildTextField(
+                              if (addressType.addressTypeEnum == AddressTypeEnum.address) ElementsOfDesign.buildTextField(
                                   controller: houseController,
                                   labelText: 'Номер дома',
                                   canEdit: canEdit,
@@ -563,19 +468,16 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                         ElementsOfDesign.buildAdaptiveRow(
                             isMobile: isMobile,
                             children: [
-                              ElementsOfDesign.buildTextField(
-                                  controller: priceTypeController,
-                                  labelText: 'Тип цены за билеты',
+
+                              chosenPriceType.getPriceTypeFieldWidget(
                                   canEdit: canEdit,
-                                  icon: FontAwesomeIcons.dollarSign,
                                   context: context,
-                                  readOnly: true,
                                   onTap: () async {
                                     await choosePriceType();
                                   }
                               ),
 
-                              if (getPriceType() == PriceTypeEnum.free) ElementsOfDesign.buildTextField(
+                              if (chosenPriceType.priceType == PriceTypeEnum.free) ElementsOfDesign.buildTextField(
                                   controller: freePriceController,
                                   labelText: 'Цена',
                                   canEdit: false,
@@ -583,7 +485,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   context: context
                               ),
 
-                              if (getPriceType() == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
+                              if (chosenPriceType.priceType == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
                                   controller: rangeStartPriceController,
                                   labelText: 'Минимальная цена билетов',
                                   canEdit: canEdit,
@@ -591,14 +493,14 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   context: context
                               ),
 
-                              if (getPriceType() == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
+                              if (chosenPriceType.priceType == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
                                   controller: rangeEndPriceController,
                                   labelText: 'Максимальная цена билетов',
                                   canEdit: canEdit,
                                   icon: FontAwesomeIcons.dollarSign,
                                   context: context
                               ),
-                              if (getPriceType() == PriceTypeEnum.fixed) ElementsOfDesign.buildTextField(
+                              if (chosenPriceType.priceType == PriceTypeEnum.fixed) ElementsOfDesign.buildTextField(
                                   controller: fixedPriceController,
                                   labelText: 'Цена билетов',
                                   canEdit: canEdit,
@@ -659,96 +561,120 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   icon: FontAwesomeIcons.calendar,
                                   context: context
                               ),
-                              ElementsOfDesign.buildTextField(
-                                  controller: creatorController,
-                                  labelText: EventsConstants.creatorEvent,
-                                  canEdit: canEdit && currentAdminUser.adminRole.accessToEditCreator(),
-                                  icon: FontAwesomeIcons.signature,
-                                  context: context,
-                                  readOnly: true,
+
+                              creator.getCreatorWidget(
+                                  creator: creator,
                                   onTap: () async {
                                     await chooseCreator();
-                                  }
+                                  },
+                                  canEdit: canEdit && currentAdminUser.adminRole.accessToEditCreator(),
+                                  context: context
                               )
                             ]
                         ),
 
-                        ElementsOfDesign.buildTextField(
-                            controller: dateTypeController,
-                            labelText: 'Тип дат проведения',
-                            canEdit: canEdit,
-                            icon: FontAwesomeIcons.calendar,
-                            context: context,
-                          readOnly: true,
-                          onTap: () async {
-                              await chooseDateType();
-                          }
-                        ),
-
-                        const SizedBox(height: 10,),
-
-                        if (getDateType() == DateTypeEnum.regular) schedule.getRegularEditWidget(
-                          context: context,
-                          onTapStart: (index) => pickTime(index, true),
-                          onTapEnd: (index) => pickTime(index, false),
-                          canEdit: canEdit,
-                          showSchedule: true, //showSchedule,
-                          show: (){
-                            setState(() {
-                              //showSchedule = !showSchedule;
-                            });
-                          },
-                          onClean: (index) {
-                            updateTime(index, true, null);
-                            updateTime(index, false, null);
-                          },
-                        ),
-
-                        if (getDateType() == DateTypeEnum.once) Card(
+                        Card(
+                          color: AppColors.greyBackground,
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                              padding: const EdgeInsets.all(20),
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Дата
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text("Дата:", style: TextStyle(fontSize: 16)),
-                                    Text(
-                                      onceDate.date != null
-                                          ? sm.formatDateTimeToHumanView(onceDate.date!)
-                                          : "Выбрать дату",
-                                    )
-                                  ],
-                                ),
-                                const SizedBox(height: 8),
 
-                                // Время начала
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text("Время начала:", style: TextStyle(fontSize: 16)),
-                                    Text(
-                                      onceDate.startTime != null
-                                          ? "${onceDate.startTime!.hour.toString().padLeft(2, '0')}:${onceDate.startTime!.minute.toString().padLeft(2, '0')}"
-                                          : "Выбрать время",
-                                    ),
-                                  ],
+                                chosenDateType.getDateTypeWidget(
+                                    canEdit: canEdit,
+                                    context: context,
+                                    onTap: () async {
+                                      await chooseDateType();
+                                    }
                                 ),
-                                const SizedBox(height: 8),
 
-                                // Время завершения
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    const Text("Время завершения:", style: TextStyle(fontSize: 16)),
-                                    Text(
-                                      onceDate.endTime != null
-                                          ? "${onceDate.endTime!.hour.toString().padLeft(2, '0')}:${onceDate.endTime!.minute.toString().padLeft(2, '0')}"
-                                          : "Выбрать время",
-                                    ),
-                                  ],
+                                const SizedBox(height: 20,),
+
+                                if (chosenDateType.dateType == DateTypeEnum.regular) schedule.getRegularEditWidgetTwo(
+                                    context: context,
+                                    onTapStart: (index) => pickRegularTime(index, true),
+                                    onTapEnd: (index) => pickRegularTime(index, false),
+                                    canEdit: canEdit,
+                                    onClean: (index) {
+                                      updateTime(index, true, null);
+                                      updateTime(index, false, null);
+                                    },
+                                    isMobile: isMobile
+                                ),
+
+                                const SizedBox(height: 10,),
+
+                                if (chosenDateType.dateType == DateTypeEnum.once) onceDate.getOnceDayWidget(
+                                    isMobile: isMobile,
+                                    canEdit: canEdit,
+                                    context: context,
+                                    onDateTap: () async {
+                                      await pickOnceDate();
+                                    },
+                                    onStartTimeTap: () async {
+                                      await pickOnceTime(true);
+                                    },
+                                    onEndTimeTap: () async {
+                                      await pickOnceTime(false);
+                                    }
+                                ),
+
+                                if (chosenDateType.dateType == DateTypeEnum.long) longDate.getLongDateWidget(
+                                    isMobile: isMobile,
+                                    canEdit: canEdit,
+                                    context: context,
+                                    onStartDate: () async {
+                                      await pickLongDate(isStart: true);
+                                    },
+                                    onEndDate: () async {
+                                      await pickLongDate(isStart: false);
+                                    },
+                                    onStartTime: () async {
+                                      await pickLongTime(true);
+                                    },
+                                    onEndTime: () async {
+                                      await pickLongTime(false);
+                                    }
+                                ),
+
+                                if (chosenDateType.dateType == DateTypeEnum.irregular) irregularDate.getIrregularDateWidget(
+                                    isMobile: isMobile,
+                                    canEdit: canEdit,
+                                    context: context,
+                                    onDateTap: canEdit ? (index) async{
+                                      DateTime? picked = await pickIrregularDate(date: irregularDate.dates[index].date);
+                                      if (picked != null) {
+                                        setState(() {
+                                          irregularDate.dates[index].date = picked;
+                                        });
+                                      }
+                                    } : null,
+                                    onStartTimeTap: canEdit ? (index) async{
+                                      TimeOfDay? picked = await pickIrregularTime(irregularDate.dates[index].startTime);
+                                      if (picked != null) {
+                                        setState(() {
+                                          irregularDate.dates[index].startTime = picked;
+                                        });
+                                      }
+                                    } : null,
+                                    onEndTimeTap: canEdit ? (index) async{
+                                      TimeOfDay? picked = await pickIrregularTime(irregularDate.dates[index].endTime);
+                                      if (picked != null) {
+                                        setState(() {
+                                          irregularDate.dates[index].endTime = picked;
+                                        });
+                                      }
+                                    } : null,
+                                    onRemoveDate: (index) {
+                                      setState(() {
+                                        irregularDate.dates.remove(irregularDate.dates[index]);
+                                      });
+                                    },
+                                    addDate: (){
+                                      setState(() {
+                                        irregularDate.dates.add(OnceDate(date: null, startTime: null, endTime: null));
+                                      });
+                                    }
                                 ),
                               ],
                             ),
@@ -827,7 +753,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   }
 
   /// Показ диалога выбора времени
-  Future<void> pickTime(int index, bool isStart) async {
+  Future<void> pickRegularTime(int index, bool isStart) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: schedule.getTime(index: index, isStart: true) ?? TimeOfDay.now(),
@@ -838,27 +764,183 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     }
   }
 
-  AddressTypeEnum getAddressType(){
-    if (chosenAddressType.addressTypeEnum == AddressTypeEnum.notChosen){
-      return addressType.addressTypeEnum;
+  /// Показ диалога выбора времени
+  Future<void> pickOnceTime(bool isStart) async {
+    
+    TimeOfDay initial = TimeOfDay.now();
+
+    if (isStart){
+      if (onceDate.startTime != null) {
+        initial = onceDate.startTime!;
+      }
     } else {
-      return chosenAddressType.addressTypeEnum;
+      if (onceDate.endTime != null) {
+        initial = onceDate.endTime!;
+      }
+    }
+    
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      initialEntryMode: TimePickerEntryMode.dial,
+    );
+    if (picked != null) {
+      setState(() {
+        if (isStart){
+          onceDate.startTime = picked;
+        } else {
+          onceDate.endTime = picked;
+        }
+      });
     }
   }
 
-  PriceTypeEnum getPriceType(){
-    if (chosenPriceType.priceType == PriceTypeEnum.notChosen){
-      return editEvent.priceType.priceType;
+  /// Показ диалога выбора времени
+  Future<TimeOfDay?> pickIrregularTime(TimeOfDay? time) async {
+
+    TimeOfDay initial = TimeOfDay.now();
+
+    if (time != null) {
+      initial = time;
+    }
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      initialEntryMode: TimePickerEntryMode.dial,
+    );
+    if (picked != null) {
+      return picked;
+    }
+
+    return null;
+  }
+
+  /// Показ диалога выбора времени
+  Future<void> pickLongTime(bool isStart) async {
+
+    TimeOfDay initial = TimeOfDay.now();
+
+    if (isStart){
+      if (longDate.startTime != null) {
+        initial = longDate.startTime!;
+      }
     } else {
-      return chosenPriceType.priceType;
+      if (longDate.endTime != null) {
+        initial = longDate.endTime!;
+      }
+    }
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      initialEntryMode: TimePickerEntryMode.dial,
+    );
+    if (picked != null) {
+
+      setState(() {
+        if (isStart){
+          longDate.startTime = picked;
+        } else {
+          longDate.endTime = picked;
+        }
+      });
+
+
     }
   }
 
-  DateTypeEnum getDateType(){
-    if (chosenDateType.dateType == DateTypeEnum.notChosen){
-      return editEvent.dateType.dateType;
+  Future<DateTime?> pickIrregularDate({required DateTime? date}) async{
+    DateTime firstDate = DateTime.now();
+
+    if (date != null){
+      firstDate = date;
+    }
+
+    final DateTime? pickedDate = await sm.dataPicker(
+        context: context,
+        label: 'Выбери дату проведения',
+        firstDate: firstDate,
+        lastDate: DateTime(2050),
+        currentDate: date
+    );
+
+    if (pickedDate != null){
+     return pickedDate;
+    }
+
+    return null;
+  }
+
+  Future<void> pickOnceDate() async{
+    DateTime firstDate = DateTime.now();
+
+    if (onceDate.date != null){
+      firstDate = onceDate.date!;
+    }
+
+    final DateTime? pickedDate = await sm.dataPicker(
+        context: context,
+        label: 'Выбери дату проведения',
+        firstDate: firstDate,
+        lastDate: DateTime(2050),
+        currentDate: onceDate.date
+    );
+
+    if (pickedDate != null){
+      setState(() {
+        onceDate.date = pickedDate;
+      });
+    }
+
+  }
+
+  Future<void> pickLongDate({required bool isStart}) async {
+    DateTime firstDate = DateTime.now();
+    DateTime? lastDate;
+
+    // Устанавливаем границы выбора дат в зависимости от выбранного типа (isStart)
+    if (isStart) {
+      // Дата начала
+      lastDate = longDate.endDate; // Дата завершения должна быть границей
+      if (longDate.startDate != null) {
+        firstDate = longDate.startDate!;
+      }
     } else {
-      return chosenDateType.dateType;
+      // Дата завершения
+      firstDate = longDate.startDate ?? DateTime.now(); // Дата начала должна быть границей
+    }
+
+    // Показываем пикер
+    final DateTime? pickedDate = await sm.dataPicker(
+      context: context,
+      label: isStart ? 'Выбери дату начала проведения' : 'Выбери дату завершения проведения',
+      firstDate: firstDate,
+      lastDate: lastDate ?? DateTime(2050), // Если границы нет, оставляем 2050 год
+      currentDate: isStart ? longDate.startDate : longDate.endDate,
+    );
+
+    if (pickedDate != null) {
+      // Проверяем, изменяем ли дату начала или завершения
+      if (isStart) {
+        setState(() {
+          longDate.startDate = pickedDate;
+        });
+
+        // Если новая дата начала больше текущей даты завершения, сбрасываем дату завершения
+        if (longDate.endDate != null && longDate.startDate!.isAfter(longDate.endDate!)) {
+          longDate.endDate = null;
+        }
+      } else {
+        setState(() {
+          longDate.endDate = pickedDate;
+        });
+
+        // Если новая дата завершения меньше текущей даты начала, сбрасываем дату начала
+        if (longDate.startDate != null && longDate.endDate!.isBefore(longDate.startDate!)) {
+          longDate.startDate = null;
+        }
+      }
     }
   }
 

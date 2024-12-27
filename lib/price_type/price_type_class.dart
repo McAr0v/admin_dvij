@@ -1,4 +1,8 @@
 import 'package:admin_dvij/constants/price_type_constants.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../design_elements/elements_of_design.dart';
 
 enum PriceTypeEnum {
   free,
@@ -20,6 +24,26 @@ class PriceType {
       case PriceTypeConstants.rangeId: return PriceType(priceType: PriceTypeEnum.range);
       default: return PriceType();
     }
+  }
+
+  factory PriceType.setPriceType({required PriceType priceType}){
+    return PriceType(priceType: priceType.priceType);
+  }
+
+  Widget getPriceTypeFieldWidget({
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onTap
+  }){
+    return ElementsOfDesign.buildTextField(
+        controller: TextEditingController(text: toString(translate: true)),
+        labelText: 'Тип цены за билеты',
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.dollarSign,
+        context: context,
+        readOnly: true,
+        onTap: onTap
+    );
   }
 
   @override

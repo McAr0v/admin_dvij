@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../design_elements/elements_of_design.dart';
 import '../system_methods/dates_methods.dart';
 import '../system_methods/system_methods_class.dart';
 
@@ -24,6 +26,18 @@ class LongDate {
         startTime: null,
         endTime: null
     );
+  }
+
+  factory LongDate.setLongDate({required LongDate fromDate}){
+    LongDate longDate = LongDate.empty();
+
+    longDate.startDate = fromDate.startDate;
+    longDate.endDate = fromDate.endDate;
+    longDate.startTime = fromDate.startTime;
+    longDate.endTime = fromDate.endTime;
+
+    return longDate;
+
   }
 
   factory LongDate.fromJson({required String jsonString}){
@@ -169,6 +183,73 @@ class LongDate {
 
     // Мероприятие завершилось, если текущий момент позже времени завершения.
     return now.isAfter(eventEnd);
+  }
+
+  Widget getLongDateWidget({
+    required bool isMobile,
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onStartDate,
+    required VoidCallback onEndDate,
+    required VoidCallback onStartTime,
+    required VoidCallback onEndTime,
+  }){
+
+    SystemMethodsClass sm = SystemMethodsClass();
+
+    TextEditingController startDateController = TextEditingController();
+    TextEditingController endDateController = TextEditingController();
+    TextEditingController startTimeController = TextEditingController();
+    TextEditingController endTimeController = TextEditingController();
+
+    startDateController.text = startDate != null ? sm.formatDateTimeToHumanView(startDate!) : 'Выбери дату начала';
+    endDateController.text = endDate != null ? sm.formatDateTimeToHumanView(endDate!) : 'Выбери дату завершения';
+    startTimeController.text = startTime != null ? sm.formatTimeToHumanView(startTime!) : 'Выбери время начала';
+    endTimeController.text = endTime != null ? sm.formatTimeToHumanView(endTime!) : 'Выбери время завершения';
+
+    return ElementsOfDesign.buildAdaptiveRow(
+        isMobile: isMobile,
+        children: [
+          ElementsOfDesign.buildTextField(
+              controller: startDateController,
+              labelText: 'Дата начала проведения',
+              canEdit: canEdit,
+              icon: FontAwesomeIcons.calendar,
+              context: context,
+              readOnly: true,
+              onTap: onStartDate
+          ),
+
+          ElementsOfDesign.buildTextField(
+              controller: endDateController,
+              labelText: 'Дата завершения проведения',
+              canEdit: canEdit,
+              icon: FontAwesomeIcons.calendar,
+              context: context,
+              readOnly: true,
+              onTap: onEndDate
+          ),
+
+          ElementsOfDesign.buildTextField(
+              controller: startTimeController,
+              labelText: 'Время начала',
+              canEdit: canEdit,
+              icon: FontAwesomeIcons.signature,
+              context: context,
+              readOnly: true,
+              onTap: onStartTime
+          ),
+          ElementsOfDesign.buildTextField(
+              controller: endTimeController,
+              labelText: 'Время завершения',
+              canEdit: canEdit,
+              icon: FontAwesomeIcons.signature,
+              context: context,
+              readOnly: true,
+              onTap: onEndTime
+          ),
+        ]
+    );
   }
 
 }

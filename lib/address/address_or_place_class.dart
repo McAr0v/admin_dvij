@@ -1,3 +1,8 @@
+import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../design_elements/elements_of_design.dart';
+
 enum AddressTypeEnum {
   address,
   place,
@@ -24,6 +29,26 @@ class AddressType {
       AddressType(addressTypeEnum: AddressTypeEnum.address),
       AddressType(addressTypeEnum: AddressTypeEnum.place)
     ];
+  }
+
+  Widget getAddressTypeFieldWidget({
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onTap
+  }){
+
+    TextEditingController addressTypeController = TextEditingController();
+    addressTypeController.text = toString();
+
+    return ElementsOfDesign.buildTextField(
+        controller: addressTypeController,
+        labelText: 'Где проводится',
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.city,
+        context: context,
+        readOnly: true,
+        onTap: onTap
+    );
   }
 
 }

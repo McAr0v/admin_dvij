@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../design/app_colors.dart';
+import '../design_elements/elements_of_design.dart';
 
 class OnceDate {
   DateTime? date;
@@ -16,6 +20,16 @@ class OnceDate {
 
   factory OnceDate.empty(){
     return OnceDate(date: null, startTime: null, endTime: null);
+  }
+
+  factory OnceDate.setOnceDay({required OnceDate fromDate}){
+    OnceDate onceDate = OnceDate.empty();
+
+    onceDate.date = fromDate.date;
+    onceDate.startTime = fromDate.startTime;
+    onceDate.endTime = fromDate.endTime;
+
+    return onceDate;
   }
 
   factory OnceDate.fromJson({required String jsonString}){
@@ -181,6 +195,83 @@ class OnceDate {
       date!.day,
       endTime!.hour,
       endTime!.minute,
+    );
+  }
+
+  Widget getOnceDayWidget({
+    required bool isMobile,
+    required bool canEdit,
+    bool isIrregular = false,
+    required BuildContext context,
+    required VoidCallback onDateTap,
+    required VoidCallback onStartTimeTap,
+    required VoidCallback onEndTimeTap,
+    VoidCallback? onRemoveDate,
+  }){
+
+    SystemMethodsClass sm = SystemMethodsClass();
+
+    TextEditingController dateController = TextEditingController();
+    TextEditingController startTimeController = TextEditingController();
+    TextEditingController endTimeController = TextEditingController();
+
+    dateController.text = date != null ? sm.formatDateTimeToHumanView(date!) : 'Выбери дату';
+    startTimeController.text = startTime != null ? sm.formatTimeToHumanView(startTime!) : 'Выбери время начала';
+    endTimeController.text = endTime != null ? sm.formatTimeToHumanView(endTime!) : 'Выбери время завершения';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: ElementsOfDesign.buildAdaptiveRow(
+          isMobile: isMobile,
+          children: [
+            Row(
+              children: [
+
+                if (isIrregular && canEdit && !isMobile) ElementsOfDesign.cleanButton(onClean: onRemoveDate ?? (){}),
+
+                if (isIrregular && canEdit && !isMobile) const SizedBox(width: 10,),
+
+                Expanded(
+                  child: ElementsOfDesign.buildTextField(
+                      controller: dateController,
+                      labelText: 'Дата проведения',
+                      canEdit: canEdit,
+                      icon: FontAwesomeIcons.calendar,
+                      context: context,
+                      readOnly: true,
+                      onTap: onDateTap
+                  ),
+                ),
+
+                if (isIrregular && canEdit && isMobile) const SizedBox(width: 10,),
+
+                if (isIrregular && canEdit && isMobile) ElementsOfDesign.cleanButton(onClean: onRemoveDate ?? (){}),
+
+              ],
+            ),
+            ElementsOfDesign.buildTextField(
+                controller: startTimeController,
+                labelText: 'Время начала',
+                canEdit: canEdit,
+                icon: FontAwesomeIcons.signature,
+                context: context,
+                readOnly: true,
+                onTap: onStartTimeTap
+            ),
+            ElementsOfDesign.buildTextField(
+                controller: endTimeController,
+                labelText: 'Время завершения',
+                canEdit: canEdit,
+                icon: FontAwesomeIcons.signature,
+                context: context,
+                readOnly: true,
+                onTap: onEndTimeTap
+            ),
+
+
+
+          ]
+      ),
     );
   }
 

@@ -153,6 +153,25 @@ class Place implements IEntity{
     );
   }
 
+  Widget getPlaceWidgetField({
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onTap
+  }){
+    TextEditingController placeController = TextEditingController();
+    placeController.text = id.isNotEmpty ? name : 'Выбери заведение';
+
+    return ElementsOfDesign.buildTextField(
+        controller: placeController,
+        labelText: 'Название заведения',
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.house,
+        context: context,
+        readOnly: true,
+        onTap: onTap
+    );
+  }
+
   @override
   Future<String> deleteFromDb()async {
 

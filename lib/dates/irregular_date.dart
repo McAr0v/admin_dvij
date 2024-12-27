@@ -1,4 +1,6 @@
 import 'package:admin_dvij/dates/once_date.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
+import 'package:flutter/cupertino.dart';
 
 class IrregularDate {
   List<OnceDate> dates;
@@ -7,6 +9,19 @@ class IrregularDate {
 
   factory IrregularDate.empty(){
     return IrregularDate(dates: []);
+  }
+
+  factory IrregularDate.setIrregularDates({required IrregularDate fromDate}){
+
+    IrregularDate irregularDate = IrregularDate.empty();
+
+    for(OnceDate date in fromDate.dates){
+      irregularDate.dates.add(
+          OnceDate.setOnceDay(fromDate: date)
+      );
+    }
+
+    return irregularDate;
   }
 
   /// Метод для преобразования JSON-строки в объект IrregularDate
@@ -105,6 +120,39 @@ class IrregularDate {
       // Сравниваем по времени начала
       return a.startDateTime.compareTo(b.startDateTime);
     });
+  }
+
+  Widget getIrregularDateWidget({
+    required bool isMobile,
+    required bool canEdit,
+    required BuildContext context,
+    required void Function(int index)? onDateTap,
+    required void Function(int index)? onStartTimeTap,
+    required void Function(int index)? onEndTimeTap,
+    required void Function(int index)? onRemoveDate,
+    required VoidCallback addDate
+  }){
+    return Column(
+      children: [
+        for (int i = 0; i < dates.length; i++) dates[i].getOnceDayWidget(
+            isMobile: isMobile,
+            canEdit: canEdit,
+            context: context,
+            onDateTap: () => onDateTap != null ? onDateTap(i) : null,
+            onStartTimeTap: () => onStartTimeTap != null ? onStartTimeTap(i) : null,
+            onEndTimeTap: () => onEndTimeTap != null ? onEndTimeTap(i) : null,
+            isIrregular: true,
+            onRemoveDate: () => onRemoveDate != null ? onRemoveDate(i) : null,
+        ),
+
+        if (canEdit) ElementsOfDesign.customButton(
+            method: addDate,
+            textOnButton: 'Добавить дату',
+            context: context
+        )
+
+      ],
+    );
   }
 
 

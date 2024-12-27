@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:admin_dvij/constants/regular_date_constants.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../design/app_colors.dart';
@@ -72,6 +73,27 @@ class RegularDate {
       sundayStart: parseTime(jsonData[RegularDateConstants.startTime7Id]),
       sundayEnd: parseTime(jsonData[RegularDateConstants.endTime7Id]),
     );
+  }
+
+  factory RegularDate.setSchedule({required RegularDate fromDate}){
+    RegularDate schedule = RegularDate();
+
+    schedule.mondayStart = fromDate.mondayStart;
+    schedule.mondayEnd = fromDate.mondayEnd;
+    schedule.tuesdayStart = fromDate.tuesdayStart;
+    schedule.tuesdayEnd = fromDate.tuesdayEnd;
+    schedule.wednesdayStart = fromDate.wednesdayStart;
+    schedule.wednesdayEnd = fromDate.wednesdayEnd;
+    schedule.thursdayStart = fromDate.thursdayStart;
+    schedule.thursdayEnd = fromDate.thursdayEnd;
+    schedule.fridayStart = fromDate.fridayStart;
+    schedule.fridayEnd = fromDate.fridayEnd;
+    schedule.saturdayStart = fromDate.saturdayStart;
+    schedule.saturdayEnd = fromDate.saturdayEnd;
+    schedule.sundayStart = fromDate.sundayStart;
+    schedule.sundayEnd = fromDate.sundayEnd;
+
+    return schedule;
   }
 
   /// Метод для преобразования в строку JSON
@@ -265,6 +287,97 @@ class RegularDate {
           ),
         ],
       ),
+    );
+  }
+
+  /// Виджет дня недели в форме поле ввода
+  Widget getDayNameWidget({required int index, required BuildContext context} ){
+    return Expanded(
+      child: ElementsOfDesign.buildTextFieldWithoutController(
+          controllerText: _days[index],
+          labelText: 'День недели',
+          canEdit: false,
+          icon: FontAwesomeIcons.calendarDay,
+          context: context,
+          readOnly: true
+      ),
+    );
+  }
+
+
+
+  Widget getRegularEditWidgetTwo({
+    required BuildContext context,
+    required Function(int index) onTapStart,
+    required Function(int index) onTapEnd,
+    required Function(int index) onClean,
+    required bool canEdit,
+    required bool isMobile
+  }){
+
+    return Column(
+      children: [
+        for (int i =0 ; i<_days.length; i++) Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0),
+          child: ElementsOfDesign.buildAdaptiveRow(
+              isMobile: isMobile,
+              children: [
+
+                // Разный порядок элементов
+                // На мобиле - сначала название дня, потом кнопка очистить
+                // На декстопе - сначала кнопка очистить, потом название дня
+                Row(
+                  children: isMobile ?
+                  [
+                    getDayNameWidget(index: i, context: context),
+                    if (canEdit) const SizedBox(width: 10,),
+                    if (canEdit) ElementsOfDesign.cleanButton(
+                        onClean: () => onClean(i)
+                    )
+                  ] :
+
+                  [
+                    if (canEdit) ElementsOfDesign.cleanButton(
+                        onClean: () => onClean(i)
+                    ),
+                    if (canEdit) const SizedBox(width: 10,),
+                    getDayNameWidget(index: i, context: context),
+                  ],
+                ),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElementsOfDesign.buildTextFieldWithoutController(
+                          controllerText: getTime(index: i, isStart: true)?.format(context) ?? RegularDateConstants.notChosen,
+                          labelText: 'Время начала',
+                          canEdit: canEdit,
+                          icon: FontAwesomeIcons.clock,
+                          context: context,
+                          readOnly: true,
+                          onTap: canEdit ? () => onTapStart(i) : (){}
+                      ),
+                    ),
+
+                    SizedBox(width: isMobile ? 10 : 20,),
+
+                    Expanded(
+                      child: ElementsOfDesign.buildTextFieldWithoutController(
+                          controllerText: getTime(index: i, isStart: false)?.format(context) ?? RegularDateConstants.notChosen,
+                          labelText: 'Время завершения',
+                          canEdit: canEdit,
+                          icon: FontAwesomeIcons.clock,
+                          context: context,
+                          readOnly: true,
+                          onTap: canEdit ? () => onTapEnd(i) : (){}
+                      ),
+                    ),
+                  ],
+                )
+              ]
+          ),
+        )
+      ]
     );
   }
 

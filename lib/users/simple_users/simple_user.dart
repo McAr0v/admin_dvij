@@ -15,6 +15,7 @@ import '../../cities/cities_list_class.dart';
 import '../../cities/city_class.dart';
 import '../../constants/admins_constants.dart';
 import '../../constants/database_constants.dart';
+import '../../constants/events_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 import '../../database/image_uploader.dart';
@@ -77,6 +78,47 @@ class SimpleUser extends IEntity{
         placesList: [],
         myEvents: []
 
+    );
+  }
+
+  factory SimpleUser.setCreator({required SimpleUser creator}){
+    return SimpleUser(
+        uid: creator.uid,
+        email: creator.email,
+        name: creator.name,
+        lastName: creator.lastName,
+        phone: creator.phone,
+        whatsapp: creator.whatsapp,
+        telegram: creator.telegram,
+        instagram: creator.instagram,
+        city: creator.city,
+        birthDate: creator.birthDate,
+        gender: creator.gender,
+        avatar: creator.avatar,
+        registrationDate: creator.registrationDate,
+        placesList: creator.placesList
+    );
+  }
+
+  Widget getCreatorWidget({
+    required SimpleUser creator,
+    required VoidCallback onTap,
+    required bool canEdit,
+    required BuildContext context
+
+
+  }){
+    TextEditingController creatorController = TextEditingController();
+    creatorController.text = creator.getFullName().isNotEmpty ? creator.getFullName() : EventsConstants.chooseCreator;
+
+    return ElementsOfDesign.buildTextField(
+        controller: creatorController,
+        labelText: EventsConstants.creatorEvent,
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.signature,
+        context: context,
+        readOnly: true,
+        onTap: onTap
     );
   }
 

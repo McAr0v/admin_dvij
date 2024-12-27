@@ -319,6 +319,34 @@ class ElementsOfDesign {
     );
   }
 
+  static Widget buildTextFieldWithoutController({
+    required String controllerText,
+    required String labelText,
+    required bool canEdit,
+    required IconData icon,
+    required BuildContext context,
+    int? maxLines = 1,
+    VoidCallback? onTap,
+    bool readOnly = false,
+  }) {
+
+    TextEditingController controller = TextEditingController();
+    controller.text = controllerText;
+
+    return TextField(
+      style: Theme.of(context).textTheme.bodyMedium,
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        prefixIcon: Icon(icon, size: 18,),
+      ),
+      enabled: canEdit,
+      readOnly: readOnly,
+      onTap: onTap,
+      maxLines: maxLines,
+    );
+  }
+
   static Widget getTag({
     required BuildContext context,
     Color color = AppColors.brandColor,
@@ -338,6 +366,21 @@ class ElementsOfDesign {
               Text(text, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: textColor),),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  static Widget cleanButton ({required VoidCallback onClean}) {
+
+    return IconButton(
+      onPressed: onClean,
+      icon: const Icon(FontAwesomeIcons.x, size: 15, color: AppColors.attentionRed,),
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) {
+            return AppColors.greyBackground;
+          },
         ),
       ),
     );

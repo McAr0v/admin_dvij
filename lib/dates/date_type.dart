@@ -1,4 +1,8 @@
 import 'package:admin_dvij/constants/date_type_constants.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../design_elements/elements_of_design.dart';
 
 enum DateTypeEnum {
   once,
@@ -22,6 +26,30 @@ class DateType {
       case DateTypeConstants.irregularId: return DateType(dateType: DateTypeEnum.irregular);
       default: return DateType(dateType: DateTypeEnum.notChosen);
     }
+  }
+
+  factory DateType.setDateType({required DateType dateType}){
+    return DateType(dateType: dateType.dateType);
+  }
+
+  Widget getDateTypeWidget({
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onTap
+  }){
+
+    TextEditingController dateTypeController = TextEditingController();
+    dateTypeController.text = toString(translate: true);
+
+    return ElementsOfDesign.buildTextField(
+        controller: dateTypeController,
+        labelText: 'Тип дат проведения',
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.calendar,
+        context: context,
+        readOnly: true,
+        onTap: onTap
+    );
   }
 
   @override

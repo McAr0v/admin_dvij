@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../constants/database_constants.dart';
+import '../../constants/events_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 import '../../design/app_colors.dart';
@@ -34,6 +35,30 @@ class EventCategory implements IEntity {
 
   factory EventCategory.empty(){
     return EventCategory(id: '', name: '');
+  }
+
+  factory EventCategory.setCategory({required EventCategory category}){
+    return EventCategory(id: category.id, name: category.name);
+  }
+
+  Widget getCategoryFieldWidget({
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onTap
+  }){
+
+    TextEditingController categoryController = TextEditingController();
+    categoryController.text = name.isNotEmpty ? name : EventsConstants.chooseCategory;
+
+    return ElementsOfDesign.buildTextField(
+        controller: categoryController,
+        labelText: EventsConstants.eventCategory,
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.tag,
+        context: context,
+        readOnly: true,
+        onTap: onTap
+    );
   }
 
   @override
