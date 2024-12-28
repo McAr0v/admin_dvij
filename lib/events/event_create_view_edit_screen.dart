@@ -477,13 +477,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                   }
                               ),
 
-                              if (chosenPriceType.priceType == PriceTypeEnum.free) ElementsOfDesign.buildTextField(
-                                  controller: freePriceController,
-                                  labelText: 'Цена',
-                                  canEdit: false,
-                                  icon: FontAwesomeIcons.dollarSign,
-                                  context: context
-                              ),
+                              if (chosenPriceType.priceType == PriceTypeEnum.free) chosenPriceType.getFreePriceWidget(context: context),
 
                               if (chosenPriceType.priceType == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
                                   controller: rangeStartPriceController,
@@ -609,13 +603,13 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                     canEdit: canEdit,
                                     context: context,
                                     onDateTap: () async {
-                                      await pickOnceDate();
+                                      await pickOnceLongDate(isStart: true, isOnce: true);
                                     },
                                     onStartTimeTap: () async {
-                                      await pickOnceTime(true);
+                                      await pickOnceLongTime(isOnce: true, isStart:  true);
                                     },
                                     onEndTimeTap: () async {
-                                      await pickOnceTime(false);
+                                      await pickOnceLongTime(isOnce: true, isStart:  false);
                                     }
                                 ),
 
@@ -624,16 +618,16 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                     canEdit: canEdit,
                                     context: context,
                                     onStartDate: () async {
-                                      await pickLongDate(isStart: true);
+                                      await pickOnceLongDate(isStart: true, isOnce: false);
                                     },
                                     onEndDate: () async {
-                                      await pickLongDate(isStart: false);
+                                      await pickOnceLongDate(isStart: false, isOnce: false);
                                     },
                                     onStartTime: () async {
-                                      await pickLongTime(true);
+                                      await pickOnceLongTime(isOnce: false, isStart:  true);
                                     },
                                     onEndTime: () async {
-                                      await pickLongTime(false);
+                                      await pickOnceLongTime(isOnce: false, isStart:  false);
                                     }
                                 ),
 
@@ -765,17 +759,43 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
   }
 
   /// Показ диалога выбора времени
-  Future<void> pickOnceTime(bool isStart) async {
+  Future<void> pickOnceLongTime({
+    required bool isStart,
+    required bool isOnce
+  }) async {
     
     TimeOfDay initial = TimeOfDay.now();
 
+    // Устанавливаем initial
+    // Если это начальная дата
     if (isStart){
-      if (onceDate.startTime != null) {
-        initial = onceDate.startTime!;
+      // Если одиночная дата
+      if (isOnce){
+        if (onceDate.startTime != null) {
+          initial = onceDate.startTime!;
+        }
       }
-    } else {
-      if (onceDate.endTime != null) {
-        initial = onceDate.endTime!;
+      // Если долгая дата
+      else {
+        if (longDate.startTime != null) {
+          initial = longDate.startTime!;
+        }
+      }
+
+    }
+    // Если это конечная дата
+    else {
+      // Если одиночная дата
+      if (isOnce){
+        if (onceDate.endTime != null) {
+          initial = onceDate.endTime!;
+        }
+      }
+      // Если долгая дата
+      else {
+        if (longDate.endTime != null) {
+          initial = longDate.endTime!;
+        }
       }
     }
     
@@ -787,9 +807,17 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     if (picked != null) {
       setState(() {
         if (isStart){
-          onceDate.startTime = picked;
+          if (isOnce){
+            onceDate.startTime = picked;
+          } else {
+            longDate.startTime = picked;
+          }
         } else {
-          onceDate.endTime = picked;
+          if (isOnce) {
+            onceDate.endTime = picked;
+          } else {
+            longDate.endTime = picked;
+          }
         }
       });
     }
@@ -816,40 +844,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     return null;
   }
 
-  /// Показ диалога выбора времени
-  Future<void> pickLongTime(bool isStart) async {
-
-    TimeOfDay initial = TimeOfDay.now();
-
-    if (isStart){
-      if (longDate.startTime != null) {
-        initial = longDate.startTime!;
-      }
-    } else {
-      if (longDate.endTime != null) {
-        initial = longDate.endTime!;
-      }
-    }
-
-    final TimeOfDay? picked = await showTimePicker(
-      context: context,
-      initialTime: initial,
-      initialEntryMode: TimePickerEntryMode.dial,
-    );
-    if (picked != null) {
-
-      setState(() {
-        if (isStart){
-          longDate.startTime = picked;
-        } else {
-          longDate.endTime = picked;
-        }
-      });
-
-
-    }
-  }
-
   Future<DateTime?> pickIrregularDate({required DateTime? date}) async{
     DateTime firstDate = DateTime.now();
 
@@ -872,76 +866,52 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     return null;
   }
 
-  Future<void> pickOnceDate() async{
+  Future<void> pickOnceLongDate({required isOnce, required bool isStart}) async{
     DateTime firstDate = DateTime.now();
+    DateTime? lastDate;
 
-    if (onceDate.date != null){
-      firstDate = onceDate.date!;
+    DateTime currentDate = DateTime.now();
+
+    if (isOnce){
+      if (onceDate.date != null){
+        firstDate = onceDate.date!;
+        currentDate = onceDate.date!;
+      }
+    } else {
+      // Устанавливаем границы выбора дат в зависимости от выбранного типа (isStart)
+      if (isStart) {
+        currentDate = longDate.startDate ?? DateTime.now();
+        lastDate = longDate.endDate ?? DateTime(2050); // Дата завершения должна быть границей
+      } else {
+        currentDate = longDate.endDate ?? longDate.startDate ?? DateTime.now();
+        firstDate = longDate.startDate ?? DateTime.now(); // Дата начала должна быть границей
+        lastDate = DateTime(2050);
+      }
     }
 
     final DateTime? pickedDate = await sm.dataPicker(
         context: context,
         label: 'Выбери дату проведения',
         firstDate: firstDate,
-        lastDate: DateTime(2050),
-        currentDate: onceDate.date
+        lastDate: lastDate ?? DateTime(2050),
+        currentDate: currentDate
     );
 
     if (pickedDate != null){
       setState(() {
-        onceDate.date = pickedDate;
+        if (isOnce){
+          onceDate.date = pickedDate;
+        } else {
+          if (isStart) {
+            longDate.startDate = pickedDate;
+          } else {
+            longDate.endDate = pickedDate;
+          }
+        }
+
       });
     }
 
-  }
-
-  Future<void> pickLongDate({required bool isStart}) async {
-    DateTime firstDate = DateTime.now();
-    DateTime? lastDate;
-
-    // Устанавливаем границы выбора дат в зависимости от выбранного типа (isStart)
-    if (isStart) {
-      // Дата начала
-      lastDate = longDate.endDate; // Дата завершения должна быть границей
-      if (longDate.startDate != null) {
-        firstDate = longDate.startDate!;
-      }
-    } else {
-      // Дата завершения
-      firstDate = longDate.startDate ?? DateTime.now(); // Дата начала должна быть границей
-    }
-
-    // Показываем пикер
-    final DateTime? pickedDate = await sm.dataPicker(
-      context: context,
-      label: isStart ? 'Выбери дату начала проведения' : 'Выбери дату завершения проведения',
-      firstDate: firstDate,
-      lastDate: lastDate ?? DateTime(2050), // Если границы нет, оставляем 2050 год
-      currentDate: isStart ? longDate.startDate : longDate.endDate,
-    );
-
-    if (pickedDate != null) {
-      // Проверяем, изменяем ли дату начала или завершения
-      if (isStart) {
-        setState(() {
-          longDate.startDate = pickedDate;
-        });
-
-        // Если новая дата начала больше текущей даты завершения, сбрасываем дату завершения
-        if (longDate.endDate != null && longDate.startDate!.isAfter(longDate.endDate!)) {
-          longDate.endDate = null;
-        }
-      } else {
-        setState(() {
-          longDate.endDate = pickedDate;
-        });
-
-        // Если новая дата завершения меньше текущей даты начала, сбрасываем дату начала
-        if (longDate.startDate != null && longDate.endDate!.isBefore(longDate.startDate!)) {
-          longDate.startDate = null;
-        }
-      }
-    }
   }
 
 }

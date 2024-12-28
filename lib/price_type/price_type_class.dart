@@ -30,6 +30,16 @@ class PriceType {
     return PriceType(priceType: priceType.priceType);
   }
 
+  Widget getFreePriceWidget({required BuildContext context}){
+    return ElementsOfDesign.buildTextField(
+        controller: TextEditingController(text: 'Бесплатно'),
+        labelText: 'Цена',
+        canEdit: false,
+        icon: FontAwesomeIcons.dollarSign,
+        context: context
+    );
+  }
+
   Widget getPriceTypeFieldWidget({
     required bool canEdit,
     required BuildContext context,
