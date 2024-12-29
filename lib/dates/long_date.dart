@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../constants/system_constants.dart';
 import '../design_elements/elements_of_design.dart';
 import '../system_methods/dates_methods.dart';
 import '../system_methods/system_methods_class.dart';
@@ -60,6 +61,20 @@ class LongDate {
       );
     } else {
       return LongDate.empty();
+    }
+  }
+
+  String checkDate(){
+    if (startDate == null){
+      return 'Дата начала не выбрана';
+    } else if (endDate == null){
+      return 'Дата завершения не выбрана';
+    } else if (startTime == null){
+      return 'Не выбрано время начала';
+    } else if (endTime == null){
+      return 'Не выбрано время завершения';
+    } else {
+      return SystemConstants.successConst;
     }
   }
 

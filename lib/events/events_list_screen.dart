@@ -73,19 +73,8 @@ class _EventsListScreenState extends State<EventsListScreen> {
                       tempEvent.getEventsTimeWidget(context: context)
                     ],
                   ),
-
-
-
-                  /*Row(
-                                  children: [
-
-                                    tempEvent.getEventsCounter(context: context),
-                                    tempEvent.getPromosCounter(context: context)
-                                  ]
-                              )*/
                 ],
               ),
-              //leftTopTag: tempEvent.category.getCategoryWidget(context: context)
             );
 
           }

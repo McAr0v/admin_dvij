@@ -115,6 +115,10 @@ class EventClass implements IEntity{
     EventCategoriesList eventCategoriesList = EventCategoriesList();
     CitiesList citiesList = CitiesList();
 
+    IrregularDate irregularDate = IrregularDate.fromJson(json: infoFolder.child('irregularDays').value.toString());
+
+    irregularDate.sortDates();
+
     return EventClass(
         id: infoFolder.child(DatabaseConstants.id).value.toString(),
         dateType: DateType.fromString(enumString: infoFolder.child('eventType').value.toString()),
@@ -137,7 +141,7 @@ class EventClass implements IEntity{
         onceDay: OnceDate.fromJson(jsonString: infoFolder.child('onceDay').value.toString()),
         longDays: LongDate.fromJson(jsonString: infoFolder.child('longDays').value.toString()),
         regularDays: RegularDate.fromJson(infoFolder.child('regularDays').value.toString()),
-        irregularDays: IrregularDate.fromJson(json: infoFolder.child('irregularDays').value.toString()),
+        irregularDays: irregularDate,
         favUsersIds: methodsForDatabase.getStringFromKeyFromSnapshot(snapshot: favFolder, key: DatabaseConstants.userId),
     );
   }
@@ -150,6 +154,10 @@ class EventClass implements IEntity{
     MethodsForDatabase methodsForDatabase = MethodsForDatabase();
     EventCategoriesList eventCategoriesList = EventCategoriesList();
     CitiesList citiesList = CitiesList();
+
+    IrregularDate irregularDate = IrregularDate.fromJson(json: infoFolder['irregularDays'] ?? '');
+
+    irregularDate.sortDates();
 
     return EventClass(
         id: infoFolder[DatabaseConstants.id] ?? '',
@@ -173,7 +181,7 @@ class EventClass implements IEntity{
         onceDay: OnceDate.fromJson(jsonString: infoFolder['onceDay'] ?? ''),
         longDays: LongDate.fromJson(jsonString: infoFolder['longDays'] ?? ''),
         regularDays: RegularDate.fromJson(infoFolder['regularDays'] ?? ''),
-        irregularDays: IrregularDate.fromJson(json: infoFolder['irregularDays'] ?? ''),
+        irregularDays: irregularDate,
         favUsersIds: favFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: favFolder, inputKey: DatabaseConstants.userId) : []
     );
   }

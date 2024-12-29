@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +69,18 @@ class OnceDate {
       return jsonEncode(json);
     } else {
       return '';
+    }
+  }
+
+  String checkDate(){
+    if (date == null){
+      return 'Дата не выбрана';
+    } else if (startTime == null){
+      return 'Не выбрано время начала';
+    } else if (endTime == null){
+      return 'Не выбрано время завершения';
+    } else {
+      return SystemConstants.successConst;
     }
   }
 

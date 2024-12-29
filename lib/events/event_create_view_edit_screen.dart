@@ -74,8 +74,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
   AddressType addressType = AddressType();
 
-  AddressType chosenAddressType = AddressType();
-
   DateType chosenDateType = DateType();
 
   OnceDate onceDate = OnceDate.empty();
@@ -119,10 +117,8 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     currentAdminUser = await currentAdminUser.getCurrentUser(fromDb: false);
 
     // Подгружаем список заведений и список пользователей
-    if (fromDb){
-      await placesList.getDownloadedList(fromDb: fromDb);
-      await usersList.getDownloadedList(fromDb: fromDb);
-    }
+    await placesList.getDownloadedList(fromDb: fromDb);
+    await usersList.getDownloadedList(fromDb: fromDb);
 
     // Если это создание, то устанавливаем режим редактирования и показ расписания сразу
     if (widget.event == null){
@@ -287,7 +283,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
           houseController.text = chosenPlace.house;
           chosenCity = chosenPlace.city;
         } else {
-          chosenCity = City.empty();
+          chosenCity = editEvent.city;
           streetController.text = editEvent.street;
           houseController.text = editEvent.house;
           chosenPlace = Place.empty();
@@ -339,8 +335,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
           if (currentAdminUser.adminRole.accessToDeleteEvents() && widget.event != null) IconButton(
             onPressed: () async {
-              // TODO Сделать удаление
-              //await deletePlace();
+              await deleteEvent();
             },
             icon: const Icon(FontAwesomeIcons.trash, size: 15, color: AppColors.white,),
           ),
@@ -684,8 +679,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                             children: [
                               ElementsOfDesign.customButton(
                                   method: () async {
-                                    //await savePlace();
-
+                                    await saveEvent();
                                   },
                                   textOnButton: ButtonsConstants.save,
                                   context: context
@@ -705,7 +699,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                               ),
                             ]
                         ),
-
                       ],
                     ),
                   ),
@@ -715,6 +708,238 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
       ),
 
     );
+  }
+
+  Future<void> deleteEvent () async {
+
+    bool? result = await ElementsOfDesign.exitDialog(
+        context,
+        'Если удалите мероприятие, данные будет невозможно восстановить',
+        ButtonsConstants.delete,
+        ButtonsConstants.cancel,
+        'Удалить мероприятие?'
+    );
+
+    if (result != null && result){
+      setState(() {
+        deleting = true;
+      });
+
+      String publishResult = await editEvent.deleteFromDb();
+
+      if (publishResult == SystemConstants.successConst){
+
+        _showSnackBar('Мероприятие успешно удалено');
+        navigateToEventsListScreen();
+
+      } else {
+        _showSnackBar(publishResult);
+      }
+
+      setState(() {
+        saving = false;
+      });
+    }
+
+  }
+
+  Future<void> saveEvent() async{
+    setState(() {
+      saving = true;
+    });
+
+    EventClass tempEvent = setEventBeforeSaving();
+
+
+    if (checkEvent(tempEvent) == SystemConstants.successConst){
+
+      String publishResult = await tempEvent.publishToDb(_imageFile);
+
+      if (publishResult == SystemConstants.successConst) {
+
+        // Если поменяли создателя
+        if (creator.uid != editEvent.creatorId){
+          // Подгружаем старого создателя
+          SimpleUser previousCreator = usersList.getEntityFromList(editEvent.creatorId);
+
+          // Если прогрузился
+          if (previousCreator.uid.isNotEmpty){
+            // Удаляем запись об этом мероприятии
+            await previousCreator.deleteEventFromMyEvents(eventId: editEvent.id);
+          }
+        }
+
+        // Если есть выбранное место
+        if (chosenPlace.id.isNotEmpty){
+          // Если выбрали другое место проведения
+          if (chosenPlace.id != editEvent.placeId){
+            // Подгружаем место
+            Place previousPlace = placesList.getEntityFromList(editEvent.placeId);
+
+            // Если место прогрузилось
+            if (previousPlace.id.isNotEmpty){
+              // Удаляем мероприятие из заведения
+              await previousPlace.deleteEventFromPlace(eventId: editEvent.id);
+            }
+          }
+        }
+
+        await initialization();
+
+
+
+        _showSnackBar('Мероприятие успешно сохранено');
+
+        canEdit = false;
+        setTextFieldsOnDefault();
+
+        if (widget.event == null){
+          navigateToEventsListScreen();
+        }
+
+      } else {
+        _showSnackBar(publishResult);
+      }
+    } else {
+      _showSnackBar(checkEvent(tempEvent));
+    }
+
+    setState(() {
+      saving = false;
+    });
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  String checkEvent(EventClass tempEvent){
+
+    if (tempEvent.dateType.dateType == DateTypeEnum.notChosen){
+      return 'Не выбран тип даты';
+    }
+
+    if (tempEvent.headline.isEmpty){
+      return 'Нет названия мероприятия';
+    }
+    if (tempEvent.desc.isEmpty){
+      return 'Нет описания мероприятия';
+    }
+    if (tempEvent.creatorId.isEmpty){
+      return 'Не выбран создатель';
+    }
+
+    if (tempEvent.city.id.isEmpty){
+      return 'Не выбран город';
+    }
+    if (tempEvent.category.id.isEmpty){
+      return 'Не выбрана категория';
+    }
+    if (tempEvent.street.isEmpty){
+      return 'Не указана улица';
+    }
+
+    if (tempEvent.house.isEmpty){
+      return 'Не указан номер дома';
+    }
+
+    if (tempEvent.phone.isEmpty){
+      return 'Нет контактного телефона';
+    }
+
+    if (addressType.addressTypeEnum == AddressTypeEnum.place){
+      if (tempEvent.placeId.isEmpty){
+        return 'Не выбрано заведение';
+      }
+    } else if (addressType.addressTypeEnum == AddressTypeEnum.notChosen){
+      return 'Не выбран тип адреса - в заведении или по адресу';
+    }
+
+    if (tempEvent.priceType.priceType == PriceTypeEnum.notChosen){
+      return 'Не выбран тип цены билетов';
+    } else if (tempEvent.priceType.priceType == PriceTypeEnum.fixed){
+      if (fixedPriceController.text.isEmpty){
+        return 'Не указана цена билетов';
+      }
+    } else if (tempEvent.priceType.priceType == PriceTypeEnum.range){
+      if (rangeStartPriceController.text.isEmpty){
+        return 'Не указана начальная цена билетов';
+      } else if (rangeEndPriceController.text.isEmpty){
+        return 'Не указана конечная цена билетов';
+      }
+    }
+
+    if (tempEvent.dateType.dateType == DateTypeEnum.notChosen){
+      return 'Не указан тип дат проведения';
+    } else if (tempEvent.dateType.dateType == DateTypeEnum.once){
+      if (tempEvent.onceDay.checkDate() != SystemConstants.successConst){
+        return tempEvent.onceDay.checkDate();
+      }
+    } else if (tempEvent.dateType.dateType == DateTypeEnum.long){
+      if (tempEvent.longDays.checkDate() != SystemConstants.successConst){
+        return tempEvent.longDays.checkDate();
+      }
+    } else if (tempEvent.dateType.dateType == DateTypeEnum.regular){
+      if (!schedule.checkRegularDate()){
+        return 'В расписании нет ни одного выбранного дня';
+      }
+    } else if (tempEvent.dateType.dateType == DateTypeEnum.irregular){
+      if (tempEvent.irregularDays.checkDate() != SystemConstants.successConst){
+        return tempEvent.irregularDays.checkDate();
+      }
+    }
+
+    return SystemConstants.successConst;
+
+  }
+
+  EventClass setEventBeforeSaving(){
+
+    EventClass tempEvent = EventClass.empty();
+
+    tempEvent.id = editEvent.id;
+
+    tempEvent.dateType = chosenDateType;
+
+    if (chosenDateType.dateType == DateTypeEnum.once){
+      tempEvent.onceDay = onceDate;
+    } else if (chosenDateType.dateType == DateTypeEnum.long){
+      tempEvent.longDays = longDate;
+    } else if (chosenDateType.dateType == DateTypeEnum.regular){
+      tempEvent.regularDays = schedule;
+    } else if (chosenDateType.dateType == DateTypeEnum.irregular){
+      tempEvent.irregularDays = irregularDate;
+    }
+
+    tempEvent.headline = headlineController.text;
+    tempEvent.desc = descController.text;
+    tempEvent.creatorId = creator.uid;
+    tempEvent.createDate = editEvent.createDate;
+    tempEvent.category = chosenCategory;
+    tempEvent.city = chosenCity;
+    tempEvent.street = streetController.text;
+    tempEvent.house = houseController.text;
+    tempEvent.phone = phoneController.text;
+    tempEvent.whatsapp = whatsappController.text;
+    tempEvent.instagram = instagramController.text;
+    tempEvent.telegram = telegramController.text;
+    tempEvent.imageUrl = editEvent.imageUrl;
+    tempEvent.placeId = chosenPlace.id;
+    tempEvent.priceType = chosenPriceType;
+
+    tempEvent.price = chosenPriceType.getPriceStringForDb(
+        fixedPrice: fixedPriceController.text,
+        startPrice: rangeStartPriceController.text,
+        endPrice: rangeEndPriceController.text
+    );
+
+    return tempEvent;
+
   }
 
   /// Обновляем время
@@ -911,7 +1136,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
       });
     }
-
   }
 
 }

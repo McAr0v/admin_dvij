@@ -57,7 +57,8 @@ class _EventsPageState extends State<EventsPage> {
         filterCategory: filterCategory,
         filterInPlace: filterInPlace,
         searchingText: searchingController.text,
-        isActive: true
+        isActive: true,
+      fromDb: fromDb
     );
 
     completedEventsList = await eventsListClass.getNeededEvents(
@@ -65,7 +66,8 @@ class _EventsPageState extends State<EventsPage> {
         filterCategory: filterCategory,
         filterInPlace: filterInPlace,
         searchingText: searchingController.text,
-        isActive: false
+        isActive: false,
+      fromDb: fromDb
     );
 
     setState(() {

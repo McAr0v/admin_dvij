@@ -1,3 +1,4 @@
+import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/dates/once_date.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:flutter/cupertino.dart';
@@ -55,6 +56,25 @@ class IrregularDate {
 
   }
 
+  String checkDate(){
+
+    if (dates.isEmpty){
+      return 'Не выбран ни один день проведения';
+    } else {
+      for (int i = 0; i < dates.length; i++){
+        String result = dates[i].checkDate();
+        if (result != SystemConstants.successConst){
+          return '${i+1} - $result';
+        }
+      }
+    }
+
+
+
+    return SystemConstants.successConst;
+
+  }
+
   /// Метод для преобразования объекта IrregularDate в JSON-строку
   String toJson() {
     // Проверяем, если список пуст, возвращаем пустой JSON-массив
@@ -64,6 +84,8 @@ class IrregularDate {
 
     // Создаем строку вручную, избегая добавления '_' после последнего элемента
     final StringBuffer buffer = StringBuffer('[');
+
+    sortDates();
 
     for (int i = 0; i < dates.length; i++) {
       buffer.write(dates[i].toJsonString());
@@ -118,7 +140,7 @@ class IrregularDate {
   void sortDates() {
     dates.sort((a, b) {
       // Сравниваем по времени начала
-      return a.startDateTime.compareTo(b.startDateTime);
+      return a.startDateTime.compareTo(b.startDateTime!);
     });
   }
 
