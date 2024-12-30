@@ -3,9 +3,14 @@ import 'package:admin_dvij/constants/events_constants.dart';
 import 'package:admin_dvij/events/event_class.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../categories/event_categories/event_category.dart';
 import '../cities/city_class.dart';
 import '../database/database_class.dart';
+import '../design/app_colors.dart';
+import '../design_elements/elements_of_design.dart';
 
 class EventsListClass implements IEntitiesList<EventClass> {
 
@@ -213,6 +218,109 @@ class EventsListClass implements IEntitiesList<EventClass> {
 
     // Если все фильтры соответствуют, возвращаем true
     return cityMatches && categoryMatches && inPlaceMatches;
+  }
+
+  Future<List<EventClass>> getEventsListFromSimpleUser({required List<String> eventsIdList}) async{
+
+    List<EventClass> returnedList = [];
+
+    if (_currentEventsList.isEmpty){
+      await getListFromDb();
+    }
+
+    for (String eventId in eventsIdList){
+      EventClass tempEvent = getEntityFromList(eventId);
+      if (tempEvent.id == eventId){
+        returnedList.add(tempEvent);
+      }
+    }
+
+    return returnedList;
+
+  }
+
+  Widget getEventsListWidget({
+    required List<EventClass> eventsList,
+    required VoidCallback onTap,
+    required BuildContext context,
+    required bool showEvents,
+    required void Function(int index) editEvent
+  }){
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        color: AppColors.greyBackground,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text('Мероприятия (${eventsList.length})', style: Theme.of(context).textTheme.bodyMedium,),
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: onTap,
+                      icon: Icon(showEvents ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight, size: 15,)
+                  )
+                ],
+              ),
+
+              if (eventsList.isNotEmpty && showEvents) for (int i = 0; i < eventsList.length; i++) Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: GestureDetector(
+                  onTap: () => editEvent(i),
+                  child: Card(
+                    color: AppColors.greyOnBackground,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 5),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElementsOfDesign.imageWithTags(
+                            imageUrl: eventsList[i].imageUrl,
+                            width: 100, //Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
+                            height: 100,
+                          ),
+                          const SizedBox(width: 10,),
+                          Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(eventsList[i].headline),
+                                  const SizedBox(height: 5,),
+                                  Text(
+                                    eventsList[i].desc,
+                                    style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                    maxLines: 2,
+                                  ),
+                                  const SizedBox(height: 10,),
+                                  Wrap(
+                                    children: [
+                                      eventsList[i].getEventStatusWidget(context: context),
+                                      eventsList[i].category.getCategoryWidget(context: context)
+                                    ],
+                                  )
+                                ],
+                              )
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
 }

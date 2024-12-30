@@ -8,4 +8,5 @@ class SimpleUsersConstants {
   static const String searchTint = 'Имя, фамилия, телефон...';
   static const String myEvents = 'Моих мероприятий';
   static const String myPlaces = 'Моих заведений';
+  static const String myPromos = 'Моих акций';
 }

@@ -6,8 +6,14 @@ import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 import '../database/database_class.dart';
+import '../design/app_colors.dart';
+import '../design_elements/elements_of_design.dart';
+import '../users/simple_users/simple_user.dart';
 
 class PlacesList implements IEntitiesList<Place>{
 
@@ -232,6 +238,84 @@ class PlacesList implements IEntitiesList<Place>{
 
     return returnedList;
 
+  }
+
+  Widget getPlacesListWidget ({
+    required List<Place> placesList,
+    required VoidCallback onTap,
+    required BuildContext context,
+    required bool showPlaces,
+    required void Function(int index) editPlace,
+    required SimpleUser editUser
+  }){
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        color: AppColors.greyBackground,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text('Заведения (${placesList.length})', style: Theme.of(context).textTheme.bodyMedium,),
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: onTap,
+                      icon: Icon(showPlaces ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight, size: 15,)
+                  )
+                ],
+              ),
+
+              if (placesList.isNotEmpty && showPlaces) for (int i = 0; i < placesList.length; i++) Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: GestureDetector(
+                  onTap: () => editPlace(i),
+                  child: Card(
+                    color: AppColors.greyOnBackground,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElementsOfDesign.imageWithTags(
+                            imageUrl: placesList[i].imageUrl,
+                            width: 100, //Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
+                            height: 100,
+                          ),
+                          const SizedBox(width: 10,),
+                          Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(placesList[i].name),
+                                  Text(placesList[i].getAddress(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    placesList[i].getCurrentPlaceAdmin(adminsList: editUser.placesList).placeRole.toString(needTranslate: true),
+                                    style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                  ),
+                                ],
+                              )
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
 

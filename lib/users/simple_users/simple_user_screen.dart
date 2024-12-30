@@ -2,9 +2,14 @@ import 'dart:io';
 import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/constants/date_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
+import 'package:admin_dvij/events/event_class.dart';
+import 'package:admin_dvij/events/event_create_view_edit_screen.dart';
+import 'package:admin_dvij/events/events_list_class.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/places/place_create_view_edit_screen.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
+import 'package:admin_dvij/promos/promo_create_edit_view_screen.dart';
+import 'package:admin_dvij/promos/promos_list_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +26,7 @@ import '../../design/app_colors.dart';
 import '../../design/loading_screen.dart';
 import '../../design_elements/button_state_enum.dart';
 import '../../design_elements/elements_of_design.dart';
+import '../../promos/promo_class.dart';
 import '../../system_methods/system_methods_class.dart';
 import '../admin_user/admin_user_class.dart';
 import '../genders/gender_class.dart';
@@ -46,6 +52,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
   final ImagePickerService imagePickerService = ImagePickerService();
   SimpleUsersList usersListsClass = SimpleUsersList();
   PlacesList placesList = PlacesList();
+  EventsListClass eventsListClass = EventsListClass();
+  PromosListClass promosListClass = PromosListClass();
 
   final TextEditingController emailController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
@@ -66,10 +74,13 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
   Gender chosenGender = Gender();
   File? _imageFile;
   List<Place> userPlaces = [];
+  List<EventClass> userEvents = [];
+  List<Promo> userPromo = [];
 
 
   bool showPlaces = false;
   bool showEvents = false;
+  bool showPromos = false;
 
   bool loading = false;
   bool logOuting = false;
@@ -136,6 +147,8 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
     editUser = await editUser.getUserFromDownloadedList(uid: widget.simpleUser.uid, fromDb: fromDB);
 
     userPlaces = await placesList.getPlacesListFromSimpleUser(placesList: editUser.placesList);
+    userEvents = await eventsListClass.getEventsListFromSimpleUser(eventsIdList: editUser.myEvents);
+    userPromo = await promosListClass.getPromosListFromSimpleUser(promosIdList: editUser.myPromos);
 
     // Сбрасываем значения переменных для изменений в исходное состояние
     setTextFieldsOnDefault();
@@ -370,186 +383,76 @@ class _SimpleUserScreenState extends State<SimpleUserScreen> {
                                 ]
                             ),
 
-                            GestureDetector(
-                              onTap: (){
-                                setState(() {
-                                  showPlaces = !showPlaces;
-                                });
-                              },
-                              child: Card(
-                                color: AppColors.greyBackground,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
+                            placesList.getPlacesListWidget(
+                                placesList: userPlaces,
+                                onTap: (){
+                                  setState(() {
+                                    showPlaces = !showPlaces;
+                                  });
+                                },
+                                context: context,
+                                showPlaces: showPlaces,
+                                editPlace: (index)async {
+                                  final result = await systemMethods.pushToPageWithResult(
+                                      context: context,
+                                      page: PlaceCreateViewEditScreen(place: userPlaces[index],)
+                                  );
 
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(20.0),
-                                              child: Text('Заведения пользователя (${userPlaces.length})', style: Theme.of(context).textTheme.bodyMedium,),
-                                            ),
-                                          ),
-                                          IconButton(
-                                              onPressed: (){
-                                                setState(() {
-                                                  showPlaces = !showPlaces;
-                                                });
-                                              },
-                                              icon: Icon(showPlaces ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight, size: 15,)
-                                          )
-                                        ],
-                                      ),
+                                  if (result != null){
+                                    await getUsersInfo();
+                                  }
 
-                                      if (userPlaces.isNotEmpty && showPlaces) for (Place temp in userPlaces) Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 5),
-                                        child: GestureDetector(
-                                          onTap: ()async {
-                                            final result = await systemMethods.pushToPageWithResult(
-                                                context: context,
-                                                page: PlaceCreateViewEditScreen(place: temp,)
-                                            );
-
-                                            if (result != null){
-                                              await getUsersInfo();
-                                            }
-
-                                          },
-                                          child: Card(
-                                            color: AppColors.greyOnBackground,
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                                              child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  ElementsOfDesign.imageWithTags(
-                                                    imageUrl: temp.imageUrl,
-                                                    width: 100, //Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
-                                                    height: 100,
-                                                  ),
-                                                  const SizedBox(width: 10,),
-                                                  Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(temp.name),
-                                                          Text(temp.getAddress(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                                                          const SizedBox(height: 10),
-                                                          Text(
-                                                            temp.getCurrentPlaceAdmin(adminsList: editUser.placesList).placeRole.toString(needTranslate: true),
-                                                            style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                                                          ),
-                                                        ],
-                                                      )
-                                                  ),
-                                                  //const SizedBox(width: 20,),
-
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                                },
+                                editUser: editUser
                             ),
 
                             const SizedBox(height: 10,),
 
-                            GestureDetector(
-                              onTap: (){
-                                setState(() {
-                                  showPlaces = !showPlaces;
-                                });
-                              },
-                              child: Card(
-                                color: AppColors.greyBackground,
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
+                            eventsListClass.getEventsListWidget(
+                                eventsList: userEvents,
+                                onTap: (){
+                                  setState(() {
+                                    showEvents = !showEvents;
+                                  });
+                                },
+                                context: context,
+                                showEvents: showEvents,
+                                editEvent: (index) async {
+                                  final result = await systemMethods.pushToPageWithResult(
+                                      context: context,
+                                      page: EventCreateViewEditScreen(event: userEvents[index], indexTabPage: 0,)
+                                  );
 
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: Padding(
-                                              padding: const EdgeInsets.all(20.0),
-                                              child: Text('Мероприятия пользователя (${editUser.myEvents.length})', style: Theme.of(context).textTheme.bodyMedium,),
-                                            ),
-                                          ),
-                                          IconButton(
-                                              onPressed: (){
-                                                setState(() {
-                                                  showEvents = !showEvents;
-                                                });
-                                              },
-                                              icon: Icon(showEvents ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight, size: 15,)
-                                          )
-                                        ],
-                                      ),
+                                  if (result != null){
+                                    await getUsersInfo();
+                                  }
 
-                                      /*if (userPlaces.isNotEmpty && showPlaces) for (Place temp in userPlaces) Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 5),
-                                        child: GestureDetector(
-                                          onTap: ()async {
-                                            final result = await systemMethods.pushToPageWithResult(
-                                                context: context,
-                                                page: PlaceCreateViewEditScreen(place: temp,)
-                                            );
-
-                                            if (result != null){
-                                              await getUsersInfo();
-                                            }
-
-                                          },
-                                          child: Card(
-                                            color: AppColors.greyOnBackground,
-                                            child: Padding(
-                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 5),
-                                              child: Row(
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                children: [
-                                                  ElementsOfDesign.imageWithTags(
-                                                    imageUrl: temp.imageUrl,
-                                                    width: 100, //Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
-                                                    height: 100,
-                                                  ),
-                                                  const SizedBox(width: 10,),
-                                                  Expanded(
-                                                      child: Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children: [
-                                                          Text(temp.name),
-                                                          Text(temp.getAddress(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                                                          const SizedBox(height: 10),
-                                                          Text(
-                                                            temp.getCurrentPlaceAdmin(adminsList: editUser.placesList).placeRole.toString(needTranslate: true),
-                                                            style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                                                          ),
-                                                        ],
-                                                      )
-                                                  ),
-                                                  //const SizedBox(width: 20,),
-
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),*/
-                                    ],
-                                  ),
-                                ),
-                              ),
+                                }
                             ),
 
+                            const SizedBox(height: 10,),
+
+                            promosListClass.getPromosListWidget(
+                                promosList: userPromo,
+                                onTap: (){
+                                  setState(() {
+                                    showPromos = !showPromos;
+                                  });
+                                },
+                                context: context,
+                                showPromos: showPromos,
+                                editPromo: (index) async {
+                                  final result = await systemMethods.pushToPageWithResult(
+                                      context: context,
+                                      page: PromoCreateViewEditScreen(indexTabPage: 0, promo: userPromo[index],)
+                                  );
+
+                                  if (result != null){
+                                    await getUsersInfo();
+                                  }
+
+                                }
+                            ),
 
                           ],
                         ),

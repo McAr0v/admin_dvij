@@ -597,6 +597,39 @@ class SimpleUser extends IEntity{
     );
   }
 
+  Widget getPlacesCounterWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: placesList.length.toString(),
+        icon: FontAwesomeIcons.locationPin,
+        color: AppColors.greyBackground,
+        textColor: AppColors.white
+
+    );
+  }
+
+  Widget getEventsCounterWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: myEvents.length.toString(),
+        icon: FontAwesomeIcons.champagneGlasses,
+        color: AppColors.greyBackground,
+        textColor: AppColors.white
+
+    );
+  }
+
+  Widget getPromosCounterWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(
+        context: context,
+        text: myPromos.length.toString(),
+        icon: FontAwesomeIcons.fire,
+        color: AppColors.greyBackground,
+        textColor: AppColors.white
+
+    );
+  }
+
   Widget getUserCardInList ({
     required BuildContext context,
     required VoidCallback onTap,
@@ -635,13 +668,13 @@ class SimpleUser extends IEntity{
                       getAdminRole().getNameOrDescOfRole(true),
                       style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
                     ),
-                    Text(
-                      '${SimpleUsersConstants.myPlaces} - ${placesList.length.toString()}',
-                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                    ),
-                    Text(
-                      '${SimpleUsersConstants.myEvents} - ${myEvents.length.toString()}',
-                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                    const SizedBox(height: 10,),
+                    Wrap(
+                      children: [
+                        getPlacesCounterWidget(context: context),
+                        getEventsCounterWidget(context: context),
+                        getPromosCounterWidget(context: context)
+                      ],
                     ),
                   ],
                 ),

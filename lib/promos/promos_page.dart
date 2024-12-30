@@ -6,6 +6,7 @@ import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:admin_dvij/promos/filter_promos.dart';
 import 'package:admin_dvij/promos/promo_class.dart';
+import 'package:admin_dvij/promos/promo_create_edit_view_screen.dart';
 import 'package:admin_dvij/promos/promos_list_class.dart';
 import 'package:admin_dvij/promos/promos_list_screen.dart';
 import 'package:flutter/material.dart';
@@ -240,14 +241,14 @@ class _PromosPageState extends State<PromosPage> {
     // Уходим на страницу создания / редактирования
     // Ждем результат с нее
 
-    /*final results = await sm.pushToPageWithResult(
+    final results = await sm.pushToPageWithResult(
         context: context,
-        page: EventCreateViewEditScreen(event: event, indexTabPage: tabIndex,)
+        page: PromoCreateViewEditScreen(promo: promo, indexTabPage: tabIndex,)
     );
 
     if (results != null) {
       await initialization();
-    }*/
+    }
 
   }
 

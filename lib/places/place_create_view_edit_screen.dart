@@ -4,9 +4,13 @@ import 'package:admin_dvij/categories/place_categories/place_category_picker.dar
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/cities/city_picker_page.dart';
 import 'package:admin_dvij/constants/places_constants.dart';
+import 'package:admin_dvij/events/event_class.dart';
+import 'package:admin_dvij/events/events_list_class.dart';
 import 'package:admin_dvij/places/place_admin/current_place_admins_list_screen.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
+import 'package:admin_dvij/promos/promo_class.dart';
+import 'package:admin_dvij/promos/promos_list_class.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/simple_users/creator_popup.dart';
@@ -24,6 +28,8 @@ import '../design/app_colors.dart';
 import '../design/loading_screen.dart';
 import '../design_elements/button_state_enum.dart';
 import '../design_elements/elements_of_design.dart';
+import '../events/event_create_view_edit_screen.dart';
+import '../promos/promo_create_edit_view_screen.dart';
 
 class PlaceCreateViewEditScreen extends StatefulWidget {
 
@@ -44,6 +50,9 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   SystemMethodsClass sm = SystemMethodsClass();
   final ImagePickerService imagePickerService = ImagePickerService();
 
+  EventsListClass eventsListClass = EventsListClass();
+  PromosListClass promosListClass = PromosListClass();
+
   bool loading = false;
   bool saving = false;
   bool deleting = false;
@@ -59,6 +68,12 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   City chosenCity = City.empty();
 
   RegularDate schedule = RegularDate();
+
+  List<EventClass> eventsListInPlace = [];
+  List<Promo> promosListInPlace = [];
+
+  bool showEvents = false;
+  bool showPromos = false;
 
 
   final TextEditingController nameController = TextEditingController();
@@ -90,6 +105,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
     if (fromDb){
       await placesList.getDownloadedList(fromDb: fromDb);
       await usersList.getDownloadedList(fromDb: fromDb);
+      await eventsListClass.getDownloadedList(fromDb: fromDb);
+      await promosListClass.getDownloadedList(fromDb: fromDb);
     }
 
     // Если это создание, то устанавливаем режим редактирования и показ расписания сразу
@@ -103,6 +120,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
       editPlace = placesList.getEntityFromList(widget.place!.id);
       creator = usersList.getEntityFromList(editPlace.creatorId);
       schedule = RegularDate.setSchedule(fromDate: editPlace.openingHours);
+      eventsListInPlace = await eventsListClass.getEventsListFromSimpleUser(eventsIdList: editPlace.eventsList);
+      promosListInPlace = await promosListClass.getPromosListFromSimpleUser(promosIdList: editPlace.promosList);
     }
 
     // Сбрасываем текстовые поля и выбранные настройки по умолчанию
@@ -336,33 +355,79 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                           isMobile: isMobile
                       ),
 
-                      if (widget.place != null) const SizedBox(height: 20,),
-
                       if (widget.place != null) GestureDetector(
                         onTap: () async {
                           await goToAdminsPage();
-
                         },
-                        child: Row(
-                          children: [
-                            Expanded(
-                                child: Text(
-                                  PlacesConstants.adminsPlace,
-                                  style: Theme.of(context).textTheme.titleMedium,
+                        child: Card(
+                          color: AppColors.greyBackground,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(20.0),
+                                    child: Text(
+                                      PlacesConstants.adminsPlace,
+                                      style: Theme.of(context).textTheme.bodyMedium,
+                                    ),
+                                  ),
                                 ),
-                            ),
 
-                            IconButton(
-                                onPressed: () async {
-                                  await goToAdminsPage();
-                                },
-                                icon: const Icon(FontAwesomeIcons.chevronRight, size: 15,)
+                                IconButton(
+                                    onPressed: () async {
+                                      await goToAdminsPage();
+                                    },
+                                    icon: const Icon(FontAwesomeIcons.chevronRight, size: 15,)
+                                )
+                              ],
                             )
-                          ],
+                          ),
                         ),
                       ),
 
-                      const SizedBox(height: 20,),
+                      if (widget.place != null) eventsListClass.getEventsListWidget(
+                          eventsList: eventsListInPlace,
+                          onTap: (){
+                            setState(() {
+                              showEvents = !showEvents;
+                            });
+                          },
+                          context: context,
+                          showEvents: showEvents,
+                          editEvent: (index) async {
+                            final result = await sm.pushToPageWithResult(
+                                context: context,
+                                page: EventCreateViewEditScreen(event: eventsListInPlace[index], indexTabPage: 0,)
+                            );
+
+                            if (result != null){
+                              await initialization();
+                            }
+                          }
+                      ),
+
+                      if (widget.place != null) promosListClass.getPromosListWidget(
+                          promosList: promosListInPlace,
+                          onTap: (){
+                            setState(() {
+                              showPromos = !showPromos;
+                            });
+                          },
+                          context: context,
+                          showPromos: showPromos,
+                          editPromo: (index) async {
+                            final result = await sm.pushToPageWithResult(
+                                context: context,
+                                page: PromoCreateViewEditScreen(indexTabPage: 0, promo: promosListInPlace[index],)
+                            );
+
+                            if (result != null){
+                              await initialization();
+                            }
+                          }
+                      ),
 
                       if (canEdit) ElementsOfDesign.buildAdaptiveRow(
                           isMobile: isMobile,

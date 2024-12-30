@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:admin_dvij/categories/promo_categories/promo_categories_list.dart';
+import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -150,6 +151,30 @@ class PromoCategory implements IEntity{
 
   Widget getCategoryWidget({required BuildContext context}){
     return ElementsOfDesign.getTag(context: context, text: name);
+  }
+
+  factory PromoCategory.setCategory({required PromoCategory category}){
+    return PromoCategory(id: category.id, name: category.name);
+  }
+
+  Widget getCategoryFieldWidget({
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onTap
+  }){
+
+    TextEditingController categoryController = TextEditingController();
+    categoryController.text = name.isNotEmpty ? name : CategoriesConstants.chooseCategory;
+
+    return ElementsOfDesign.buildTextField(
+        controller: categoryController,
+        labelText: FieldsConstants.categoryField,
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.tag,
+        context: context,
+        readOnly: true,
+        onTap: onTap
+    );
   }
 
 }

@@ -3,9 +3,16 @@ import 'package:admin_dvij/categories/promo_categories/promo_category.dart';
 import 'package:admin_dvij/constants/promo_constants.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:admin_dvij/promos/promo_class.dart';
+import 'package:admin_dvij/promos/promo_create_edit_view_screen.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../cities/city_class.dart';
 import '../database/database_class.dart';
+import '../design/app_colors.dart';
+import '../design_elements/elements_of_design.dart';
 
 class PromosListClass implements IEntitiesList<Promo> {
 
@@ -212,6 +219,110 @@ class PromosListClass implements IEntitiesList<Promo> {
 
     // Если все фильтры соответствуют, возвращаем true
     return cityMatches && categoryMatches && inPlaceMatches;
+  }
+
+  Future<List<Promo>> getPromosListFromSimpleUser({required List<String> promosIdList}) async{
+
+    List<Promo> returnedList = [];
+
+    if (_currentPromosList.isEmpty){
+      await getListFromDb();
+    }
+
+    for (String eventId in promosIdList){
+      Promo tempPromo = getEntityFromList(eventId);
+      if (tempPromo.id == eventId){
+        returnedList.add(tempPromo);
+      }
+    }
+
+    return returnedList;
+
+  }
+
+  Widget getPromosListWidget({
+    required List<Promo> promosList,
+    required VoidCallback onTap,
+    required BuildContext context,
+    required bool showPromos,
+    required void Function(int index) editPromo
+
+  }){
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        color: AppColors.greyBackground,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Text('Акции (${promosList.length})', style: Theme.of(context).textTheme.bodyMedium,),
+                    ),
+                  ),
+                  IconButton(
+                      onPressed: onTap,
+                      icon: Icon(showPromos ? FontAwesomeIcons.chevronDown : FontAwesomeIcons.chevronRight, size: 15,)
+                  )
+                ],
+              ),
+
+              if (promosList.isNotEmpty && showPromos) for (int i = 0; i < promosList.length; i++) Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: GestureDetector(
+                  onTap: () => editPromo(i),
+                  child: Card(
+                    color: AppColors.greyOnBackground,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 5),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElementsOfDesign.imageWithTags(
+                            imageUrl: promosList[i].imageUrl,
+                            width: 100, //Platform.isWindows || Platform.isMacOS ? 100 : double.infinity,
+                            height: 100,
+                          ),
+                          const SizedBox(width: 10,),
+                          Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(promosList[i].headline),
+                                  const SizedBox(height: 5,),
+                                  Text(
+                                    promosList[i].desc,
+                                    style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                    maxLines: 2,
+                                  ),
+                                  const SizedBox(height: 10,),
+                                  Wrap(
+                                    children: [
+                                      promosList[i].getEventStatusWidget(context: context),
+                                      promosList[i].category.getCategoryWidget(context: context)
+                                    ],
+                                  )
+                                ],
+                              )
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
 }

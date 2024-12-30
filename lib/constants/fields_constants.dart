@@ -7,6 +7,7 @@ class FieldsConstants {
   static const String dateField = 'Дата проведения';
   static const String dayOfWeekField = 'День недели';
   static const String categoryNameHintField = 'Название категории';
+  static const String categoryField = 'Категория';
 
   static const String streetField = 'Улица';
   static const String houseNumberField = 'Номер дома';
