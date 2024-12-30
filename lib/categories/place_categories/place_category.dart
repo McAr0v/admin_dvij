@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:admin_dvij/categories/place_categories/place_categories_list.dart';
+import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -33,6 +34,10 @@ class PlaceCategory implements IEntity {
 
   factory PlaceCategory.empty(){
     return PlaceCategory(id: '', name: '');
+  }
+
+  factory PlaceCategory.setCategory({required PlaceCategory category}){
+    return PlaceCategory(id: category.id, name: category.name);
   }
 
   @override
@@ -103,6 +108,26 @@ class PlaceCategory implements IEntity {
       placesList.addToCurrentDownloadedList(this);
     }
     return result;
+  }
+
+  Widget getCategoryFieldWidget({
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onTap
+  }){
+
+    TextEditingController categoryController = TextEditingController();
+    categoryController.text = name.isNotEmpty ? name : CategoriesConstants.chooseCategory;
+
+    return ElementsOfDesign.buildTextField(
+        controller: categoryController,
+        labelText: PlacesConstants.categoryPlace,
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.tag,
+        context: context,
+        readOnly: true,
+        onTap: onTap
+    );
   }
 
   Widget getWidgetElementInList({

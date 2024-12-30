@@ -1,10 +1,6 @@
 class EventsConstants {
   static const eventsPath = 'events';
   static const String eventsInfoFolder = 'event_info';
-  static const String eventTypeId = 'event_info';
-
-
-
   // screens
   static const editEvent = 'Редактирование мероприятия';
   static const createEvent = 'Создание мероприятия';

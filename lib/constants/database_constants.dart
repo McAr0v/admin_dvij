@@ -36,6 +36,7 @@ class DatabaseConstants {
   static const String userId = 'userId';
   static const String events = 'events';
   static const String myEvents = 'myEvents';
+  static const String myPromos = 'myPromos';
   static const String eventId = 'eventId';
   static const String promos = 'promos';
   static const String promoId = 'promoId';

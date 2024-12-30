@@ -16,7 +16,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import '../constants/buttons_constants.dart';
-import '../constants/city_constants.dart';
 import '../constants/system_constants.dart';
 import '../constants/users_constants.dart';
 import '../database/image_picker.dart';
@@ -58,17 +57,13 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
   PlaceCategory chosenCategory = PlaceCategory.empty();
   City chosenCity = City.empty();
-  SimpleUser chosenCreator = SimpleUser.empty();
 
   RegularDate schedule = RegularDate();
 
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController descController = TextEditingController();
-  final TextEditingController creatorController = TextEditingController();
   final TextEditingController createDateController = TextEditingController();
-  final TextEditingController categoryController = TextEditingController();
-  final TextEditingController cityController = TextEditingController();
   final TextEditingController streetController = TextEditingController();
   final TextEditingController houseController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
@@ -83,8 +78,6 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   }
 
   Future<void> initialization({bool fromDb = false}) async {
-
-
 
     setState(() {
       loading = true;
@@ -109,7 +102,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
     if (widget.place != null){
       editPlace = placesList.getEntityFromList(widget.place!.id);
       creator = usersList.getEntityFromList(editPlace.creatorId);
-      setSchedule();
+      schedule = RegularDate.setSchedule(fromDate: editPlace.openingHours);
     }
 
     // Сбрасываем текстовые поля и выбранные настройки по умолчанию
@@ -231,28 +224,22 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                       ElementsOfDesign.buildAdaptiveRow(
                           isMobile: isMobile,
                           children: [
-                            ElementsOfDesign.buildTextField(
-                                controller: cityController,
-                                labelText: UserConstants.city,
+
+                            chosenCity.getCityWidget(
                                 canEdit: canEdit,
-                                icon: FontAwesomeIcons.city,
                                 context: context,
-                                readOnly: true,
                                 onTap: () async {
                                   await chooseCity();
                                 }
                             ),
-                            ElementsOfDesign.buildTextField(
-                                controller: categoryController,
-                                labelText: PlacesConstants.categoryPlace,
+
+                            chosenCategory.getCategoryFieldWidget(
                                 canEdit: canEdit,
-                                icon: FontAwesomeIcons.tag,
                                 context: context,
-                                readOnly: true,
                                 onTap: () async {
                                   await chooseCategory();
                                 }
-                            )
+                            ),
                           ]
                       ),
                       ElementsOfDesign.buildAdaptiveRow(
@@ -325,35 +312,28 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                                 icon: FontAwesomeIcons.calendar,
                                 context: context
                             ),
-                            ElementsOfDesign.buildTextField(
-                                controller: creatorController,
-                                labelText: PlacesConstants.creatorPlace,
-                                canEdit: canEdit && currentAdminUser.adminRole.accessToEditCreator(),
-                                icon: FontAwesomeIcons.signature,
-                                context: context,
-                                readOnly: true,
+
+                            creator.getCreatorWidget(
+                                creator: creator,
                                 onTap: () async {
                                   await chooseCreator();
-                                }
-                            )
+                                },
+                                canEdit: canEdit && currentAdminUser.adminRole.accessToEditCreator(),
+                                context: context
+                            ),
                           ]
                       ),
 
-                      schedule.getRegularEditWidget(
+                      schedule.getRegularEditWidgetTwo(
                           context: context,
                           onTapStart: (index) => pickTime(index, true),
                           onTapEnd: (index) => pickTime(index, false),
+                          onClean: (index) {
+                            updateTime(index, true, null);
+                            updateTime(index, false, null);
+                          },
                           canEdit: canEdit,
-                        showSchedule: showSchedule,
-                        show: (){
-                            setState(() {
-                              showSchedule = !showSchedule;
-                            });
-                        },
-                        onClean: (index) {
-                          updateTime(index, true, null);
-                          updateTime(index, false, null);
-                        },
+                          isMobile: isMobile
                       ),
 
                       if (widget.place != null) const SizedBox(height: 20,),
@@ -390,7 +370,6 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
                             ElementsOfDesign.customButton(
                                 method: () async {
                                   await savePlace();
-
                                 },
                                 textOnButton: ButtonsConstants.save,
                                 context: context
@@ -398,7 +377,7 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
                             ElementsOfDesign.customButton(
                                 method: (){
-                                  setTextFieldsOnDefault();
+                                  initialization();
                                   setState(() {
                                     canEdit = false;
                                   });
@@ -430,42 +409,20 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
     }
   }
 
-  void setSchedule(){
-    schedule.mondayStart = editPlace.openingHours.mondayStart;
-    schedule.mondayEnd = editPlace.openingHours.mondayEnd;
-    schedule.tuesdayStart = editPlace.openingHours.tuesdayStart;
-    schedule.tuesdayEnd = editPlace.openingHours.tuesdayEnd;
-    schedule.wednesdayStart = editPlace.openingHours.wednesdayStart;
-    schedule.wednesdayEnd = editPlace.openingHours.wednesdayEnd;
-    schedule.thursdayStart = editPlace.openingHours.thursdayStart;
-    schedule.thursdayEnd = editPlace.openingHours.thursdayEnd;
-    schedule.fridayStart = editPlace.openingHours.fridayStart;
-    schedule.fridayEnd = editPlace.openingHours.fridayEnd;
-    schedule.saturdayStart = editPlace.openingHours.saturdayStart;
-    schedule.saturdayEnd = editPlace.openingHours.saturdayEnd;
-    schedule.sundayStart = editPlace.openingHours.sundayStart;
-    schedule.sundayEnd = editPlace.openingHours.sundayEnd;
-  }
 
   void setTextFieldsOnDefault(){
     setState(() {
       nameController.text = editPlace.name;
       descController.text = editPlace.desc;
-      creatorController.text = creator.getFullName().isNotEmpty ? creator.getFullName() : PlacesConstants.chooseCreatorPlace;
       createDateController.text = sm.formatDateTimeToHumanView(editPlace.createDate);
-      categoryController.text = editPlace.category.name.isNotEmpty ? editPlace.category.name : PlacesConstants.chooseCategoryPlace;
-      cityController.text = editPlace.city.name.isNotEmpty ? editPlace.city.name : CityConstants.cityNotChosen;
       streetController.text = editPlace.street;
       houseController.text = editPlace.house;
       phoneController.text = editPlace.phone;
       whatsappController.text = editPlace.whatsapp;
       telegramController.text = editPlace.telegram;
       instagramController.text = editPlace.instagram;
-      setSchedule();
-
-      chosenCreator = SimpleUser.empty();
-      chosenCategory = PlaceCategory.empty();
-      chosenCity = City.empty();
+      chosenCategory = PlaceCategory.setCategory(category: editPlace.category);
+      chosenCity = City.setCity(city: editPlace.city);
 
       _imageFile = null;
     });
@@ -486,15 +443,15 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
         deleting = true;
       });
 
-      String publishResult = await editPlace.deleteFromDb();
+      String deleteResult = await editPlace.deleteFromDb();
 
-      if (publishResult == SystemConstants.successConst){
+      if (deleteResult == SystemConstants.successConst){
 
         _showSnackBar(PlacesConstants.deletePlaceSuccess);
         navigateToPlacesListScreen();
 
       } else {
-        _showSnackBar(publishResult);
+        _showSnackBar(deleteResult);
       }
 
       setState(() {
@@ -507,25 +464,9 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   Place setPlaceBeforeSaving(){
 
     Place tempPlace = Place.empty();
-
-    if (chosenCategory.id.isNotEmpty){
-      tempPlace.category = chosenCategory;
-    } else {
-      tempPlace.category = editPlace.category;
-    }
-
-    if (chosenCity.id.isNotEmpty){
-      tempPlace.city = chosenCity;
-    } else {
-      tempPlace.city = editPlace.city;
-    }
-
-    if (chosenCreator.uid.isNotEmpty){
-      tempPlace.creatorId = chosenCreator.uid;
-    } else {
-      tempPlace.creatorId = editPlace.creatorId;
-    }
-
+    tempPlace.category = chosenCategory;
+    tempPlace.city = chosenCity;
+    tempPlace.creatorId = creator.uid;
     tempPlace.createDate = editPlace.createDate;
     tempPlace.street = streetController.text;
     tempPlace.house = houseController.text;
@@ -645,8 +586,9 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
 
       if (publishResult == SystemConstants.successConst) {
 
-        if (chosenCreator.uid.isNotEmpty){
-          creator.deletePlaceRoleFromUser(editPlace.id);
+        if (tempPlace.creatorId != editPlace.creatorId){
+          SimpleUser previousCreator = usersList.getEntityFromList(editPlace.creatorId);
+          previousCreator.deletePlaceRoleFromUser(editPlace.id);
         }
 
         await initialization();
@@ -656,8 +598,8 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
         _showSnackBar(PlacesConstants.savePlaceSuccess);
 
         canEdit = false;
-        setTextFieldsOnDefault();
-        //resetChosenOptions();
+
+        initialization();
 
         if (widget.place == null){
           navigateToPlacesListScreen();
@@ -695,24 +637,30 @@ class _PlaceCreateViewEditScreenState extends State<PlaceCreateViewEditScreen> {
   Future<void> chooseCreator() async{
     final results = await sm.getPopup(context: context, page: CreatorPopup(placeId: editPlace.id,));
     if (results != null){
-      chosenCreator = results;
-      creatorController.text = chosenCreator.getFullName();
+      setState(() {
+        creator = results;
+      });
+
     }
   }
 
   Future<void> chooseCity() async{
     final results = await sm.getPopup(context: context, page: const CityPickerPage());
     if (results != null){
-      chosenCity = results;
-      cityController.text = chosenCity.name;
+      setState(() {
+        chosenCity = results;
+      });
+
     }
   }
 
   Future<void> chooseCategory() async{
     final results = await sm.getPopup(context: context, page: const PlaceCategoryPicker());
     if (results != null){
-      chosenCategory = results;
-      categoryController.text = chosenCategory.name;
+      setState(() {
+        chosenCategory = results;
+      });
+
     }
   }
 

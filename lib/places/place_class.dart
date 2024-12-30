@@ -352,6 +352,38 @@ class Place implements IEntity{
     }
   }
 
+  Future<void> addPromoToPlace ({required String promoId}) async {
+
+    DatabaseClass db = DatabaseClass();
+
+    String path = '${PlacesConstants.placesPath}/$id/${DatabaseConstants.promos}/$promoId';
+
+    Map <String, dynamic> data = <String, dynamic> {
+      DatabaseConstants.promoId: promoId,
+    };
+
+    if (Platform.isWindows){
+      await db.publishToDBForWindows(path, data);
+    } else {
+      await db.publishToDB(path, data);
+    }
+
+    // Проверяем, есть ли у этого заведения акции
+    if (promosList.isNotEmpty){
+
+      // Если есть, проверяем, есть ли уже у списка акций эта акция
+      int promoIndex = promosList.indexWhere((c) => c == promoId);
+
+      // Если нет, добавляем
+      if (promoIndex == -1){
+        promosList.add(promoId);
+      }
+    } else {
+      // Если список акций заведения пустой, добавляем акцию
+      promosList.add(promoId);
+    }
+  }
+
   Future<void> deleteEventFromPlace({required String eventId}) async {
 
     DatabaseClass db = DatabaseClass();
@@ -368,6 +400,25 @@ class Place implements IEntity{
 
     if (result == SystemConstants.successConst){
       eventsList.removeWhere((c) => c == eventId);
+    }
+  }
+
+  Future<void> deletePromoFromPlace({required String promoId}) async {
+
+    DatabaseClass db = DatabaseClass();
+
+    String path = '${PlacesConstants.placesPath}/$id/${DatabaseConstants.promos}/$promoId';
+
+    String result = '';
+
+    if (Platform.isWindows){
+      result = await db.deleteFromDbForWindows(path);
+    } else {
+      result = await db.deleteFromDb(path);
+    }
+
+    if (result == SystemConstants.successConst){
+      promosList.removeWhere((c) => c == promoId);
     }
   }
 

@@ -15,6 +15,7 @@ import '../../cities/city_class.dart';
 import '../../constants/admins_constants.dart';
 import '../../constants/database_constants.dart';
 import '../../constants/events_constants.dart';
+import '../../constants/fields_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 import '../../database/image_uploader.dart';
@@ -40,6 +41,7 @@ class SimpleUser extends IEntity{
   DateTime registrationDate;
   List<PlaceAdmin> placesList;
   List<String> myEvents;
+  List<String> myPromos;
 
   SimpleUser({
     required this.uid,
@@ -56,7 +58,8 @@ class SimpleUser extends IEntity{
     required this.avatar,
     required this.registrationDate,
     required this.placesList,
-    this.myEvents = const []
+    this.myEvents = const [],
+    this.myPromos = const [],
   });
 
   factory SimpleUser.empty() {
@@ -75,7 +78,8 @@ class SimpleUser extends IEntity{
         telegram: '',
         instagram: '',
         placesList: [],
-        myEvents: []
+        myEvents: [],
+        myPromos: []
 
     );
   }
@@ -112,7 +116,7 @@ class SimpleUser extends IEntity{
 
     return ElementsOfDesign.buildTextField(
         controller: creatorController,
-        labelText: EventsConstants.creatorEvent,
+        labelText: FieldsConstants.creatorField,
         canEdit: canEdit,
         icon: FontAwesomeIcons.signature,
         context: context,
@@ -126,6 +130,7 @@ class SimpleUser extends IEntity{
     MethodsForDatabase methodsForDatabase = MethodsForDatabase();
 
     DataSnapshot eventsFolder = snapshot.child(DatabaseConstants.myEvents);
+    DataSnapshot promosFolder = snapshot.child(DatabaseConstants.myPromos);
 
     DataSnapshot infoFolder = snapshot.child(SimpleUsersConstants.usersFolderInfo);
     DataSnapshot myPlacesFolder = snapshot.child(SimpleUsersConstants.usersMyPlacesFolder);
@@ -154,6 +159,7 @@ class SimpleUser extends IEntity{
         instagram: infoFolder.child(DatabaseConstants.instagram).value.toString(),
         placesList: myPlaces,
         myEvents: methodsForDatabase.getStringFromKeyFromSnapshot(snapshot: eventsFolder, key: DatabaseConstants.eventId),
+        myPromos: methodsForDatabase.getStringFromKeyFromSnapshot(snapshot: promosFolder, key: DatabaseConstants.promoId)
     );
   }
 
@@ -162,6 +168,7 @@ class SimpleUser extends IEntity{
     MethodsForDatabase methodsForDatabase = MethodsForDatabase();
 
     Map<String, dynamic>? eventsFolder = json[DatabaseConstants.myEvents];
+    Map<String, dynamic>? promosFolder = json[DatabaseConstants.myPromos];
 
     Map<String, dynamic> infoFolder = json[SimpleUsersConstants.usersFolderInfo];
     Map<String, dynamic> myPlacesFolder = json[SimpleUsersConstants.usersMyPlacesFolder];
@@ -186,7 +193,8 @@ class SimpleUser extends IEntity{
         telegram: infoFolder[DatabaseConstants.telegram] ?? '',
         instagram: infoFolder[DatabaseConstants.instagram] ?? '',
         placesList: myPlaces,
-        myEvents: eventsFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: eventsFolder, inputKey: DatabaseConstants.eventId) : []
+        myEvents: eventsFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: eventsFolder, inputKey: DatabaseConstants.eventId) : [],
+        myPromos: promosFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: promosFolder, inputKey: DatabaseConstants.promoId) : [],
     );
   }
 
@@ -435,6 +443,26 @@ class SimpleUser extends IEntity{
     return result;
   }
 
+  Future<String> deletePromoFromMyPromos({required String promoId}) async{
+    String result = '';
+
+    DatabaseClass db = DatabaseClass();
+
+    String path = '${SimpleUsersConstants.usersPath}/$uid/${DatabaseConstants.myPromos}/$promoId';
+
+    if (Platform.isWindows){
+      result = await db.deleteFromDbForWindows(path);
+    } else {
+      result = await db.deleteFromDb(path);
+    }
+
+    if (result == SystemConstants.successConst){
+      myPromos.removeWhere((c) => c == promoId);
+    }
+
+    return result;
+  }
+
   Future <String> addEventToMyEvents({required String eventId}) async {
     String result = '';
 
@@ -466,6 +494,45 @@ class SimpleUser extends IEntity{
       } else {
         // Если список мероприятий заведения пустой, добавляем мероприятие
         myEvents.add(eventId);
+      }
+
+    }
+
+    return result;
+
+  }
+
+  Future <String> addPromoToMyPromos({required String promoId}) async {
+    String result = '';
+
+    DatabaseClass db = DatabaseClass();
+
+    String path = '${SimpleUsersConstants.usersPath}/$uid/${DatabaseConstants.myPromos}/$promoId';
+
+    Map <String, dynamic> data = <String, dynamic> {
+      DatabaseConstants.promoId: promoId,
+    };
+
+    if (Platform.isWindows){
+      result = await db.publishToDBForWindows(path, data);
+    } else {
+      result = await db.publishToDB(path, data);
+    }
+
+    if (result == SystemConstants.successConst){
+
+      if (myPromos.isNotEmpty){
+
+        // Если есть, проверяем, есть ли уже у списка акций эта акция
+        int eventIndex = myPromos.indexWhere((c) => c == promoId);
+
+        // Если нет, добавляем
+        if (eventIndex == -1){
+          myPromos.add(promoId);
+        }
+      } else {
+        // Если список акций пустой, добавляем акцию
+        myPromos.add(promoId);
       }
 
     }

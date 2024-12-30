@@ -17,6 +17,7 @@ class FieldsConstants {
   static const String minTicketPriceField = 'Минимальная цена билетов';
   static const String maxTicketPriceField = 'Максимальная цена билетов';
   static const String ticketPriceField = 'Цена билетов';
+  static const String creatorField = 'Создатель';
 
 
 }

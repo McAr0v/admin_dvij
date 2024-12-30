@@ -9,6 +9,7 @@ import '../../constants/database_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 import '../../design/app_colors.dart';
+import '../../design_elements/elements_of_design.dart';
 
 class PromoCategory implements IEntity{
   String id;
@@ -145,6 +146,10 @@ class PromoCategory implements IEntity{
         ),
       ),
     );
+  }
+
+  Widget getCategoryWidget({required BuildContext context}){
+    return ElementsOfDesign.getTag(context: context, text: name);
   }
 
 }
