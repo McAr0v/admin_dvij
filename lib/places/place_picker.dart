@@ -4,9 +4,7 @@ import 'package:admin_dvij/places/place_class.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../design/app_colors.dart';
 
 class PlacePicker extends StatefulWidget {

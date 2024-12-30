@@ -2,7 +2,12 @@ import 'dart:io';
 import 'package:admin_dvij/address/address_or_place_class.dart';
 import 'package:admin_dvij/address/address_type_picker.dart';
 import 'package:admin_dvij/categories/event_categories/event_category.dart';
+import 'package:admin_dvij/constants/city_constants.dart';
+import 'package:admin_dvij/constants/errors_constants.dart';
 import 'package:admin_dvij/constants/events_constants.dart';
+import 'package:admin_dvij/constants/fields_constants.dart';
+import 'package:admin_dvij/constants/price_type_constants.dart';
+import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/dates/date_type.dart';
 import 'package:admin_dvij/dates/date_type_picker.dart';
 import 'package:admin_dvij/dates/irregular_date.dart';
@@ -20,6 +25,8 @@ import 'package:image_picker/image_picker.dart';
 import '../cities/city_class.dart';
 import '../cities/city_picker_page.dart';
 import '../constants/buttons_constants.dart';
+import '../constants/categories_constants.dart';
+import '../constants/date_constants.dart';
 import '../constants/system_constants.dart';
 import '../constants/users_constants.dart';
 import '../database/image_picker.dart';
@@ -184,7 +191,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
       telegramController.text = editEvent.telegram;
       instagramController.text = editEvent.instagram;
 
-      freePriceController.text = 'Бесплатно';
+      freePriceController.text = PriceTypeConstants.freePrice;
 
       if (editEvent.priceType.priceType == PriceTypeEnum.fixed){
         fixedPriceController.text = editEvent.price;
@@ -441,17 +448,17 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
                               if (addressType.addressTypeEnum == AddressTypeEnum.address) ElementsOfDesign.buildTextField(
                                   controller: streetController,
-                                  labelText: 'Улица',
+                                  labelText: FieldsConstants.streetField,
                                   canEdit: canEdit,
-                                  icon: FontAwesomeIcons.heading,
+                                  icon: FontAwesomeIcons.streetView,
                                   context: context
                               ),
 
                               if (addressType.addressTypeEnum == AddressTypeEnum.address) ElementsOfDesign.buildTextField(
                                   controller: houseController,
-                                  labelText: 'Номер дома',
+                                  labelText: FieldsConstants.houseNumberField,
                                   canEdit: canEdit,
-                                  icon: FontAwesomeIcons.heading,
+                                  icon: FontAwesomeIcons.hashtag,
                                   context: context
                               ),
 
@@ -476,7 +483,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
                               if (chosenPriceType.priceType == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
                                   controller: rangeStartPriceController,
-                                  labelText: 'Минимальная цена билетов',
+                                  labelText: FieldsConstants.minTicketPriceField,
                                   canEdit: canEdit,
                                   icon: FontAwesomeIcons.dollarSign,
                                   context: context
@@ -484,14 +491,14 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
                               if (chosenPriceType.priceType == PriceTypeEnum.range) ElementsOfDesign.buildTextField(
                                   controller: rangeEndPriceController,
-                                  labelText: 'Максимальная цена билетов',
+                                  labelText: FieldsConstants.maxTicketPriceField,
                                   canEdit: canEdit,
                                   icon: FontAwesomeIcons.dollarSign,
                                   context: context
                               ),
                               if (chosenPriceType.priceType == PriceTypeEnum.fixed) ElementsOfDesign.buildTextField(
                                   controller: fixedPriceController,
-                                  labelText: 'Цена билетов',
+                                  labelText: FieldsConstants.ticketPriceField,
                                   canEdit: canEdit,
                                   icon: FontAwesomeIcons.dollarSign,
                                   context: context
@@ -714,10 +721,10 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
     bool? result = await ElementsOfDesign.exitDialog(
         context,
-        'Если удалите мероприятие, данные будет невозможно восстановить',
+        EventsConstants.deleteEventDesc,
         ButtonsConstants.delete,
         ButtonsConstants.cancel,
-        'Удалить мероприятие?'
+        EventsConstants.deleteEventHeadline
     );
 
     if (result != null && result){
@@ -729,7 +736,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
       if (publishResult == SystemConstants.successConst){
 
-        _showSnackBar('Мероприятие успешно удалено');
+        _showSnackBar(EventsConstants.deleteEventSuccess);
         navigateToEventsListScreen();
 
       } else {
@@ -788,7 +795,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
 
 
-        _showSnackBar('Мероприятие успешно сохранено');
+        _showSnackBar(EventsConstants.editEventSuccess);
 
         canEdit = false;
         setTextFieldsOnDefault();
@@ -820,62 +827,58 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
   String checkEvent(EventClass tempEvent){
 
-    if (tempEvent.dateType.dateType == DateTypeEnum.notChosen){
-      return 'Не выбран тип даты';
-    }
-
     if (tempEvent.headline.isEmpty){
-      return 'Нет названия мероприятия';
+      return EventsConstants.noNameError;
     }
     if (tempEvent.desc.isEmpty){
-      return 'Нет описания мероприятия';
+      return EventsConstants.noDescError;
     }
     if (tempEvent.creatorId.isEmpty){
-      return 'Не выбран создатель';
+      return SimpleUsersConstants.creatorNotChosenError;
     }
 
     if (tempEvent.city.id.isEmpty){
-      return 'Не выбран город';
+      return CityConstants.noChosenCityError;
     }
     if (tempEvent.category.id.isEmpty){
-      return 'Не выбрана категория';
+      return CategoriesConstants.categoryNotChosen;
     }
     if (tempEvent.street.isEmpty){
-      return 'Не указана улица';
+      return ErrorConstants.noStreetError;
     }
 
     if (tempEvent.house.isEmpty){
-      return 'Не указан номер дома';
+      return ErrorConstants.noStreetError;
     }
 
     if (tempEvent.phone.isEmpty){
-      return 'Нет контактного телефона';
+      return ErrorConstants.noPhone;
     }
 
     if (addressType.addressTypeEnum == AddressTypeEnum.place){
       if (tempEvent.placeId.isEmpty){
-        return 'Не выбрано заведение';
+        return ErrorConstants.noChosenPlaceError;
       }
     } else if (addressType.addressTypeEnum == AddressTypeEnum.notChosen){
-      return 'Не выбран тип адреса - в заведении или по адресу';
+      return ErrorConstants.noChosenAddressType;
     }
 
     if (tempEvent.priceType.priceType == PriceTypeEnum.notChosen){
-      return 'Не выбран тип цены билетов';
+      return ErrorConstants.noPriceType;
     } else if (tempEvent.priceType.priceType == PriceTypeEnum.fixed){
       if (fixedPriceController.text.isEmpty){
-        return 'Не указана цена билетов';
+        return ErrorConstants.noPrice;
       }
     } else if (tempEvent.priceType.priceType == PriceTypeEnum.range){
       if (rangeStartPriceController.text.isEmpty){
-        return 'Не указана начальная цена билетов';
+        return ErrorConstants.noMinPrice;
       } else if (rangeEndPriceController.text.isEmpty){
-        return 'Не указана конечная цена билетов';
+        return ErrorConstants.noMaxPrice;
       }
     }
 
     if (tempEvent.dateType.dateType == DateTypeEnum.notChosen){
-      return 'Не указан тип дат проведения';
+      return ErrorConstants.noChosenDateType;
     } else if (tempEvent.dateType.dateType == DateTypeEnum.once){
       if (tempEvent.onceDay.checkDate() != SystemConstants.successConst){
         return tempEvent.onceDay.checkDate();
@@ -886,7 +889,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
       }
     } else if (tempEvent.dateType.dateType == DateTypeEnum.regular){
       if (!schedule.checkRegularDate()){
-        return 'В расписании нет ни одного выбранного дня';
+        return ErrorConstants.scheduleNotHaveInputTime;
       }
     } else if (tempEvent.dateType.dateType == DateTypeEnum.irregular){
       if (tempEvent.irregularDays.checkDate() != SystemConstants.successConst){
@@ -1078,7 +1081,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
     final DateTime? pickedDate = await sm.dataPicker(
         context: context,
-        label: 'Выбери дату проведения',
+        label: DateConstants.onceDayDateChoose,
         firstDate: firstDate,
         lastDate: DateTime(2050),
         currentDate: date
@@ -1116,7 +1119,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
     final DateTime? pickedDate = await sm.dataPicker(
         context: context,
-        label: 'Выбери дату проведения',
+        label: DateConstants.onceDayDateChoose,
         firstDate: firstDate,
         lastDate: lastDate ?? DateTime(2050),
         currentDate: currentDate
@@ -1133,7 +1136,6 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
             longDate.endDate = pickedDate;
           }
         }
-
       });
     }
   }

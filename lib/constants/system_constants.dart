@@ -21,7 +21,6 @@ class SystemConstants {
 
   // Изображения по умолчанию
   static const String defaultAvatar = 'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg';
-  static const String defaultImagePath = 'assets/u_user.png';
   static const String defaultAdImagePath = 'https://firebasestorage.googleapis.com/v0/b/dvij-flutter.appspot.com/o/ad_no_image.jpg?alt=media';
   static const String logoSvgPath = 'assets/logo.svg';
   static const String noImagePath = 'https://firebasestorage.googleapis.com/v0/b/dvij-flutter.appspot.com/o/no_image.jpg?alt=media';
@@ -31,6 +30,9 @@ class SystemConstants {
   static const String noPassword = 'Поле с паролем не заполнено';
   static const String fillAllFields = 'Пожалуйста, заполните все поля';
   static const String inputNameOrEmail = 'Введи имя или Email для поиска';
+
+  static const String activeStatus = 'Активно';
+  static const String finishedStatus = 'Завершено';
 
   static String requestAnswerNegative(String message){
     return 'По запросу $message ничего не найдено';

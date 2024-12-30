@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:admin_dvij/constants/date_constants.dart';
+import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/system_constants.dart';
@@ -48,10 +50,10 @@ class LongDate {
       final Map<String, dynamic> json = jsonDecode(jsonString);
 
       // Извлекаем данные и создаем экземпляр
-      final startDate = DateTime.parse(json['startDate']);
-      final endDate = DateTime.parse(json['endDate']);
-      final startTimeParts = json['startTime'].split(':').map(int.parse).toList();
-      final endTimeParts = json['endTime'].split(':').map(int.parse).toList();
+      final startDate = DateTime.parse(json[DateConstants.longDayStartDayId]);
+      final endDate = DateTime.parse(json[DateConstants.longDayEndDayId]);
+      final startTimeParts = json[DateConstants.startTimeId].split(':').map(int.parse).toList();
+      final endTimeParts = json[DateConstants.endTimeId].split(':').map(int.parse).toList();
 
       return LongDate(
         startDate: startDate,
@@ -66,13 +68,13 @@ class LongDate {
 
   String checkDate(){
     if (startDate == null){
-      return 'Дата начала не выбрана';
+      return DateConstants.longDayStartDayNoChosen;
     } else if (endDate == null){
-      return 'Дата завершения не выбрана';
+      return DateConstants.longDayEndDayNoChosen;
     } else if (startTime == null){
-      return 'Не выбрано время начала';
+      return DateConstants.startTimeNoChosen;
     } else if (endTime == null){
-      return 'Не выбрано время завершения';
+      return DateConstants.endTimeNoChosen;
     } else {
       return SystemConstants.successConst;
     }
@@ -83,10 +85,10 @@ class LongDate {
     if (startDate != null && endDate != null && startTime != null && endTime != null){
       // Преобразуем объект в карту
       final Map<String, String> json = {
-        'startDate': startDate!.toIso8601String().split('T').first, // Только дата
-        'endDate': endDate!.toIso8601String().split('T').first, // Только дата
-        'startTime': '${startTime!.hour.toString().padLeft(2, '0')}:${startTime!.minute.toString().padLeft(2, '0')}',
-        'endTime': '${endTime!.hour.toString().padLeft(2, '0')}:${endTime!.minute.toString().padLeft(2, '0')}',
+        DateConstants.longDayStartDayId: startDate!.toIso8601String().split('T').first, // Только дата
+        DateConstants.longDayEndDayId: endDate!.toIso8601String().split('T').first, // Только дата
+        DateConstants.startTimeId: '${startTime!.hour.toString().padLeft(2, '0')}:${startTime!.minute.toString().padLeft(2, '0')}',
+        DateConstants.endTimeId: '${endTime!.hour.toString().padLeft(2, '0')}:${endTime!.minute.toString().padLeft(2, '0')}',
       };
 
       // Возвращаем строку в формате JSON
@@ -104,7 +106,7 @@ class LongDate {
     if (startDate != null && endDate != null){
       return '${sm.formatDateTimeToHumanView(startDate!)} - ${sm.formatDateTimeToHumanView(endDate!)}';
     } else {
-      return 'Дата не выбрана';
+      return DateConstants.noDate;
     }
   }
 
@@ -217,17 +219,17 @@ class LongDate {
     TextEditingController startTimeController = TextEditingController();
     TextEditingController endTimeController = TextEditingController();
 
-    startDateController.text = startDate != null ? sm.formatDateTimeToHumanView(startDate!) : 'Выбери дату начала';
-    endDateController.text = endDate != null ? sm.formatDateTimeToHumanView(endDate!) : 'Выбери дату завершения';
-    startTimeController.text = startTime != null ? sm.formatTimeToHumanView(startTime!) : 'Выбери время начала';
-    endTimeController.text = endTime != null ? sm.formatTimeToHumanView(endTime!) : 'Выбери время завершения';
+    startDateController.text = startDate != null ? sm.formatDateTimeToHumanView(startDate!) : DateConstants.longDayStartDayChoose;
+    endDateController.text = endDate != null ? sm.formatDateTimeToHumanView(endDate!) : DateConstants.longDayEndDayChoose;
+    startTimeController.text = startTime != null ? sm.formatTimeToHumanView(startTime!) : DateConstants.startTimeChoose;
+    endTimeController.text = endTime != null ? sm.formatTimeToHumanView(endTime!) : DateConstants.endTimeChoose;
 
     return ElementsOfDesign.buildAdaptiveRow(
         isMobile: isMobile,
         children: [
           ElementsOfDesign.buildTextField(
               controller: startDateController,
-              labelText: 'Дата начала проведения',
+              labelText: FieldsConstants.startDateField,
               canEdit: canEdit,
               icon: FontAwesomeIcons.calendar,
               context: context,
@@ -237,7 +239,7 @@ class LongDate {
 
           ElementsOfDesign.buildTextField(
               controller: endDateController,
-              labelText: 'Дата завершения проведения',
+              labelText: FieldsConstants.endDateField,
               canEdit: canEdit,
               icon: FontAwesomeIcons.calendar,
               context: context,
@@ -247,18 +249,18 @@ class LongDate {
 
           ElementsOfDesign.buildTextField(
               controller: startTimeController,
-              labelText: 'Время начала',
+              labelText: FieldsConstants.startTimeField,
               canEdit: canEdit,
-              icon: FontAwesomeIcons.signature,
+              icon: FontAwesomeIcons.clock,
               context: context,
               readOnly: true,
               onTap: onStartTime
           ),
           ElementsOfDesign.buildTextField(
               controller: endTimeController,
-              labelText: 'Время завершения',
+              labelText: FieldsConstants.endTimeField,
               canEdit: canEdit,
-              icon: FontAwesomeIcons.signature,
+              icon: FontAwesomeIcons.clock,
               context: context,
               readOnly: true,
               onTap: onEndTime

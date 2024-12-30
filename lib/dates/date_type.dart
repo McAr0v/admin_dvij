@@ -1,7 +1,7 @@
 import 'package:admin_dvij/constants/date_type_constants.dart';
+import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../design_elements/elements_of_design.dart';
 
 enum DateTypeEnum {
@@ -43,7 +43,7 @@ class DateType {
 
     return ElementsOfDesign.buildTextField(
         controller: dateTypeController,
-        labelText: 'Тип дат проведения',
+        labelText: FieldsConstants.dateTypeField,
         canEdit: canEdit,
         icon: FontAwesomeIcons.calendar,
         context: context,
@@ -63,7 +63,7 @@ class DateType {
         return !translate ? DateTypeConstants.regularId : DateTypeConstants.regularHeadline;
       case DateTypeEnum.irregular:
         return !translate ? DateTypeConstants.irregularId : DateTypeConstants.irregularHeadline;
-      default: return !translate ? '' : 'Тип дат';
+      default: return !translate ? '' : DateTypeConstants.notChosenHeadline;
     }
   }
 

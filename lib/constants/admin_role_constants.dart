@@ -27,7 +27,7 @@ class AdminRoleConstants{
   static const savingAdminProcess = 'Сохранение администратора';
   static const loadingAdminProcess = 'Загрузка админов';
   static const deletingAdminProcess = 'Удаление администратора';
-  static const noChosenUser = 'Пользователь не выбран';
+
   static const thisIsCreator = 'Это создатель';
   static const cantChangeCreator = 'Создателя нельзя изменить';
   static const adminsInChosenPlace = 'Администраторы в';

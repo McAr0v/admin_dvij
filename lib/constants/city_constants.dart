@@ -17,4 +17,7 @@ class CityConstants {
   static const String citySearch = 'Поиск города...';
   static const String cityNotChosen = 'Город не выбран';
   static const String chooseCity = 'Выберите город';
+  static const String noChosenCityError = 'Не выбран город';
+
+
 }

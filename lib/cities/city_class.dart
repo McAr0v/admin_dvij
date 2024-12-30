@@ -53,7 +53,7 @@ class City implements IEntity<City>{
         controller: cityController,
         labelText: UserConstants.city,
         canEdit: canEdit,
-        icon: FontAwesomeIcons.city,
+        icon: FontAwesomeIcons.mapLocation,
         context: context,
         readOnly: true,
         onTap: onTap

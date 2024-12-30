@@ -9,5 +9,6 @@ class ButtonsConstants {
   static const String changePhoto = 'Изменить фото';
   static const String reset = 'Сбросить';
   static const String chooseUser = 'Выбрать пользователя';
+  static const String addDate = 'Добавить дату';
 
 }

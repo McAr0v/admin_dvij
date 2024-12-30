@@ -13,6 +13,7 @@ import 'package:admin_dvij/users/simple_users/creator_popup.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../../constants/errors_constants.dart';
 import '../../design/app_colors.dart';
 import '../../system_methods/system_methods_class.dart';
 import '../../users/simple_users/simple_user.dart';
@@ -133,7 +134,7 @@ class _AddOrEditPlaceAdminState extends State<AddOrEditPlaceAdmin> {
 
 
                                 Text(
-                                  AdminRoleConstants.noChosenUser,
+                                  ErrorConstants.noChosenUser,
                                   style: Theme.of(context).textTheme.bodyMedium,
                                 ),
 

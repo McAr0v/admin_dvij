@@ -1,6 +1,8 @@
 class EventsConstants {
   static const eventsPath = 'events';
   static const String eventsInfoFolder = 'event_info';
+  static const String eventTypeId = 'event_info';
+
 
 
   // screens
@@ -10,7 +12,12 @@ class EventsConstants {
   static const createEventProcess = 'Идет создание мероприятия';
   static const loadingEventProcess = 'Идет загрузка мероприятий';
   static const deleteEventProcess = 'Идет удаление мероприятия';
+  static const deleteEventSuccess = 'Мероприятие успешно удалено';
   static const editEventProcess = 'Сохранение мероприятия';
+  static const editEventSuccess = 'Мероприятие успешно сохранено';
+
+  static const String deleteEventHeadline = 'Удалить мероприятие?';
+  static const String deleteEventDesc = 'Если удалите мероприятие, данные будет невозможно восстановить';
 
   // fields
   static const String nameEvent = 'Заголовок мероприятия';
@@ -24,6 +31,12 @@ class EventsConstants {
   // tabs
   static const activeTab = 'Активные';
   static const completedTab = 'Завершенные';
+
+
+  static const noNameError = 'Нет названия мероприятия';
+  static const noDescError = 'Нет описания мероприятия';
+
+
 
 
   static const String searchBarHeadline = 'Название, описание, категория, город, адрес...';

@@ -1,3 +1,5 @@
+import 'package:admin_dvij/constants/buttons_constants.dart';
+import 'package:admin_dvij/constants/date_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/dates/once_date.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
@@ -59,7 +61,7 @@ class IrregularDate {
   String checkDate(){
 
     if (dates.isEmpty){
-      return 'Не выбран ни один день проведения';
+      return DateConstants.irregularDateNoDateError;
     } else {
       for (int i = 0; i < dates.length; i++){
         String result = dates[i].checkDate();
@@ -68,11 +70,7 @@ class IrregularDate {
         }
       }
     }
-
-
-
     return SystemConstants.successConst;
-
   }
 
   /// Метод для преобразования объекта IrregularDate в JSON-строку
@@ -140,7 +138,7 @@ class IrregularDate {
   void sortDates() {
     dates.sort((a, b) {
       // Сравниваем по времени начала
-      return a.startDateTime.compareTo(b.startDateTime!);
+      return a.startDateTime.compareTo(b.startDateTime);
     });
   }
 
@@ -169,13 +167,10 @@ class IrregularDate {
 
         if (canEdit) ElementsOfDesign.customButton(
             method: addDate,
-            textOnButton: 'Добавить дату',
+            textOnButton: ButtonsConstants.addDate,
             context: context
         )
-
       ],
     );
   }
-
-
 }

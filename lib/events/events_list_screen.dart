@@ -52,7 +52,7 @@ class _EventsListScreenState extends State<EventsListScreen> {
                     runSpacing: 10, // Вертикальное расстояние между строками
                     children: [
                       tempEvent.getEventStatusWidget(context: context),
-                      tempEvent.getFavCounter(context: context),
+                      tempEvent.getFavCounterWidget(context: context),
                       tempEvent.getPriceWidget(context: context),
 
                     ],

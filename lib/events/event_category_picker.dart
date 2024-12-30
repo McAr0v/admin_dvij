@@ -1,5 +1,6 @@
 import 'package:admin_dvij/categories/event_categories/event_categories_list.dart';
 import 'package:admin_dvij/categories/event_categories/event_category.dart';
+import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:flutter/material.dart';
 import '../constants/system_constants.dart';
 import '../design/app_colors.dart';
@@ -67,7 +68,7 @@ class _EventCategoryPickerState extends State<EventCategoryPicker> {
                 child: TextField(
                   controller: searchController,
                   decoration: const InputDecoration(
-                    hintText: 'Название категории',
+                    hintText: FieldsConstants.categoryNameHintField,
                   ),
                   onChanged: (value) {
                     updateFilteredCities(value);

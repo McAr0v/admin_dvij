@@ -1,6 +1,6 @@
+import 'package:admin_dvij/constants/address_type_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../design_elements/elements_of_design.dart';
 
 enum AddressTypeEnum {
@@ -18,9 +18,9 @@ class AddressType {
   @override
   String toString() {
     switch (addressTypeEnum) {
-      case AddressTypeEnum.address: return 'По адресу';
-      case AddressTypeEnum.place: return 'В заведении';
-      case AddressTypeEnum.notChosen: return 'Не выбран';
+      case AddressTypeEnum.address: return AddressTypeConstants.onAddress;
+      case AddressTypeEnum.place: return AddressTypeConstants.inPlace;
+      case AddressTypeEnum.notChosen: return AddressTypeConstants.notChosen;
     }
   }
 
@@ -42,7 +42,7 @@ class AddressType {
 
     return ElementsOfDesign.buildTextField(
         controller: addressTypeController,
-        labelText: 'Где проводится',
+        labelText: AddressTypeConstants.whenAction,
         canEdit: canEdit,
         icon: FontAwesomeIcons.city,
         context: context,

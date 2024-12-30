@@ -1,5 +1,6 @@
 import 'package:admin_dvij/categories/event_categories/event_category.dart';
 import 'package:admin_dvij/cities/city_picker_page.dart';
+import 'package:admin_dvij/constants/address_type_constants.dart';
 import 'package:admin_dvij/constants/categories_constants.dart';
 import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/events/event_category_picker.dart';
@@ -143,7 +144,7 @@ class _FilterEventsState extends State<FilterEvents> {
               const SizedBox(height: 20,),
 
               ElementsOfDesign.checkBox(
-                  text: 'В заведении',
+                  text: AddressTypeConstants.inPlace,
                   isChecked: chosenInPlace,
                   onChanged: (value){
                     setState(() {

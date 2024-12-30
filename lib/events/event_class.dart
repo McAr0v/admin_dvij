@@ -1,7 +1,11 @@
 import 'dart:io';
 import 'package:admin_dvij/categories/event_categories/event_categories_list.dart';
 import 'package:admin_dvij/cities/cities_list_class.dart';
+import 'package:admin_dvij/constants/date_constants.dart';
+import 'package:admin_dvij/constants/event_type_constants.dart';
 import 'package:admin_dvij/constants/events_constants.dart';
+import 'package:admin_dvij/constants/places_constants.dart';
+import 'package:admin_dvij/constants/price_type_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/dates/date_type.dart';
 import 'package:admin_dvij/events/events_list_class.dart';
@@ -115,13 +119,13 @@ class EventClass implements IEntity{
     EventCategoriesList eventCategoriesList = EventCategoriesList();
     CitiesList citiesList = CitiesList();
 
-    IrregularDate irregularDate = IrregularDate.fromJson(json: infoFolder.child('irregularDays').value.toString());
+    IrregularDate irregularDate = IrregularDate.fromJson(json: infoFolder.child(DateConstants.irregularDaysId).value.toString());
 
     irregularDate.sortDates();
 
     return EventClass(
         id: infoFolder.child(DatabaseConstants.id).value.toString(),
-        dateType: DateType.fromString(enumString: infoFolder.child('eventType').value.toString()),
+        dateType: DateType.fromString(enumString: infoFolder.child(EventTypeConstants.eventTypeId).value.toString()),
         headline: infoFolder.child(DatabaseConstants.headline).value.toString(),
         desc: infoFolder.child(DatabaseConstants.desc).value.toString(),
         creatorId: infoFolder.child(DatabaseConstants.creatorId).value.toString(),
@@ -136,11 +140,11 @@ class EventClass implements IEntity{
         instagram: infoFolder.child(DatabaseConstants.instagram).value.toString(),
         imageUrl: infoFolder.child(DatabaseConstants.imageUrl).value.toString(),
         placeId: infoFolder.child(DatabaseConstants.placeId).value.toString(),
-        priceType: PriceType.fromString(enumString: infoFolder.child('priceType').value.toString()),
+        priceType: PriceType.fromString(enumString: infoFolder.child(PriceTypeConstants.priceTypeId).value.toString()),
         price: infoFolder.child(DatabaseConstants.price).value.toString(),
-        onceDay: OnceDate.fromJson(jsonString: infoFolder.child('onceDay').value.toString()),
-        longDays: LongDate.fromJson(jsonString: infoFolder.child('longDays').value.toString()),
-        regularDays: RegularDate.fromJson(infoFolder.child('regularDays').value.toString()),
+        onceDay: OnceDate.fromJson(jsonString: infoFolder.child(DateConstants.onceDayId).value.toString()),
+        longDays: LongDate.fromJson(jsonString: infoFolder.child(DateConstants.longDaysId).value.toString()),
+        regularDays: RegularDate.fromJson(infoFolder.child(DateConstants.regularDaysId).value.toString()),
         irregularDays: irregularDate,
         favUsersIds: methodsForDatabase.getStringFromKeyFromSnapshot(snapshot: favFolder, key: DatabaseConstants.userId),
     );
@@ -155,13 +159,13 @@ class EventClass implements IEntity{
     EventCategoriesList eventCategoriesList = EventCategoriesList();
     CitiesList citiesList = CitiesList();
 
-    IrregularDate irregularDate = IrregularDate.fromJson(json: infoFolder['irregularDays'] ?? '');
+    IrregularDate irregularDate = IrregularDate.fromJson(json: infoFolder[DateConstants.irregularDaysId] ?? '');
 
     irregularDate.sortDates();
 
     return EventClass(
         id: infoFolder[DatabaseConstants.id] ?? '',
-        dateType: DateType.fromString(enumString: infoFolder['eventType'] ?? ''),
+        dateType: DateType.fromString(enumString: infoFolder[EventTypeConstants.eventTypeId] ?? ''),
         headline: infoFolder[DatabaseConstants.headline] ?? '',
         desc: infoFolder[DatabaseConstants.desc] ?? '',
         creatorId: infoFolder[DatabaseConstants.creatorId] ?? '',
@@ -176,11 +180,11 @@ class EventClass implements IEntity{
         instagram: infoFolder[DatabaseConstants.instagram] ?? '',
         imageUrl: infoFolder[DatabaseConstants.imageUrl] ?? '',
         placeId: infoFolder[DatabaseConstants.placeId] ?? '',
-        priceType: PriceType.fromString(enumString: infoFolder['priceType'] ?? ''),
+        priceType: PriceType.fromString(enumString: infoFolder[PriceTypeConstants.priceTypeId] ?? ''),
         price: infoFolder[DatabaseConstants.price] ?? '',
-        onceDay: OnceDate.fromJson(jsonString: infoFolder['onceDay'] ?? ''),
-        longDays: LongDate.fromJson(jsonString: infoFolder['longDays'] ?? ''),
-        regularDays: RegularDate.fromJson(infoFolder['regularDays'] ?? ''),
+        onceDay: OnceDate.fromJson(jsonString: infoFolder[DateConstants.onceDayId] ?? ''),
+        longDays: LongDate.fromJson(jsonString: infoFolder[DateConstants.longDaysId] ?? ''),
+        regularDays: RegularDate.fromJson(infoFolder[DateConstants.regularDaysId] ?? ''),
         irregularDays: irregularDate,
         favUsersIds: favFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: favFolder, inputKey: DatabaseConstants.userId) : []
     );
@@ -254,14 +258,14 @@ class EventClass implements IEntity{
       DatabaseConstants.telegram: telegram,
       DatabaseConstants.instagram: instagram,
       DatabaseConstants.imageUrl: imageUrl,
-      'eventType': dateType.toString(),
+      EventTypeConstants.eventTypeId: dateType.toString(),
       DatabaseConstants.placeId: placeId,
-      'priceType': priceType.toString(),
+      PriceTypeConstants.priceTypeId: priceType.toString(),
       DatabaseConstants.price: price,
-      'onceDay': onceDay.toJsonString(),
-      'longDays': longDays.toJsonString(),
-      'regularDays': regularDays.toJsonString(),
-      'irregularDays': irregularDays.toJson()
+      DateConstants.onceDayId: onceDay.toJsonString(),
+      DateConstants.longDaysId: longDays.toJsonString(),
+      DateConstants.regularDaysId: regularDays.toJsonString(),
+      DateConstants.irregularDaysId: irregularDays.toJson()
     };
   }
 
@@ -301,23 +305,23 @@ class EventClass implements IEntity{
 
     String path = '${EventsConstants.eventsPath}/$id/${EventsConstants.eventsInfoFolder}';
 
-    Map <String, dynamic> placeData = getMap();
+    Map <String, dynamic> eventData = getMap();
 
     String result = '';
 
     if (!Platform.isWindows){
 
-      result = await db.publishToDB(path, placeData);
+      result = await db.publishToDB(path, eventData);
 
     } else {
 
-      result = await db.publishToDBForWindows(path, placeData);
+      result = await db.publishToDBForWindows(path, eventData);
 
     }
 
     // Если мероприятие от заведения
     if (placeId.isNotEmpty){
-      // Удаляем в заведении нашe мероприятие
+      // Добавляем в заведении нашe мероприятие
       Place place = placesList.getEntityFromList(placeId);
       await place.addEventToPlace(eventId: id);
       placesList.addToCurrentDownloadedList(place);
@@ -337,7 +341,7 @@ class EventClass implements IEntity{
     return result;
   }
 
-  Widget getFavCounter({required BuildContext context}){
+  Widget getFavCounterWidget({required BuildContext context}){
     return ElementsOfDesign.getTag(
         context: context,
         text: favUsersIds.length.toString(),
@@ -403,7 +407,7 @@ class EventClass implements IEntity{
   Widget getEventStatusWidget({required BuildContext context}){
     return ElementsOfDesign.getTag(
         context: context,
-        text: isFinished() ? 'Завершено' : 'Активно',
+        text: isFinished() ? SystemConstants.finishedStatus : SystemConstants.activeStatus,
         icon: isFinished() ? FontAwesomeIcons.flagCheckered : FontAwesomeIcons.circleDot,
         color: isFinished() ?  AppColors.greyBackground : AppColors.success,
         textColor: AppColors.white
@@ -414,7 +418,7 @@ class EventClass implements IEntity{
     if (placeId.isNotEmpty) {
       return ElementsOfDesign.getTag(
           context: context,
-          text: 'От заведения',
+          text: PlacesConstants.fromPlace,
           icon: FontAwesomeIcons.locationPin,
           color: AppColors.greyBackground,
           textColor: AppColors.white
@@ -433,7 +437,7 @@ class EventClass implements IEntity{
     } else if (dateType.dateType == DateTypeEnum.regular) {
       return regularDays.getHumanViewDate();
     } else {
-      return 'В разные дни, по расписанию';
+      return DateConstants.inRandomDates;
     }
   }
 
@@ -443,7 +447,7 @@ class EventClass implements IEntity{
     } else if (dateType.dateType == DateTypeEnum.long){
       return longDays.getTimePeriod();
     } else {
-      return 'По расписанию';
+      return DateConstants.fromSchedule;
     }
   }
 

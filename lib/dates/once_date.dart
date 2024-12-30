@@ -1,11 +1,11 @@
 import 'dart:convert';
+import 'package:admin_dvij/constants/date_constants.dart';
+import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import '../design/app_colors.dart';
 import '../design_elements/elements_of_design.dart';
 
 class OnceDate {
@@ -40,9 +40,9 @@ class OnceDate {
       final Map<String, dynamic> json = jsonDecode(jsonString);
 
       // Извлекаем данные и создаем экземпляр
-      final date = DateTime.parse(json['date']);
-      final startTimeParts = json['startTime'].split(':').map(int.parse).toList();
-      final endTimeParts = json['endTime'].split(':').map(int.parse).toList();
+      final date = DateTime.parse(json[DateConstants.onceDayDateId]);
+      final startTimeParts = json[DateConstants.startTimeId].split(':').map(int.parse).toList();
+      final endTimeParts = json[DateConstants.endTimeId].split(':').map(int.parse).toList();
 
       return OnceDate(
         date: date,
@@ -60,9 +60,9 @@ class OnceDate {
     if (date != null && startTime != null && endTime != null){
       // Преобразуем объект в карту
       final Map<String, String> json = {
-        'date': date!.toIso8601String().split('T').first, // Только дата
-        'startTime': '${startTime!.hour.toString().padLeft(2, '0')}:${startTime!.minute.toString().padLeft(2, '0')}',
-        'endTime': '${endTime!.hour.toString().padLeft(2, '0')}:${endTime!.minute.toString().padLeft(2, '0')}',
+        DateConstants.onceDayDateId: date!.toIso8601String().split('T').first, // Только дата
+        DateConstants.startTimeId: '${startTime!.hour.toString().padLeft(2, '0')}:${startTime!.minute.toString().padLeft(2, '0')}',
+        DateConstants.endTimeId: '${endTime!.hour.toString().padLeft(2, '0')}:${endTime!.minute.toString().padLeft(2, '0')}',
       };
 
       // Возвращаем строку в формате JSON
@@ -74,11 +74,11 @@ class OnceDate {
 
   String checkDate(){
     if (date == null){
-      return 'Дата не выбрана';
+      return DateConstants.onceDayDateNoChosen;
     } else if (startTime == null){
-      return 'Не выбрано время начала';
+      return DateConstants.startTimeNoChosen;
     } else if (endTime == null){
-      return 'Не выбрано время завершения';
+      return DateConstants.endTimeNoChosen;
     } else {
       return SystemConstants.successConst;
     }
@@ -92,7 +92,7 @@ class OnceDate {
     if (date != null){
       return sm.formatDateTimeToHumanView(date!);
     } else {
-      return 'Дата не выбрана';
+      return DateConstants.onceDayDateNoChosen;
     }
   }
 
@@ -228,9 +228,9 @@ class OnceDate {
     TextEditingController startTimeController = TextEditingController();
     TextEditingController endTimeController = TextEditingController();
 
-    dateController.text = date != null ? sm.formatDateTimeToHumanView(date!) : 'Выбери дату';
-    startTimeController.text = startTime != null ? sm.formatTimeToHumanView(startTime!) : 'Выбери время начала';
-    endTimeController.text = endTime != null ? sm.formatTimeToHumanView(endTime!) : 'Выбери время завершения';
+    dateController.text = date != null ? sm.formatDateTimeToHumanView(date!) : DateConstants.onceDayDateChoose;
+    startTimeController.text = startTime != null ? sm.formatTimeToHumanView(startTime!) : DateConstants.startTimeChoose;
+    endTimeController.text = endTime != null ? sm.formatTimeToHumanView(endTime!) : DateConstants.endTimeChoose;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -247,7 +247,7 @@ class OnceDate {
                 Expanded(
                   child: ElementsOfDesign.buildTextField(
                       controller: dateController,
-                      labelText: 'Дата проведения',
+                      labelText: FieldsConstants.dateField,
                       canEdit: canEdit,
                       icon: FontAwesomeIcons.calendar,
                       context: context,
@@ -264,25 +264,22 @@ class OnceDate {
             ),
             ElementsOfDesign.buildTextField(
                 controller: startTimeController,
-                labelText: 'Время начала',
+                labelText: FieldsConstants.startTimeField,
                 canEdit: canEdit,
-                icon: FontAwesomeIcons.signature,
+                icon: FontAwesomeIcons.clock,
                 context: context,
                 readOnly: true,
                 onTap: onStartTimeTap
             ),
             ElementsOfDesign.buildTextField(
                 controller: endTimeController,
-                labelText: 'Время завершения',
+                labelText: FieldsConstants.endTimeField,
                 canEdit: canEdit,
-                icon: FontAwesomeIcons.signature,
+                icon: FontAwesomeIcons.clock,
                 context: context,
                 readOnly: true,
                 onTap: onEndTimeTap
             ),
-
-
-
           ]
       ),
     );

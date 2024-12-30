@@ -1,3 +1,4 @@
+import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:admin_dvij/constants/price_type_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -32,8 +33,8 @@ class PriceType {
 
   Widget getFreePriceWidget({required BuildContext context}){
     return ElementsOfDesign.buildTextField(
-        controller: TextEditingController(text: 'Бесплатно'),
-        labelText: 'Цена',
+        controller: TextEditingController(text: PriceTypeConstants.freePrice),
+        labelText: FieldsConstants.priceHeadline,
         canEdit: false,
         icon: FontAwesomeIcons.dollarSign,
         context: context
@@ -47,9 +48,9 @@ class PriceType {
   }){
     return ElementsOfDesign.buildTextField(
         controller: TextEditingController(text: toString(translate: true)),
-        labelText: 'Тип цены за билеты',
+        labelText: FieldsConstants.priceTypeHeadline,
         canEdit: canEdit,
-        icon: FontAwesomeIcons.dollarSign,
+        icon: FontAwesomeIcons.tengeSign,
         context: context,
         readOnly: true,
         onTap: onTap

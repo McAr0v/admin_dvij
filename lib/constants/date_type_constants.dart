@@ -9,4 +9,6 @@ class DateTypeConstants {
   static const longHeadline = 'В период дат';
   static const regularHeadline = 'Регулярное';
   static const irregularHeadline = 'В разные даты';
+  static const notChosenHeadline = 'Тип дат';
+
 }

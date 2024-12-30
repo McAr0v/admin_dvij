@@ -138,7 +138,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             ElementsOfDesign.drawerListElement(
                 ScreenConstants.events,
-                FontAwesomeIcons.house,
+                FontAwesomeIcons.champagneGlasses,
                 const EventsPage(),
                 context
             ),

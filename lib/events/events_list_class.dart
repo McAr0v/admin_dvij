@@ -1,10 +1,8 @@
 import 'dart:io';
-
 import 'package:admin_dvij/constants/events_constants.dart';
 import 'package:admin_dvij/events/event_class.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
-
 import '../categories/event_categories/event_category.dart';
 import '../cities/city_class.dart';
 import '../database/database_class.dart';

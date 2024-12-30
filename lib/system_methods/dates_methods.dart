@@ -1,3 +1,4 @@
+import 'package:admin_dvij/constants/errors_constants.dart';
 import 'package:flutter/material.dart';
 
 class DateMethods{
@@ -10,7 +11,7 @@ class DateMethods{
       final end = _formatTimeOfDay(endTime);
       return "$start - $end";
     } else {
-      return 'Время не выбрано';
+      return ErrorConstants.noChosenTime;
     }
 
   }

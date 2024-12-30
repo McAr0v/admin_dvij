@@ -6,6 +6,8 @@ import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
+import 'package:admin_dvij/events/event_class.dart';
+import 'package:admin_dvij/events/events_list_class.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
 import 'package:admin_dvij/places/place_admin/place_role_class.dart';
@@ -159,11 +161,11 @@ class Place implements IEntity{
     required VoidCallback onTap
   }){
     TextEditingController placeController = TextEditingController();
-    placeController.text = id.isNotEmpty ? name : 'Выбери заведение';
+    placeController.text = id.isNotEmpty ? name : PlacesConstants.choosePlace;
 
     return ElementsOfDesign.buildTextField(
         controller: placeController,
-        labelText: 'Название заведения',
+        labelText: PlacesConstants.namePlace,
         canEdit: canEdit,
         icon: FontAwesomeIcons.house,
         context: context,
@@ -177,6 +179,7 @@ class Place implements IEntity{
 
     SimpleUsersList usersList = SimpleUsersList();
     final ImageUploader imageUploader = ImageUploader();
+    EventsListClass eventsListClass = EventsListClass();
 
     DatabaseClass db = DatabaseClass();
 
@@ -203,8 +206,17 @@ class Place implements IEntity{
 
     await usersList.deletePlaceAdminsFromAllUsers(id);
 
+    // Если список мероприятий не пуст, при удалении заведения удаляем и мероприятия
     if (eventsList.isNotEmpty){
-      // TODO Сделать удаление мероприятий этого заведения
+      for (String eventId in eventsList){
+        // Подгружаем каждое мероприятие и удаляем
+        if (eventId.isNotEmpty){
+          EventClass event = eventsListClass.getEntityFromList(eventId);
+          if (event.id.isNotEmpty){
+            await event.deleteFromDb();
+          }
+        }
+      }
     }
 
     if (promosList.isNotEmpty){
@@ -314,16 +326,14 @@ class Place implements IEntity{
 
     String path = '${PlacesConstants.placesPath}/$id/${DatabaseConstants.events}/$eventId';
 
-    String result = '';
-
     Map <String, dynamic> data = <String, dynamic> {
       DatabaseConstants.eventId: eventId,
     };
 
     if (Platform.isWindows){
-      result = await db.publishToDBForWindows(path, data);
+      await db.publishToDBForWindows(path, data);
     } else {
-      result = await db.publishToDB(path, data);
+      await db.publishToDB(path, data);
     }
 
     // Проверяем, есть ли у этого заведения мероприятия
@@ -392,7 +402,7 @@ class Place implements IEntity{
     return ElementsOfDesign.getTag(
         context: context,
         text: eventsList.length.toString(),
-        icon: FontAwesomeIcons.cakeCandles,
+        icon: FontAwesomeIcons.champagneGlasses,
         color: AppColors.greyBackground,
         textColor: AppColors.white
 

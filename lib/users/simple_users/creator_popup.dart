@@ -2,6 +2,7 @@ import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/material.dart';
+import '../../constants/simple_users_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../design/app_colors.dart';
 import '../../design/loading_screen.dart';
@@ -82,7 +83,7 @@ class _CreatorPopupState extends State<CreatorPopup> {
                 child: TextField(
                   controller: searchController,
                   decoration: const InputDecoration(
-                    hintText: 'Имя, фамилия, телефон...',
+                    hintText: SimpleUsersConstants.searchTint,
                   ),
                   onChanged: (value) {
                     updateFilteredUsers(value);

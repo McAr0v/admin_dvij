@@ -377,8 +377,8 @@ class ElementsOfDesign {
       onPressed: onClean,
       icon: const Icon(FontAwesomeIcons.x, size: 15, color: AppColors.attentionRed,),
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.resolveWith<Color?>(
-              (Set<MaterialState> states) {
+        backgroundColor: WidgetStateProperty.resolveWith<Color?>(
+              (Set<WidgetState> states) {
             return AppColors.greyBackground;
           },
         ),
@@ -473,7 +473,4 @@ class ElementsOfDesign {
       ),
     );
   }
-
-
-
 }

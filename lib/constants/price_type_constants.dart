@@ -4,6 +4,9 @@ class PriceTypeConstants {
   static const fixedId = 'fixed';
   static const rangeId = 'range';
 
+  static const priceTypeId = 'priceType';
+
+
   static const freeHeadline = 'Бесплатный вход';
   static const fixeHeadline = 'Фиксированная цена';
   static const rangeHeadline = 'Диапазон цен';

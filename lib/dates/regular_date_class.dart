@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:admin_dvij/constants/regular_date_constants.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../design/app_colors.dart';
-import '../system_methods/system_methods_class.dart';
 
 class RegularDate {
   TimeOfDay? mondayStart;
@@ -295,7 +295,7 @@ class RegularDate {
     return Expanded(
       child: ElementsOfDesign.buildTextFieldWithoutController(
           controllerText: _days[index],
-          labelText: 'День недели',
+          labelText: FieldsConstants.dayOfWeekField,
           canEdit: false,
           icon: FontAwesomeIcons.calendarDay,
           context: context,
@@ -350,7 +350,7 @@ class RegularDate {
                     Expanded(
                       child: ElementsOfDesign.buildTextFieldWithoutController(
                           controllerText: getTime(index: i, isStart: true)?.format(context) ?? RegularDateConstants.notChosen,
-                          labelText: 'Время начала',
+                          labelText: FieldsConstants.startTimeField,
                           canEdit: canEdit,
                           icon: FontAwesomeIcons.clock,
                           context: context,
@@ -364,7 +364,7 @@ class RegularDate {
                     Expanded(
                       child: ElementsOfDesign.buildTextFieldWithoutController(
                           controllerText: getTime(index: i, isStart: false)?.format(context) ?? RegularDateConstants.notChosen,
-                          labelText: 'Время завершения',
+                          labelText: FieldsConstants.endTimeField,
                           canEdit: canEdit,
                           icon: FontAwesomeIcons.clock,
                           context: context,

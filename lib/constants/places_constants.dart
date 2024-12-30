@@ -2,6 +2,9 @@ class PlacesConstants{
   static const placesPath = 'places';
   static const String placeInfoFolder = 'place_info';
 
+  static const String fromPlace = 'От заведения';
+  static const String choosePlace = 'Выбери заведение';
+
 
   static const String searchBarHeadline = 'Название, описание, категория, адрес...';
   static const String watchPlace = 'Просмотр заведения';

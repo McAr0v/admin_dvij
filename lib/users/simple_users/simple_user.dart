@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
@@ -570,11 +569,11 @@ class SimpleUser extends IEntity{
                       style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
                     ),
                     Text(
-                      'Моих заведений - ${placesList.length.toString()}',
+                      '${SimpleUsersConstants.myPlaces} - ${placesList.length.toString()}',
                       style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
                     ),
                     Text(
-                      'Моих мероприятий - ${myEvents.length.toString()}',
+                      '${SimpleUsersConstants.myEvents} - ${myEvents.length.toString()}',
                       style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
                     ),
                   ],
@@ -668,7 +667,4 @@ class SimpleUser extends IEntity{
       ),
     );
   }
-
-
-
 }

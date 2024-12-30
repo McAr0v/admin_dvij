@@ -1,7 +1,5 @@
 import 'package:admin_dvij/address/address_or_place_class.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../design/app_colors.dart';
 
 class AddressTypePicker extends StatefulWidget {
