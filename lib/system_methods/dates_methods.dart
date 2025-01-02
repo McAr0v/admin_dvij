@@ -23,4 +23,12 @@ class DateMethods{
     return "$hour:$minute";
   }
 
+  String formatTimeOrDateWithZero(int dayOrMonth){
+    if (dayOrMonth < 10) {
+      return '0$dayOrMonth';
+    } else {
+      return '$dayOrMonth';
+    }
+  }
+
 }
