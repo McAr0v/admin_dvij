@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
+import 'package:admin_dvij/privacy_policy/privacy_enum.dart';
 import 'package:admin_dvij/privacy_policy/privacy_policy_class.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../database/database_class.dart';
@@ -11,7 +12,9 @@ class PrivacyPolicyList implements IEntitiesList<PrivacyPolicyClass>{
   @override
   void addToCurrentDownloadedList(PrivacyPolicyClass entity) {
     // Проверяем, есть ли элемент с таким id
-    int index = _currentPrivacyPoliciesList.indexWhere((c) => c.getFolderId() == entity.getFolderId());
+    int index = _currentPrivacyPoliciesList.indexWhere((c) => c.id == entity.id);
+
+
 
     if (index != -1) {
       // Если элемент с таким id уже существует, заменяем его
@@ -21,7 +24,17 @@ class PrivacyPolicyList implements IEntitiesList<PrivacyPolicyClass>{
       _currentPrivacyPoliciesList.add(entity);
     }
 
-    _currentPrivacyPoliciesList.sortPolicyList(true);
+    //_currentPrivacyPoliciesList.sortPolicyList(true);
+    _currentPrivacyPoliciesList.rightSort();
+  }
+
+  Future<void> deactivatedLastActivePrivacy({required String currentActiveId}) async {
+    for (PrivacyPolicyClass privacy in _currentPrivacyPoliciesList) {
+      if (privacy.isActive() && currentActiveId != privacy.id) {
+        privacy.status = PrivacyStatus(privacyEnum: PrivacyEnum.draft);
+        await privacy.publishToDb(null);
+      }
+    }
   }
 
   @override
@@ -127,6 +140,18 @@ class PrivacyPolicyList implements IEntitiesList<PrivacyPolicyClass>{
 }
 
 extension SortPoliciesListExtension on List<PrivacyPolicyClass> {
+
+  void rightSort() {
+    sort((a, b) {
+      // Сначала сортируем по статусу: active выше, draft ниже
+      if (a.status.privacyEnum != b.status.privacyEnum) {
+        return a.status.privacyEnum == PrivacyEnum.active ? -1 : 1;
+      }
+
+      // Если статусы одинаковые, сортируем по дате создания (от новых к старым)
+      return b.date.compareTo(a.date);
+    });
+  }
 
   void sortPolicyList(bool order) {
     if (order) {

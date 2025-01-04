@@ -91,6 +91,14 @@ class AdminRoleClass {
     }
   }
 
+  bool accessToEditPrivacyPolicy(){
+    if (adminRole == AdminRole.notChosen || adminRole == AdminRole.viewer || adminRole == AdminRole.advertiser) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   /// Метод выдачи доступа на удаление заведений
   bool accessToDeletePlaces(){
     if (adminRole == AdminRole.creator || adminRole == AdminRole.superAdmin) {
