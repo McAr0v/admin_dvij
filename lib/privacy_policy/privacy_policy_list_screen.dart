@@ -1,5 +1,6 @@
 import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/constants/privacy_constants.dart';
+import 'package:admin_dvij/database/image_uploader.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/privacy_policy/privacy_policy_class.dart';
 import 'package:admin_dvij/privacy_policy/privacy_policy_list_class.dart';
@@ -21,6 +22,8 @@ class PrivacyPolicyListScreen extends StatefulWidget {
 }
 
 class _PrivacyPolicyListScreenState extends State<PrivacyPolicyListScreen> {
+  
+  ImageUploader im = ImageUploader();
 
   bool loading = false;
   bool deleting = false;
@@ -42,6 +45,9 @@ class _PrivacyPolicyListScreenState extends State<PrivacyPolicyListScreen> {
     setState(() {
       loading = true;
     });
+    
+    await im.getAllImages('admins');
+    await im.getAllImages('events');
 
     currentList = [];
 

@@ -9,6 +9,35 @@ class ImageUploader {
   // Инициализируем Storage
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
+  Future<List<String>> getAllImages(String folderPath) async {
+    List<String> imageUrls = [];
+    try {
+      // Получаем список всех папок и файлов в `folderPath`
+      final ListResult usersFolder = await _storage.ref(folderPath).listAll();
+
+      for (var userFolder in usersFolder.prefixes) { // Перебираем подпапки (UID пользователей)
+        String uid = userFolder.name;
+
+        print(uid);
+
+        final ListResult images = await userFolder.listAll();
+
+        for (var fileRef in images.items) { // Перебираем файлы в подпапке
+          final String url = await fileRef.getDownloadURL();
+          imageUrls.add(url);
+        }
+      }
+    } catch (e) {
+      print('Ошибка при получении списка изображений: $e');
+    }
+
+    for (String url in imageUrls) {
+      print('$folderPath - $url');
+    }
+
+    return imageUrls;
+  }
+
   Future<String?> uploadImage({required String entityId, required File pickedFile, required String folder}) async {
 
     ImagePickerService imagePickerService = ImagePickerService();
