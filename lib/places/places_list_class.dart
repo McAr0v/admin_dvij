@@ -14,6 +14,7 @@ import '../database/database_class.dart';
 import '../design/app_colors.dart';
 import '../design_elements/elements_of_design.dart';
 import '../images/image_from_db.dart';
+import '../images/image_location.dart';
 import '../users/simple_users/simple_user.dart';
 
 class PlacesList implements IEntitiesList<Place>{
@@ -46,7 +47,7 @@ class PlacesList implements IEntitiesList<Place>{
     Set<String> linkedImageIds = _currentPlacesList.map((entity) => entity.id).toSet();
 
     // Фильтруем список картинок, оставляя только те, которых нет в Set
-    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
+    return imagesList.where((image) => !linkedImageIds.contains(image.id) && image.location.location == ImageLocationEnum.places ).toList();
 
   }
 

@@ -20,7 +20,8 @@ class ImagesListScreen extends StatefulWidget {
 
 class _ImagesListScreenState extends State<ImagesListScreen> {
 
-  List<ImageFromDb> imagesList = [];
+  List<ImageFromDb> allImagesList = [];
+  List<ImageFromDb> unusedImagesList = [];
   bool loading = false;
   bool deleting = false;
   ImagesList imagesListClass = ImagesList();
@@ -36,8 +37,8 @@ class _ImagesListScreenState extends State<ImagesListScreen> {
       loading = true;
     });
 
-    imagesList = await imagesListClass.getDownloadedList(fromDb: fromDb);
-
+    allImagesList = await imagesListClass.getDownloadedList(fromDb: fromDb);
+    unusedImagesList = await imagesListClass.getUnusedImages(fromDb: fromDb);
 
     setState(() {
       loading = false;
@@ -71,22 +72,26 @@ class _ImagesListScreenState extends State<ImagesListScreen> {
         children: [
           if (loading) const LoadingScreen()
           else if (deleting) const LoadingScreen(loadingText: SystemConstants.deleting)
-          else Column(
-              children: [
+          else if (allImagesList.isEmpty) const Expanded(
+                child: Center(
+                  child: Text(SystemConstants.emptyList),
+                )
+            )
+          else Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: CustomScrollView(
+                  slivers: <Widget>[
+                    SliverGrid(
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 300.0,
+                        mainAxisSpacing: 10.0,
+                        crossAxisSpacing: 10.0,
+                        childAspectRatio: 1.0,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
 
-                if (imagesList.isEmpty) const Expanded(
-                    child: Center(
-                      child: Text(SystemConstants.emptyList),
-                    )
-                ),
-
-                if (imagesList.isNotEmpty) Expanded(
-                    child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
-                        itemCount: imagesList.length,
-                        itemBuilder: (context, index) {
-
-                          ImageFromDb tempImage = imagesList[index];
+                              ImageFromDb tempImage = allImagesList[index];
 
                           return tempImage.getImageWidget(
                               context: context,
@@ -94,11 +99,36 @@ class _ImagesListScreenState extends State<ImagesListScreen> {
                                 await deleteImage(tempImage);
                               }
                           );
-                        }
+                        },
+                        childCount: allImagesList.length,
+                      ),
+                    ),
+
+                    SliverGrid(
+                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                        maxCrossAxisExtent: 300.0,
+                        mainAxisSpacing: 10.0,
+                        crossAxisSpacing: 10.0,
+                        childAspectRatio: 1.0,
+                      ),
+                      delegate: SliverChildBuilderDelegate(
+                            (BuildContext context, int index) {
+
+                          ImageFromDb tempImage = unusedImagesList[index];
+
+                          return tempImage.getImageWidget(
+                              context: context,
+                              onDelete: () async {
+                                await deleteImage(tempImage);
+                              }
+                          );
+                        },
+                        childCount: unusedImagesList.length,
+                      ),
                     )
-                )
-              ],
-            ),
+                ],
+              ),
+          )
         ],
       ),
     );

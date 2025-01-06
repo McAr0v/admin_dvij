@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:admin_dvij/constants/admins_constants.dart';
 import 'package:admin_dvij/images/image_from_db.dart';
+import 'package:admin_dvij/images/image_location.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
@@ -43,7 +44,7 @@ class AdminUsersListClass implements IEntitiesList<AdminUserClass>{
     Set<String> linkedImageIds = _currentAdminsList.map((entity) => entity.uid).toSet();
 
     // Фильтруем список картинок, оставляя только те, которых нет в Set
-    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
+    return imagesList.where((image) => !linkedImageIds.contains(image.id) && image.location.location == ImageLocationEnum.admins).toList();
 
   }
 

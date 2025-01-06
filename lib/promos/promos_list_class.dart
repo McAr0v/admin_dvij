@@ -11,6 +11,7 @@ import '../database/database_class.dart';
 import '../design/app_colors.dart';
 import '../design_elements/elements_of_design.dart';
 import '../images/image_from_db.dart';
+import '../images/image_location.dart';
 
 class PromosListClass implements IEntitiesList<Promo> {
 
@@ -42,7 +43,7 @@ class PromosListClass implements IEntitiesList<Promo> {
     Set<String> linkedImageIds = _currentPromosList.map((entity) => entity.id).toSet();
 
     // Фильтруем список картинок, оставляя только те, которых нет в Set
-    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
+    return imagesList.where((image) => !linkedImageIds.contains(image.id) && image.location.location == ImageLocationEnum.promos ).toList();
 
   }
 

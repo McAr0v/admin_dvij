@@ -237,13 +237,14 @@ class ElementsOfDesign {
     Widget? rightTopTag,
     Widget? leftBottomTag,
     Widget? rightBottomTag,
+    bool needMargin = true
 
   }){
     return SizedBox(
       width: width, // Растягиваем картинку на всю ширину
       height: height,
       child: Card(
-        margin: Platform.isMacOS || Platform.isWindows ? const EdgeInsets.fromLTRB(10, 10, 10, 10) : const EdgeInsets.fromLTRB(10, 10, 10, 0),
+        margin: needMargin ? (Platform.isMacOS || Platform.isWindows ? const EdgeInsets.fromLTRB(10, 10, 10, 10) : const EdgeInsets.fromLTRB(10, 10, 10, 0)) : const EdgeInsets.all(0),
         clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [

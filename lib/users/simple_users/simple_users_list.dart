@@ -6,6 +6,7 @@ import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../../database/database_class.dart';
 import '../../images/image_from_db.dart';
+import '../../images/image_location.dart';
 
 class SimpleUsersList implements IEntitiesList<SimpleUser>{
 
@@ -48,7 +49,7 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
     Set<String> linkedImageIds = _currentSimpleUsersList.map((entity) => entity.uid).toSet();
 
     // Фильтруем список картинок, оставляя только те, которых нет в Set
-    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
+    return imagesList.where((image) => !linkedImageIds.contains(image.id) && image.location.location == ImageLocationEnum.users).toList();
 
   }
 

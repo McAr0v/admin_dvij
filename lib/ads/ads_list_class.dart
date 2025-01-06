@@ -11,6 +11,7 @@ import 'package:firebase_database/firebase_database.dart';
 
 import '../database/database_class.dart';
 import '../images/image_from_db.dart';
+import '../images/image_location.dart';
 
 class AdsList implements IEntitiesList<AdClass>{
   AdsList();
@@ -43,7 +44,7 @@ class AdsList implements IEntitiesList<AdClass>{
     Set<String> linkedImageIds = _currentAdsList.map((entity) => entity.id).toSet();
 
     // Фильтруем список картинок, оставляя только те, которых нет в Set
-    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
+    return imagesList.where((image) => !linkedImageIds.contains(image.id) && image.location.location == ImageLocationEnum.ads).toList();
 
   }
 
