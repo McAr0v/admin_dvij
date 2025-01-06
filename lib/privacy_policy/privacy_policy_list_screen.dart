@@ -45,9 +45,6 @@ class _PrivacyPolicyListScreenState extends State<PrivacyPolicyListScreen> {
     setState(() {
       loading = true;
     });
-    
-    await im.getAllImages('admins');
-    await im.getAllImages('events');
 
     currentList = [];
 

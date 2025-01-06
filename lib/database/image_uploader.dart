@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/database/image_picker.dart';
+import 'package:admin_dvij/images/image_from_db.dart';
+import 'package:admin_dvij/images/image_location.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 // --- ФУНКЦИИ ЗАГРУЗКИ ИЗОБРАЖЕНИЙ В STORAGE ---
@@ -9,33 +11,32 @@ class ImageUploader {
   // Инициализируем Storage
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  Future<List<String>> getAllImages(String folderPath) async {
-    List<String> imageUrls = [];
+  Future<List<ImageFromDb>> getImagesInPath(ImageLocation location) async {
+    List<ImageFromDb> imagesList = [];
     try {
       // Получаем список всех папок и файлов в `folderPath`
-      final ListResult usersFolder = await _storage.ref(folderPath).listAll();
+      final ListResult usersFolder = await _storage.ref(location.getPath()).listAll();
 
       for (var userFolder in usersFolder.prefixes) { // Перебираем подпапки (UID пользователей)
-        String uid = userFolder.name;
-
-        print(uid);
 
         final ListResult images = await userFolder.listAll();
 
         for (var fileRef in images.items) { // Перебираем файлы в подпапке
-          final String url = await fileRef.getDownloadURL();
-          imageUrls.add(url);
+
+
+          ImageFromDb tempImage = ImageFromDb.empty();
+          tempImage.location = location;
+          tempImage.id = userFolder.name;
+          tempImage.url = await fileRef.getDownloadURL();
+          imagesList.add(tempImage);
+
         }
       }
     } catch (e) {
       print('Ошибка при получении списка изображений: $e');
     }
 
-    for (String url in imageUrls) {
-      print('$folderPath - $url');
-    }
-
-    return imageUrls;
+    return imagesList;
   }
 
   Future<String?> uploadImage({required String entityId, required File pickedFile, required String folder}) async {

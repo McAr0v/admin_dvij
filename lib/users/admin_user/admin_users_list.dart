@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:admin_dvij/constants/admins_constants.dart';
+import 'package:admin_dvij/images/image_from_db.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/roles/admins_roles_class.dart';
@@ -29,6 +30,20 @@ class AdminUsersListClass implements IEntitiesList<AdminUserClass>{
     }
 
     _currentAdminsList.sortAdminsForLastName(true);
+
+  }
+
+  Future<List<ImageFromDb>> searchUnusedImages({required List<ImageFromDb> imagesList}) async {
+
+    if (_currentAdminsList.isEmpty) {
+      await getListFromDb();
+    }
+
+    // Создаем Set с ID всех изображений, привязанных к мероприятиям
+    Set<String> linkedImageIds = _currentAdminsList.map((entity) => entity.uid).toSet();
+
+    // Фильтруем список картинок, оставляя только те, которых нет в Set
+    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
 
   }
 
