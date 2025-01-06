@@ -7,6 +7,7 @@ class DatabaseConstants {
   static const String birthDate = 'birthDate';
   static const String avatar = 'avatar';
   static const String registrationDate = 'registrationDate';
+  static const String publishDate = 'publishDate';
   static const String createDate = 'createDate';
   static const String id = 'id';
   static const String category = 'category';
@@ -44,6 +45,15 @@ class DatabaseConstants {
   static const String roleId = 'roleId';
   static const String addedToFavourites = 'addedToFavourites';
   static const String price = 'price';
+  static const String startText = 'startText';
+  static const String dataCollection = 'dataCollection';
+  static const String dataUsage = 'dataUsage';
+  static const String transferData = 'transferData';
+  static const String dataSecurity = 'dataSecurity';
+  static const String yourRights = 'yourRights';
+  static const String changes = 'changes';
+  static const String contacts = 'contacts';
+  static const String status = 'status';
 
 
 }

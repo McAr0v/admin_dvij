@@ -33,6 +33,7 @@ class SystemConstants {
 
   static const String activeStatus = 'Активно';
   static const String finishedStatus = 'Завершено';
+  static const String deletingSuccess = 'Успешно удалено';
 
   static String requestAnswerNegative(String message){
     return 'По запросу $message ничего не найдено';

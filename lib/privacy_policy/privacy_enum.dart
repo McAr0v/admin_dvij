@@ -1,3 +1,4 @@
+import 'package:admin_dvij/constants/privacy_constants.dart';
 import 'package:admin_dvij/design/app_colors.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,7 +16,7 @@ class PrivacyStatus {
   factory PrivacyStatus.fromString({required String statusString}){
     switch (statusString) {
 
-      case 'active' : return PrivacyStatus(privacyEnum: PrivacyEnum.active);
+      case PrivacyConstants.privacyActiveId : return PrivacyStatus(privacyEnum: PrivacyEnum.active);
       default : return PrivacyStatus(privacyEnum: PrivacyEnum.draft);
     }
   }
@@ -23,8 +24,8 @@ class PrivacyStatus {
   @override
   String toString({bool translate = false}) {
     switch (privacyEnum) {
-      case PrivacyEnum.draft: return !translate ? 'draft' : 'Черновик';
-      case PrivacyEnum.active: return !translate ? 'active' : 'Активное';
+      case PrivacyEnum.draft: return !translate ? PrivacyConstants.privacyDraftId : PrivacyConstants.privacyDraftHeadline;
+      case PrivacyEnum.active: return !translate ? PrivacyConstants.privacyActiveId : PrivacyConstants.privacyActiveHeadline;
     }
   }
 

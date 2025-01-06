@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:admin_dvij/constants/fields_constants.dart';
+import 'package:admin_dvij/constants/privacy_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/privacy_policy/privacy_enum.dart';
@@ -102,7 +104,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Политика от ${privacy.getFolderId()}',),
+        title: Text('${PrivacyConstants.policyFrom} ${privacy.getFolderId()}',),
 
         // Задаем особый выход на кнопку назад
         // Чтобы не плодились экраны назад с разным списком сущностей
@@ -130,8 +132,8 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
       body: Stack(
         children: [
-          if (saving) const LoadingScreen(loadingText: 'Сохранение политики конфиденциальности')
-          else if (loading) const LoadingScreen()
+          if (saving) const LoadingScreen(loadingText: PrivacyConstants.privacySaving)
+          else if (loading) const LoadingScreen(loadingText: PrivacyConstants.privacyLoading,)
           else Container(
             alignment: Alignment.topCenter,
             child: SizedBox(
@@ -149,7 +151,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
                           children: [
                             ElementsOfDesign.buildTextFieldWithoutController(
                                 controllerText: sm.formatDateTimeToHumanView(privacy.date),
-                                labelText: 'Дата публикации',
+                                labelText: FieldsConstants.createDateField,
                                 canEdit: false,
                                 icon: FontAwesomeIcons.calendarDay,
                                 context: context
@@ -157,7 +159,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
                             ElementsOfDesign.buildTextFieldWithoutController(
                                 controllerText: chosenStatus.toString(translate: true),
-                                labelText: 'Статус',
+                                labelText: FieldsConstants.statusField,
                                 canEdit: canEdit,
                                 icon: FontAwesomeIcons.calendarDay,
                                 context: context,
@@ -171,7 +173,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
                       ElementsOfDesign.buildTextField(
                           controller: startTextController,
-                          labelText: 'Стартовый текст',
+                          labelText: PrivacyConstants.startTextHeadline,
                           canEdit: canEdit,
                           icon: Icons.place,
                           context: context,
@@ -182,7 +184,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
                       ElementsOfDesign.buildTextField(
                         controller: dataCollectionController,
-                        labelText: 'dataCollectionController',
+                        labelText: PrivacyConstants.dataCollectionHeadline,
                         canEdit: canEdit,
                         icon: Icons.place,
                         context: context,
@@ -193,7 +195,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
                       ElementsOfDesign.buildTextField(
                         controller: dataUsageController,
-                        labelText: 'dataUsageController',
+                        labelText: PrivacyConstants.dataUsageHeadline,
                         canEdit: canEdit,
                         icon: Icons.place,
                         context: context,
@@ -204,7 +206,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
                       ElementsOfDesign.buildTextField(
                         controller: transferDataController,
-                        labelText: 'transferDataController',
+                        labelText: PrivacyConstants.dataTransferHeadline,
                         canEdit: canEdit,
                         icon: Icons.place,
                         context: context,
@@ -215,7 +217,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
                       ElementsOfDesign.buildTextField(
                         controller: dataSecurityController,
-                        labelText: 'dataSecurityController',
+                        labelText: PrivacyConstants.dataSecurityHeadline,
                         canEdit: canEdit,
                         icon: Icons.place,
                         context: context,
@@ -226,7 +228,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
                       ElementsOfDesign.buildTextField(
                         controller: yourRightsController,
-                        labelText: 'yourRightsController',
+                        labelText: PrivacyConstants.yourRightsHeadline,
                         canEdit: canEdit,
                         icon: Icons.place,
                         context: context,
@@ -237,7 +239,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
                       ElementsOfDesign.buildTextField(
                         controller: changesController,
-                        labelText: 'changesController',
+                        labelText: PrivacyConstants.changesHeadline,
                         canEdit: canEdit,
                         icon: Icons.place,
                         context: context,
@@ -248,7 +250,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
                       ElementsOfDesign.buildTextField(
                         controller: contactsController,
-                        labelText: 'contactsController',
+                        labelText: PrivacyConstants.contactsHeadline,
                         canEdit: canEdit,
                         icon: Icons.place,
                         context: context,

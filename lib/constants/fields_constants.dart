@@ -1,5 +1,6 @@
 class FieldsConstants {
   static const String dateTypeField = 'Тип дат проведения';
+  static const String createDateField = 'Дата создания';
   static const String startDateField = 'Дата начала проведения';
   static const String endDateField = 'Дата завершения проведения';
   static const String startTimeField = 'Время начала';
@@ -8,6 +9,7 @@ class FieldsConstants {
   static const String dayOfWeekField = 'День недели';
   static const String categoryNameHintField = 'Название категории';
   static const String categoryField = 'Категория';
+  static const String statusField = 'Статус';
 
   static const String streetField = 'Улица';
   static const String houseNumberField = 'Номер дома';

@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:admin_dvij/constants/privacy_constants.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:admin_dvij/privacy_policy/privacy_enum.dart';
 import 'package:admin_dvij/privacy_policy/privacy_policy_class.dart';
@@ -80,7 +81,7 @@ class PrivacyPolicyList implements IEntitiesList<PrivacyPolicyClass>{
   Future<List<PrivacyPolicyClass>> getListFromDb() async {
     DatabaseClass database = DatabaseClass();
 
-    const String path = 'privacy_policy';
+    const String path = PrivacyConstants.privacyPolicyPath;
 
     List<PrivacyPolicyClass> tempList = [];
 

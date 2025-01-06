@@ -1,3 +1,31 @@
 class PrivacyConstants {
-  static const String privacyLoading = 'Загрузка списка всех версий политик конфиденциальности';
+  static const String privacyListLoading = 'Загрузка списка всех версий политик конфиденциальности';
+  static const String privacySaving = 'Сохранение политики конфиденциальности';
+  static const String privacyLoading = 'Загрузка политики конфиденциальности';
+  static const String privacyDeleting = 'Удаление политики конфиденциальности';
+  static const String privacyActiveId = 'active';
+  static const String privacyActiveHeadline = 'Активное';
+  static const String privacyDraftId = 'draft';
+  static const String privacyDraftHeadline = 'Черновик';
+  static const String privacyPolicyPath = 'privacy_policy';
+  static const String privacyPolicyActivePath = 'privacy_policy_active';
+  static const String noStartTextError = 'Не заполнен вступительный текст политики конфиденциальности';
+  static const String noDataCollectionError = 'Не заполнен текст раздела "Сбор данных"';
+  static const String noDataUsageError = 'Не заполнен текст раздела "Использование данных"';
+  static const String noDataTransferError = 'Не заполнен текст раздела "Передача данных третьим лицам"';
+  static const String noDataSecurityError = 'Не заполнен текст раздела "Безопасность данных"';
+  static const String noYourRightsError = 'Не заполнен текст раздела "Ваши права"';
+  static const String noChangesError = 'Не заполнен текст раздела "Изменения в политики конфиденциальности"';
+  static const String noContactsError = 'Не заполнен текст раздела "Контактная информация"';
+  static const String startTextHeadline = 'Раздел "Вступительный текст"';
+  static const String dataCollectionHeadline = 'Раздел "Сбор данных"';
+  static const String dataUsageHeadline = 'Раздел "Использование данных"';
+  static const String dataTransferHeadline = 'Раздел "Передача данных третьим лицам"';
+  static const String dataSecurityHeadline = 'Раздел "Безопасность данных"';
+  static const String yourRightsHeadline = 'Раздел "Ваши права"';
+  static const String changesHeadline = 'Раздел "Изменения в политики конфиденциальности"';
+  static const String contactsHeadline = 'Раздел "Контактная информация"';
+  static const String policyFrom = 'Политика от';
+  static const String deletePrivacyHeadline = 'Удалить данную политику конфиденциальности?';
+  static const String deletePrivacyDesc = 'Восстановить данные будет нельзя';
 }

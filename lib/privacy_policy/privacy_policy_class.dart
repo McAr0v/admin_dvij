@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:admin_dvij/constants/database_constants.dart';
+import 'package:admin_dvij/constants/privacy_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/privacy_policy/privacy_enum.dart';
 import 'package:admin_dvij/privacy_policy/privacy_policy_list_class.dart';
@@ -85,33 +87,33 @@ class PrivacyPolicyClass implements IEntity{
 
   factory PrivacyPolicyClass.fromSnapshot({required DataSnapshot snapshot}){
     return PrivacyPolicyClass(
-        id: snapshot.child('id').value.toString(),
-        date: DateTime.parse(snapshot.child('publishDate').value.toString()),
-        startText: snapshot.child('startText').value.toString(),
-        dataCollection: snapshot.child('dataCollection').value.toString(),
-        dataUsage: snapshot.child('dataUsage').value.toString(),
-        transferData: snapshot.child('transferData').value.toString(),
-        dataSecurity: snapshot.child('dataSecurity').value.toString(),
-        yourRights: snapshot.child('yourRights').value.toString(),
-        changes: snapshot.child('changes').value.toString(),
-        contacts: snapshot.child('contacts').value.toString(),
-      status: PrivacyStatus.fromString(statusString: snapshot.child('status').value.toString())
+        id: snapshot.child(DatabaseConstants.id).value.toString(),
+        date: DateTime.parse(snapshot.child(DatabaseConstants.publishDate).value.toString()),
+        startText: snapshot.child(DatabaseConstants.startText).value.toString(),
+        dataCollection: snapshot.child(DatabaseConstants.dataCollection).value.toString(),
+        dataUsage: snapshot.child(DatabaseConstants.dataUsage).value.toString(),
+        transferData: snapshot.child(DatabaseConstants.transferData).value.toString(),
+        dataSecurity: snapshot.child(DatabaseConstants.dataSecurity).value.toString(),
+        yourRights: snapshot.child(DatabaseConstants.yourRights).value.toString(),
+        changes: snapshot.child(DatabaseConstants.changes).value.toString(),
+        contacts: snapshot.child(DatabaseConstants.contacts).value.toString(),
+      status: PrivacyStatus.fromString(statusString: snapshot.child(DatabaseConstants.status).value.toString())
     );
   }
 
   factory PrivacyPolicyClass.fromJson({required Map<String, dynamic> json}){
     return PrivacyPolicyClass(
-        id:  json['id'] ?? '',
-        date: DateTime.parse(json['publishDate'] ?? ''),
-        startText: json['startText'] ?? '',
-        dataCollection: json['dataCollection'] ?? '',
-        dataUsage: json['dataUsage'] ?? '',
-        transferData: json['transferData'] ?? '',
-        dataSecurity: json['dataSecurity'] ?? '',
-        yourRights: json['yourRights'] ?? '',
-        changes: json['changes'] ?? '',
-        contacts: json['contacts'] ?? '',
-        status: PrivacyStatus.fromString(statusString: json['status'] ?? '')
+        id:  json[DatabaseConstants.id] ?? '',
+        date: DateTime.parse(json[DatabaseConstants.publishDate] ?? ''),
+        startText: json[DatabaseConstants.startText] ?? '',
+        dataCollection: json[DatabaseConstants.dataCollection] ?? '',
+        dataUsage: json[DatabaseConstants.dataUsage] ?? '',
+        transferData: json[DatabaseConstants.transferData] ?? '',
+        dataSecurity: json[DatabaseConstants.dataSecurity] ?? '',
+        yourRights: json[DatabaseConstants.yourRights] ?? '',
+        changes: json[DatabaseConstants.changes] ?? '',
+        contacts: json[DatabaseConstants.contacts] ?? '',
+        status: PrivacyStatus.fromString(statusString: json[DatabaseConstants.status] ?? '')
     );
   }
 
@@ -121,31 +123,31 @@ class PrivacyPolicyClass implements IEntity{
 
   String checkEmptyFieldsInPrivacy(){
     if (startText.isEmpty){
-      return 'No startText';
+      return PrivacyConstants.noStartTextError;
     }
 
     if (dataCollection.isEmpty){
-      return 'No datacollection';
+      return PrivacyConstants.noStartTextError;
     }
 
     if (dataUsage.isEmpty) {
-      return 'no DataUsage';
+      return PrivacyConstants.noDataUsageError;
     }
 
     if (transferData.isEmpty) {
-      return 'no transferData';
+      return PrivacyConstants.noDataTransferError;
     }
     if (dataSecurity.isEmpty) {
-      return 'no dataSecurity';
+      return PrivacyConstants.noDataSecurityError;
     }
     if (yourRights.isEmpty) {
-      return 'no yourRights';
+      return PrivacyConstants.noYourRightsError;
     }
     if (changes.isEmpty) {
-      return 'no changes';
+      return PrivacyConstants.noChangesError;
     }
     if (contacts.isEmpty) {
-      return 'no contacts';
+      return PrivacyConstants.noContactsError;
     }
 
     return SystemConstants.successConst;
@@ -156,7 +158,7 @@ class PrivacyPolicyClass implements IEntity{
 
     DatabaseClass db = DatabaseClass();
 
-    String path = 'privacy_policy/$id';
+    String path = '${PrivacyConstants.privacyPolicyPath}/$id';
 
     String result = '';
 
@@ -182,17 +184,17 @@ class PrivacyPolicyClass implements IEntity{
   @override
   Map<String, dynamic> getMap() {
     return <String, dynamic> {
-      'id': id,
-      'publishDate': date.toString(),
-      'startText': startText,
-      'dataCollection': dataCollection,
-      'dataUsage': dataUsage,
-      'transferData': transferData,
-      'dataSecurity': dataSecurity,
-      'yourRights': yourRights,
-      'changes': changes,
-      'contacts': contacts,
-      'status': status.toString()
+      DatabaseConstants.id: id,
+      DatabaseConstants.publishDate: date.toString(),
+      DatabaseConstants.startText: startText,
+      DatabaseConstants.dataCollection: dataCollection,
+      DatabaseConstants.dataUsage: dataUsage,
+      DatabaseConstants.transferData: transferData,
+      DatabaseConstants.dataSecurity: dataSecurity,
+      DatabaseConstants.yourRights: yourRights,
+      DatabaseConstants.changes: changes,
+      DatabaseConstants.contacts: contacts,
+      DatabaseConstants.status: status.toString()
     };
   }
 
@@ -216,9 +218,9 @@ class PrivacyPolicyClass implements IEntity{
       id = idPrivacy ?? 'noId_${getFolderId()}';
     }
 
-    String activePath = 'privacy_policy_active';
+    String activePath = PrivacyConstants.privacyPolicyActivePath;
 
-    String path = 'privacy_policy/$id';
+    String path = '${PrivacyConstants.privacyPolicyPath}/$id';
 
     Map <String, dynamic> data = getMap();
 

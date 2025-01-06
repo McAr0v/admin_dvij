@@ -101,8 +101,8 @@ class _PrivacyPolicyListScreenState extends State<PrivacyPolicyListScreen> {
 
       body: Stack(
         children: [
-          if (loading) const LoadingScreen(loadingText: PrivacyConstants.privacyLoading)
-          else if (deleting) const LoadingScreen(loadingText: 'Удаление')
+          if (loading) const LoadingScreen(loadingText: PrivacyConstants.privacyListLoading)
+          else if (deleting) const LoadingScreen(loadingText: PrivacyConstants.privacyDeleting)
           else Column(
             children: [
 
@@ -142,7 +142,7 @@ class _PrivacyPolicyListScreenState extends State<PrivacyPolicyListScreen> {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Text('Политика от ${tempPrivacy.getFolderId()}'),
+                                          Text('${PrivacyConstants.policyFrom} ${tempPrivacy.getFolderId()}'),
                                           Text(tempPrivacy.id, style: Theme.of(context).textTheme.labelMedium,),
                                         ],
                                       )
@@ -186,10 +186,10 @@ class _PrivacyPolicyListScreenState extends State<PrivacyPolicyListScreen> {
   Future<void> deletePrivacy({required PrivacyPolicyClass privacy}) async {
     bool? deleteAccess = await ElementsOfDesign.exitDialog(
         context,
-        'Восстановить данные будет нельзя',
+        PrivacyConstants.deletePrivacyDesc,
         ButtonsConstants.delete,
         ButtonsConstants.cancel,
-        'Удалить данную политику конфиденциальности?'
+        PrivacyConstants.deletePrivacyHeadline
     );
 
     if (deleteAccess != null && deleteAccess) {
@@ -199,7 +199,7 @@ class _PrivacyPolicyListScreenState extends State<PrivacyPolicyListScreen> {
 
       String result = await privacy.deleteFromDb();
       if (result == SystemConstants.successConst) {
-        _showSnackBar('Удаление прошло успшено');
+        _showSnackBar(SystemConstants.deletingSuccess);
         await initialization();
       } else {
         _showSnackBar(result);
