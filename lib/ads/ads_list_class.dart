@@ -10,6 +10,7 @@ import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import '../database/database_class.dart';
+import '../images/image_from_db.dart';
 
 class AdsList implements IEntitiesList<AdClass>{
   AdsList();
@@ -30,6 +31,20 @@ class AdsList implements IEntitiesList<AdClass>{
     }
 
     _currentAdsList.sortAds(true);
+  }
+
+  Future<List<ImageFromDb>> searchUnusedImages({required List<ImageFromDb> imagesList}) async {
+
+    if (_currentAdsList.isEmpty) {
+      await getListFromDb();
+    }
+
+    // Создаем Set с ID всех изображений, привязанных к мероприятиям
+    Set<String> linkedImageIds = _currentAdsList.map((entity) => entity.id).toSet();
+
+    // Фильтруем список картинок, оставляя только те, которых нет в Set
+    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
+
   }
 
   @override

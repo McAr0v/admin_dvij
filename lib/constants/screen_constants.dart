@@ -13,6 +13,7 @@ class ScreenConstants {
   static const String events = 'Мероприятия';
   static const String promos = 'Акции';
   static const String privacyPage = 'Политика конфиденциальности';
+  static const String unusedImagesPage = 'Неиспользуемые картинки';
 
 
 }

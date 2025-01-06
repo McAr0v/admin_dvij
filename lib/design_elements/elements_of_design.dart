@@ -249,7 +249,7 @@ class ElementsOfDesign {
           children: [
             SizedBox(
               width: double.infinity, // Растягиваем картинку на всю ширину
-              height: 250,
+              height: height,
               child: getImageFromUrl(imageUrl: imageUrl),
             ),
 

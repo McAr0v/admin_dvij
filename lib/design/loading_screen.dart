@@ -24,6 +24,7 @@ class LoadingScreen extends StatelessWidget {
               loadingText,
               style: Theme.of(context).textTheme.bodyMedium,
               softWrap: true,
+              textAlign: TextAlign.center,
             )
           ],
         ),

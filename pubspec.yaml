@@ -41,6 +41,7 @@ dependencies:
   flutter_svg: ^2.0.11
   image_picker: ^0.8.4
   image: ^3.0.1
+  http: ^1.2.2
 
   flutter_localizations:
     sdk: flutter

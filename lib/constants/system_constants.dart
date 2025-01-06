@@ -1,8 +1,11 @@
+import 'package:admin_dvij/images/image_location.dart';
+
 class SystemConstants {
 
   // Работа с данными
   static const String pathToDb = 'https://dvij-flutter-default-rtdb.firebaseio.com';
   static const String appDesc = 'Административное приложение';
+  static const String projectId = 'dvij-flutter';
 
   // Ответы из БД
   static const String successConst = 'ok';
@@ -37,6 +40,19 @@ class SystemConstants {
 
   static String requestAnswerNegative(String message){
     return 'По запросу $message ничего не найдено';
+  }
+
+
+  static String getStoragePath(){
+    return 'https://firebasestorage.googleapis.com/v0/b/$projectId.appspot.com';
+  }
+
+  static String getStorageFolderPath({required ImageLocation location}){
+    return "${getStoragePath()}/o?prefix=${location.getPath()}/";
+  }
+
+  static String getImageUrl({required String encodedPath, required String idToken}){
+    return "${getStoragePath()}/o/$encodedPath?alt=media&token=$idToken";
   }
 
 }

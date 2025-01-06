@@ -5,6 +5,7 @@ import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../../database/database_class.dart';
+import '../../images/image_from_db.dart';
 
 class SimpleUsersList implements IEntitiesList<SimpleUser>{
 
@@ -35,6 +36,20 @@ class SimpleUsersList implements IEntitiesList<SimpleUser>{
     } else {
       return true;
     }
+  }
+
+  Future<List<ImageFromDb>> searchUnusedImages({required List<ImageFromDb> imagesList}) async {
+
+    if (_currentSimpleUsersList.isEmpty) {
+      await getListFromDb();
+    }
+
+    // Создаем Set с ID всех изображений, привязанных к мероприятиям
+    Set<String> linkedImageIds = _currentSimpleUsersList.map((entity) => entity.uid).toSet();
+
+    // Фильтруем список картинок, оставляя только те, которых нет в Set
+    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
+
   }
 
   @override

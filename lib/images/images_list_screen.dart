@@ -1,7 +1,8 @@
-import 'package:admin_dvij/database/image_uploader.dart';
+import 'package:admin_dvij/constants/buttons_constants.dart';
+import 'package:admin_dvij/constants/images_constants.dart';
+import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/images/image_from_db.dart';
-import 'package:admin_dvij/images/image_location.dart';
 import 'package:admin_dvij/images/images_list_class.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,7 +24,6 @@ class _ImagesListScreenState extends State<ImagesListScreen> {
   bool loading = false;
   bool deleting = false;
   ImagesList imagesListClass = ImagesList();
-  ImageUploader imageUploader = ImageUploader();
 
   @override
   void initState() {
@@ -36,7 +36,7 @@ class _ImagesListScreenState extends State<ImagesListScreen> {
       loading = true;
     });
 
-    imagesList = await imagesListClass.getAllUnusedImages();
+    imagesList = await imagesListClass.getDownloadedList(fromDb: fromDb);
 
 
     setState(() {
@@ -46,10 +46,11 @@ class _ImagesListScreenState extends State<ImagesListScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
 
       appBar: AppBar(
-        title: const Text('Неиспользуемые картинки'),
+        title: const Text(ScreenConstants.unusedImagesPage),
         actions: [
 
           // КНОПКИ В AppBar
@@ -68,8 +69,8 @@ class _ImagesListScreenState extends State<ImagesListScreen> {
 
       body: Stack(
         children: [
-          if (loading) const LoadingScreen(loadingText: 'Загрузка изображений')
-          else if (deleting) const LoadingScreen(loadingText: 'Удаляем изображение')
+          if (loading) const LoadingScreen()
+          else if (deleting) const LoadingScreen(loadingText: SystemConstants.deleting)
           else Column(
               children: [
 
@@ -81,22 +82,66 @@ class _ImagesListScreenState extends State<ImagesListScreen> {
 
                 if (imagesList.isNotEmpty) Expanded(
                     child: ListView.builder(
-                        padding: const EdgeInsets.fromLTRB(10, 0, 10, 30),
+                        padding: const EdgeInsets.fromLTRB(10, 10, 10, 30),
                         itemCount: imagesList.length,
                         itemBuilder: (context, index) {
 
                           ImageFromDb tempImage = imagesList[index];
 
-                          return ElementsOfDesign.getImageFromUrl(imageUrl: tempImage.url);
-
+                          return tempImage.getImageWidget(
+                              context: context,
+                              onDelete: () async {
+                                await deleteImage(tempImage);
+                              }
+                          );
                         }
                     )
                 )
-
               ],
             ),
         ],
       ),
     );
   }
+
+  Future<void> deleteImage (ImageFromDb image) async {
+
+    bool? deleteResult = await ElementsOfDesign.exitDialog(
+        context,
+        ImagesConstants.deleteImageDesc,
+        ButtonsConstants.delete,
+        ButtonsConstants.cancel,
+        ImagesConstants.deleteImageHeadline,
+    );
+
+    if (deleteResult != null && deleteResult) {
+
+      setState(() {
+        deleting = true;
+      });
+
+      String result = await image.deleteFromDb();
+
+      if (result == SystemConstants.successConst) {
+        _showSnackBar(SystemConstants.deletingSuccess);
+        await initialization();
+      } else {
+        _showSnackBar(result);
+      }
+
+      setState(() {
+        deleting = false;
+      });
+    }
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
 }

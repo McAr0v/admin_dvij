@@ -153,12 +153,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             ElementsOfDesign.drawerListElement(
                 ScreenConstants.privacyPage,
-                FontAwesomeIcons.fire,
+                FontAwesomeIcons.shield,
                 const PrivacyPolicyListScreen(),
                 context
             ),
             ElementsOfDesign.drawerListElement(
-                'Неиспользуемые изображения',
+                ScreenConstants.unusedImagesPage,
                 FontAwesomeIcons.image,
                 const ImagesListScreen(),
                 context

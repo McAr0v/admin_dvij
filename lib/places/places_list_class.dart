@@ -13,6 +13,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../database/database_class.dart';
 import '../design/app_colors.dart';
 import '../design_elements/elements_of_design.dart';
+import '../images/image_from_db.dart';
 import '../users/simple_users/simple_user.dart';
 
 class PlacesList implements IEntitiesList<Place>{
@@ -35,7 +36,19 @@ class PlacesList implements IEntitiesList<Place>{
     _currentPlacesList.sortPlaces(true);
   }
 
+  Future<List<ImageFromDb>> searchUnusedImages({required List<ImageFromDb> imagesList}) async {
 
+    if (_currentPlacesList.isEmpty) {
+      await getListFromDb();
+    }
+
+    // Создаем Set с ID всех изображений, привязанных к мероприятиям
+    Set<String> linkedImageIds = _currentPlacesList.map((entity) => entity.id).toSet();
+
+    // Фильтруем список картинок, оставляя только те, которых нет в Set
+    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
+
+  }
 
   @override
   bool checkEntityNameInList(String entity) {

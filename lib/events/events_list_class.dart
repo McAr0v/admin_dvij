@@ -11,6 +11,7 @@ import '../cities/city_class.dart';
 import '../database/database_class.dart';
 import '../design/app_colors.dart';
 import '../design_elements/elements_of_design.dart';
+import '../images/image_from_db.dart';
 
 class EventsListClass implements IEntitiesList<EventClass> {
 
@@ -40,6 +41,20 @@ class EventsListClass implements IEntitiesList<EventClass> {
     } else {
       return true;
     }
+  }
+
+  Future<List<ImageFromDb>> searchUnusedImages({required List<ImageFromDb> imagesList}) async {
+
+    if (_currentEventsList.isEmpty) {
+      await getListFromDb();
+    }
+
+    // Создаем Set с ID всех изображений, привязанных к мероприятиям
+    Set<String> linkedImageIds = _currentEventsList.map((entity) => entity.id).toSet();
+
+    // Фильтруем список картинок, оставляя только те, которых нет в Set
+    return imagesList.where((image) => !linkedImageIds.contains(image.id)).toList();
+
   }
 
   @override

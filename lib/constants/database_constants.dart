@@ -54,6 +54,7 @@ class DatabaseConstants {
   static const String changes = 'changes';
   static const String contacts = 'contacts';
   static const String status = 'status';
+  static const String items = 'items';
 
 
 }
