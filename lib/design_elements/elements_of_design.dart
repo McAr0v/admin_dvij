@@ -364,7 +364,10 @@ class ElementsOfDesign {
             children: [
               if (icon != null) Icon(icon, color: textColor, size: 15,),
               if (icon != null) const SizedBox(width: 10,),
-              Text(text, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: textColor),),
+              Text(
+                text,
+                style: Theme.of(context).textTheme.labelMedium!.copyWith(color: textColor),
+              ),
             ],
           ),
         ),

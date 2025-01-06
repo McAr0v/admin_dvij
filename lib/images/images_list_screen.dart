@@ -1,18 +1,12 @@
-import 'package:admin_dvij/constants/buttons_constants.dart';
-import 'package:admin_dvij/constants/images_constants.dart';
-import 'package:admin_dvij/constants/screen_constants.dart';
-import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/images/image_from_db.dart';
-import 'package:admin_dvij/images/images_list_class.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/system_constants.dart';
-import '../design/app_colors.dart';
-import '../design/loading_screen.dart';
-import '../navigation/drawer_custom.dart';
 
 class ImagesListScreen extends StatefulWidget {
-  const ImagesListScreen({Key? key}) : super(key: key);
+  final List<ImageFromDb> imagesList;
+  final void Function(int index) deleteImage;
+  final void Function(int index) onTapImage;
+  const ImagesListScreen({required this.imagesList, required this.deleteImage, required this.onTapImage, Key? key}) : super(key: key);
 
   @override
   State<ImagesListScreen> createState() => _ImagesListScreenState();
@@ -20,158 +14,45 @@ class ImagesListScreen extends StatefulWidget {
 
 class _ImagesListScreenState extends State<ImagesListScreen> {
 
-  List<ImageFromDb> allImagesList = [];
-  List<ImageFromDb> unusedImagesList = [];
-  bool loading = false;
-  bool deleting = false;
-  ImagesList imagesListClass = ImagesList();
-
-  @override
-  void initState() {
-    initialization();
-    super.initState();
-  }
-
-  Future<void> initialization ({bool fromDb = false}) async {
-    setState(() {
-      loading = true;
-    });
-
-    allImagesList = await imagesListClass.getDownloadedList(fromDb: fromDb);
-    unusedImagesList = await imagesListClass.getUnusedImages(fromDb: fromDb);
-
-    setState(() {
-      loading = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-
-      appBar: AppBar(
-        title: const Text(ScreenConstants.unusedImagesPage),
-        actions: [
-
-          // КНОПКИ В AppBar
-
-          // Кнопка "Обновить"
-          IconButton(
-            onPressed: () async {
-              await initialization(fromDb: true);
-            },
-            icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
-          ),
-        ],
-      ),
-
-      drawer: const CustomDrawer(),
-
-      body: Stack(
-        children: [
-          if (loading) const LoadingScreen()
-          else if (deleting) const LoadingScreen(loadingText: SystemConstants.deleting)
-          else if (allImagesList.isEmpty) const Expanded(
-                child: Center(
-                  child: Text(SystemConstants.emptyList),
-                )
-            )
-          else Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: CustomScrollView(
-                  slivers: <Widget>[
-                    SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 300.0,
-                        mainAxisSpacing: 10.0,
-                        crossAxisSpacing: 10.0,
-                        childAspectRatio: 1.0,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-
-                              ImageFromDb tempImage = allImagesList[index];
-
-                          return tempImage.getImageWidget(
-                              context: context,
-                              onDelete: () async {
-                                await deleteImage(tempImage);
-                              }
-                          );
-                        },
-                        childCount: allImagesList.length,
-                      ),
-                    ),
-
-                    SliverGrid(
-                      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                        maxCrossAxisExtent: 300.0,
-                        mainAxisSpacing: 10.0,
-                        crossAxisSpacing: 10.0,
-                        childAspectRatio: 1.0,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
-
-                          ImageFromDb tempImage = unusedImagesList[index];
-
-                          return tempImage.getImageWidget(
-                              context: context,
-                              onDelete: () async {
-                                await deleteImage(tempImage);
-                              }
-                          );
-                        },
-                        childCount: unusedImagesList.length,
-                      ),
-                    )
-                ],
-              ),
+    if (widget.imagesList.isEmpty) {
+      return const Expanded(
+          child: Center(
+            child: Text(SystemConstants.emptyList),
           )
-        ],
-      ),
-    );
-  }
-
-  Future<void> deleteImage (ImageFromDb image) async {
-
-    bool? deleteResult = await ElementsOfDesign.exitDialog(
-        context,
-        ImagesConstants.deleteImageDesc,
-        ButtonsConstants.delete,
-        ButtonsConstants.cancel,
-        ImagesConstants.deleteImageHeadline,
-    );
-
-    if (deleteResult != null && deleteResult) {
-
-      setState(() {
-        deleting = true;
-      });
-
-      String result = await image.deleteFromDb();
-
-      if (result == SystemConstants.successConst) {
-        _showSnackBar(SystemConstants.deletingSuccess);
-        await initialization();
-      } else {
-        _showSnackBar(result);
-      }
-
-      setState(() {
-        deleting = false;
-      });
+      );
     }
-  }
+    else {
+      return Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: CustomScrollView(
+          slivers: <Widget>[
+            SliverGrid(
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                maxCrossAxisExtent: 300.0,
+                mainAxisSpacing: 10.0,
+                crossAxisSpacing: 10.0,
+                childAspectRatio: 1.0,
+              ),
+              delegate: SliverChildBuilderDelegate(
+                    (BuildContext context, int index) {
 
-  void _showSnackBar(String message){
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ),
-    );
+                  ImageFromDb tempImage = widget.imagesList[index];
+
+                  return tempImage.getImageWidget(
+                      context: context,
+                      onDelete: () => widget.deleteImage(index),
+                      onTap: () => widget.onTapImage(index)
+                  );
+                },
+                childCount: widget.imagesList.length,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
 }
