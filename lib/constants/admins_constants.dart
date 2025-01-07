@@ -5,7 +5,7 @@ class AdminConstants{
   static const String checkingAdmin = 'Проверка пользователя';
   static const String inTeamSince = 'В нашей команде ';
   static const String saveSuccess = 'Пользователь успешно сохранен!';
-  static const String createAdminHeadline = 'Создание пользователя';
+  static const String createAdminHeadline = 'Создание администратора';
   static const String adminsLoading = 'Загрузка списка администраторов';
   static const String itsYou = 'Это вы';
 

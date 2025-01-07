@@ -14,6 +14,7 @@ import 'package:admin_dvij/users/roles/admins_roles_class.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../database/database_class.dart';
 import '../../database/image_uploader.dart';
 import '../../design/app_colors.dart';
@@ -370,7 +371,12 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     );
   }
 
-  Widget getAdminCardInList ({required VoidCallback onTap, required BuildContext context,  }){
+  Widget getAdminCardInList ({
+    required VoidCallback onTap,
+    required VoidCallback onDelete,
+    required BuildContext context,
+
+  }){
 
     return GestureDetector(
       onTap: onTap,
@@ -397,7 +403,15 @@ class AdminUserClass implements IEntity<AdminUserClass> {
 
                     ],
                   )
-              )
+              ),
+
+              if (adminRole.adminRole != AdminRole.creator) const SizedBox(width: 20,),
+
+              if (adminRole.adminRole != AdminRole.creator) IconButton(
+                  onPressed: onDelete,
+                  icon: const Icon(FontAwesomeIcons.x, size: 15,)
+              ),
+
             ],
           ),
         ),

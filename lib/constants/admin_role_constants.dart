@@ -19,7 +19,7 @@ class AdminRoleConstants{
   static const viewerHeadline = 'Просмотр';
   static const viewerDesc = 'Только просмотр данных без возможности их изменения.';
   static const notChosen = 'notChosen';
-  static const notChosenHeadline = 'Неизвестная роль';
+  static const notChosenHeadline = 'Роль администратора не выбрана';
   static const notChosenDesc = 'Роль не определена.';
 
   static const addAdmin = 'Добавление админа';

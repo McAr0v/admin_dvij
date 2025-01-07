@@ -16,7 +16,7 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
   @override
   void addToCurrentDownloadedList(ImageFromDb entity) {
     // Проверяем, есть ли элемент с таким id
-    int index = _currentImagesList.indexWhere((c) => c.id == entity.id);
+    int index = _currentImagesList.indexWhere((c) => c.id == entity.id && c.location.location == entity.location.location);
 
 
 
@@ -40,8 +40,27 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
 
   @override
   void deleteEntityFromDownloadedList(String id) {
+
+    // Так как id у пользователя и админа могут быть одинаковы
+    // Мне нужно передать id и location в одном String
+    // Для точного определения, какую сущность нужно удалить из списка
+
+    // Для этого передаю сюда, объеденив id и location
+    // а в методе разделяю обратно
+
+    List<String> parts = id.split('_');
+
+    String idFromId = parts[0];
+    String location = parts[1];
+
     if (_currentImagesList.isNotEmpty){
-      _currentImagesList.removeWhere((image) => image.id == id);
+      _currentImagesList.removeWhere(
+              (image) =>
+                  // Нужно, чтобы совпадал id
+                  image.id == idFromId
+                  // и Location
+                  && image.location.location == ImageLocation.fromString(folderName: location).location
+      );
     }
   }
 
@@ -51,6 +70,61 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
       await getListFromDb();
     }
     return _currentImagesList;
+  }
+
+  Future<List<ImageFromDb>> getNeededList({
+    bool fromDb = false,
+    required bool isActive,
+    required ImageLocation location,
+    required String searchingText,
+  }) async {
+
+    List<ImageFromDb> returnedList = [];
+    List<ImageFromDb> inActiveList = [];
+
+    if (_currentImagesList.isEmpty || fromDb) {
+      await getListFromDb();
+    }
+
+    // Если нужны все изображения
+    if (isActive){
+      for (ImageFromDb image in _currentImagesList){
+        if (location.location == ImageLocationEnum.notChosen){
+          returnedList.add(image);
+        } else if (image.checkLocation(locationFromFilter: location)){
+          returnedList.add(image);
+        }
+      }
+    }
+    // Если нужны не активные изображения
+    else {
+      // Фильтруем все неактивные изображения из основного списка
+      // в отдельную переменную
+
+      inActiveList = await getUnusedImages(fromDb: fromDb);
+
+      for (ImageFromDb image in inActiveList){
+        if (location.location == ImageLocationEnum.notChosen){
+          returnedList.add(image);
+        } else if (image.checkLocation(locationFromFilter: location)){
+          returnedList.add(image);
+        }
+      }
+
+    }
+
+    if (searchingText.isNotEmpty){
+      returnedList = returnedList
+          .where((image) =>
+          image.id.toLowerCase().contains(searchingText.toLowerCase()) ||
+          image.location.toString().toLowerCase().contains(searchingText.toLowerCase()) ||
+          image.getEntityName().toLowerCase().contains(searchingText.toLowerCase())
+      ).toList();
+    }
+
+    returnedList.sortByLocation(true);
+
+    return returnedList;
   }
 
   Future<List<ImageFromDb>> getUnusedImages({bool fromDb = false}) async {
@@ -101,12 +175,6 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
     List <ImageFromDb> returnedImages = [];
 
     ImageUploader im = ImageUploader();
-    /*AdminUsersListClass adminsListClass = AdminUsersListClass();
-    AdsList adsListClass = AdsList();
-    EventsListClass eventsListClass = EventsListClass();
-    PlacesList placesListClass = PlacesList();
-    PromosListClass promosListClass = PromosListClass();
-    SimpleUsersList simpleUsersList = SimpleUsersList();*/
 
     List<ImageFromDb> adminsImagesList = await im.getImageInPath(ImageLocation(location: ImageLocationEnum.admins));
     List<ImageFromDb> adsImagesList = await im.getImageInPath(ImageLocation(location: ImageLocationEnum.ads));
@@ -114,13 +182,6 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
     List<ImageFromDb> placesImagesList = await im.getImageInPath(ImageLocation(location: ImageLocationEnum.places));
     List<ImageFromDb> promosImagesList = await im.getImageInPath(ImageLocation(location: ImageLocationEnum.promos));
     List<ImageFromDb> usersImagesList = await im.getImageInPath(ImageLocation(location: ImageLocationEnum.users));
-
-    /*returnedImages.addAll(await adminsListClass.searchUnusedImages(imagesList: adminsImagesList));
-    returnedImages.addAll(await adsListClass.searchUnusedImages(imagesList: adsImagesList));
-    returnedImages.addAll(await eventsListClass.searchUnusedImages(imagesList: eventsImagesList));
-    returnedImages.addAll(await placesListClass.searchUnusedImages(imagesList: placesImagesList));
-    returnedImages.addAll(await promosListClass.searchUnusedImages(imagesList: promosImagesList));
-    returnedImages.addAll(await simpleUsersList.searchUnusedImages(imagesList: usersImagesList));*/
 
     returnedImages.addAll(adminsImagesList);
     returnedImages.addAll(adsImagesList);
@@ -152,6 +213,18 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
   void setDownloadedList(List<ImageFromDb> list) {
     _currentImagesList = [];
     _currentImagesList = list;
+  }
+
+}
+
+extension SortSimpleUsersListExtension on List<ImageFromDb> {
+
+  void sortByLocation(bool order) {
+    if (order) {
+      sort((a, b) => a.location.toString().compareTo(b.location.toString()));
+    } else {
+      sort((a, b) => b.location.toString().compareTo(a.location.toString()));
+    }
   }
 
 }

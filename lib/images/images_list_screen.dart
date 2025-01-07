@@ -17,10 +17,8 @@ class _ImagesListScreenState extends State<ImagesListScreen> {
   @override
   Widget build(BuildContext context) {
     if (widget.imagesList.isEmpty) {
-      return const Expanded(
-          child: Center(
-            child: Text(SystemConstants.emptyList),
-          )
+      return const Center(
+        child: Text(SystemConstants.emptyList),
       );
     }
     else {

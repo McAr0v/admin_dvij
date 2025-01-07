@@ -4,6 +4,7 @@ import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/database/image_picker.dart';
 import 'package:admin_dvij/images/image_from_db.dart';
 import 'package:admin_dvij/images/image_location.dart';
+import 'package:admin_dvij/images/images_list_class.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -119,6 +120,15 @@ class ImageUploader {
     final TaskSnapshot taskSnapshot = await uploadTask;
     final downloadURL = await taskSnapshot.ref.getDownloadURL();
 
+    ImagesList imagesList = ImagesList();
+    imagesList.addToCurrentDownloadedList(
+        ImageFromDb(
+            id: entityId,
+            url: downloadURL,
+            location: ImageLocation.fromString(folderName: folder)
+        )
+    );
+
     // Возвращаем URL загруженного файла
     return downloadURL;
   }
@@ -129,6 +139,15 @@ class ImageUploader {
 
     try {
       await storageRef.delete();
+
+      ImagesList imagesList = ImagesList();
+
+      // Так как id у пользователя и админа могут быть одинаковы
+      // Мне нужно передать id и location в одном String
+      // Для точного определения, какую сущность нужно удалить из списка
+
+      imagesList.deleteEntityFromDownloadedList('${entityId}_$folder');
+
       return SystemConstants.successConst;
     } on FirebaseException catch (e) {
       return e.toString();

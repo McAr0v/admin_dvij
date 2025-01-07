@@ -1,4 +1,5 @@
 import 'package:admin_dvij/constants/admins_constants.dart';
+import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:admin_dvij/users/admin_user/profile_screen.dart';
@@ -29,6 +30,7 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
   SystemMethodsClass systemMethods = SystemMethodsClass();
 
   bool loading = false;
+  bool deleting = false;
   bool upSorting = false;
 
   final TextEditingController adminEmailController = TextEditingController();
@@ -93,8 +95,9 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
       ),
       body: Stack(
         children: [
-          if (loading) const LoadingScreen(loadingText: AdminConstants.adminsLoading),
-          if (!loading) Column(
+          if (loading) const LoadingScreen(loadingText: AdminConstants.adminsLoading)
+          else if (deleting) const LoadingScreen(loadingText: 'Удаление пользователя')
+          else Column(
             children: [
 
               // ПОЛЕ ПОИСКА
@@ -142,6 +145,9 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
                                   onTap: () async {
                                     await editAdmin(tempAdmin);
                                   },
+                                  onDelete: () async {
+                                    await deleteAdmin(admin: tempAdmin);
+                                  },
                                   context: context
                               );
                             }
@@ -157,6 +163,37 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
       ),
       drawer: const CustomDrawer(),
     );
+  }
+
+  Future<void> deleteAdmin ({required AdminUserClass admin}) async {
+    bool? confirmed = await ElementsOfDesign.exitDialog(
+        context,
+        'Восстановить данные администратора нельзя',
+        ButtonsConstants.delete,
+        ButtonsConstants.cancel,
+        'Удалить администратора ${admin.getFullName()}?'
+    );
+
+    if (confirmed != null && confirmed){
+      setState(() {
+        deleting = true;
+      });
+
+      String result = await admin.deleteFromDb();
+
+      if (result == SystemConstants.successConst){
+        await initialization();
+        _showSnackBar(SystemConstants.deletingSuccess);
+      } else {
+        _showSnackBar(result);
+      }
+
+      setState(() {
+        deleting = false;
+      });
+
+    }
+
   }
 
   Future<void> editAdmin(AdminUserClass admin) async{
