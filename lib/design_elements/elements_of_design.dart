@@ -280,6 +280,7 @@ class ElementsOfDesign {
     );
   }
 
+
   static Tab getTabWithIcon({
     required IconData icon,
     required String text
@@ -287,10 +288,29 @@ class ElementsOfDesign {
     return Tab(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(icon, size: 15,),
           const SizedBox(width: 10,),
-          Text(text, style: const TextStyle(fontSize: 13),),
+
+          if (Platform.isAndroid || Platform.isIOS)
+          Expanded(
+            child: Text(
+              text,
+              overflow: TextOverflow.ellipsis,
+              softWrap: false,
+              maxLines: 1,
+              style: const TextStyle(fontSize: 13),
+              textAlign: TextAlign.center,
+            ),
+          ),
+
+          if (Platform.isWindows || Platform.isMacOS)
+            Text(
+              text,
+              style: const TextStyle(fontSize: 13),
+            ),
+
         ],
       ),
     );

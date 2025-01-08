@@ -201,74 +201,72 @@ class FeedbackCustom implements IEntity{
     return Card(
       color: AppColors.greyOnBackground,
       child: Padding(
-          padding: const EdgeInsets.all(20),
-        child: Row(
+        padding: const EdgeInsets.all(20),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            if (Platform.isMacOS || Platform.isWindows) avatar,
-            if (Platform.isMacOS || Platform.isWindows)  const SizedBox(width: 20,),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (Platform.isAndroid || Platform.isIOS) avatar,
-                  if (Platform.isAndroid || Platform.isIOS) const SizedBox(height: 20,),
-                  Row(
+            Row(
+              children: [
+                avatar,
+                const SizedBox(width: 20,),
+
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                          child: Text(
-                              topic.toString(translate: true),
-                              softWrap: false,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis
-                          )
+                      ElementsOfDesign.getTag(context: context, text: status.toString(translate: true)),
+
+                      const SizedBox(height: 10,),
+
+                      Text(
+                          topic.toString(translate: true),
+                          softWrap: false,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis
                       ),
 
-                      const SizedBox(width: 20,),
-                      ElementsOfDesign.getTag(context: context, text: status.toString(translate: true)),
+                      const SizedBox(height: 5,),
+
+                      Text(id, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+
+
+
 
                     ],
                   ),
+                ),
+              ],
+            ),
 
-                  Text(client.getFullName(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-                  Text(id, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-
-                  Card(
-                    color: AppColors.greyForCards,
-                    margin: EdgeInsets.symmetric(vertical: 20),
-                    child: Padding(
-                        padding: EdgeInsets.all(20),
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                                lastMessage.id.isNotEmpty ? lastMessage.messageText : 'Сообщений нет',
-                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                                    color: AppColors.greyText,
-                                ),
-                                textAlign: TextAlign.start,
-                                softWrap: false,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 10,),
-                            Text(
-                              '${sender.getFullName()}, ${sm.formatDateTimeToHumanViewWithClock(lastMessage.sendTime)}',
-                              style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                              textAlign: TextAlign.end,
-                            ),
-
-                          ],
-                        ),
+            Card(
+              color: AppColors.greyForCards,
+              margin: EdgeInsets.symmetric(vertical: 20),
+              child: Padding(
+                padding: EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      lastMessage.id.isNotEmpty ? lastMessage.messageText : 'Сообщений нет',
+                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                        color: AppColors.greyText,
                       ),
+                      textAlign: TextAlign.start,
+                      softWrap: false,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  )
-                ],
+                    const SizedBox(height: 10,),
+                    Text(
+                      '${sender.getFullName()}, ${sm.formatDateTimeToHumanViewWithClock(lastMessage.sendTime)}',
+                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                      textAlign: TextAlign.end,
+                    ),
 
+                  ],
+                ),
               ),
-            )
+            ),
           ],
         ),
       ),
