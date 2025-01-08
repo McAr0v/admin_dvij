@@ -37,6 +37,7 @@ class DatabaseConstants {
   static const String clientWhatsapp = 'clientWhatsapp';
   static const String ordersDate = 'ordersDate';
   static const String userId = 'userId';
+  static const String senderId = 'senderId';
   static const String events = 'events';
   static const String myEvents = 'myEvents';
   static const String myPromos = 'myPromos';

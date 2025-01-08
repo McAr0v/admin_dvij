@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:admin_dvij/design/app_colors.dart';
 import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/feedback/feedback_list_class.dart';
 import 'package:admin_dvij/feedback/feedback_message.dart';
 import 'package:admin_dvij/feedback/feedback_status.dart';
 import 'package:admin_dvij/feedback/feedback_topic.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
@@ -55,7 +57,7 @@ class FeedbackCustom implements IEntity{
         id: messageInfoFolder.child(DatabaseConstants.id).value.toString(),
         userId: messageInfoFolder.child(DatabaseConstants.userId).value.toString(),
         createDate: DateTime.parse(messageInfoFolder.child(DatabaseConstants.createDate).value.toString()),
-        finishDate: finishDateValue.isNotEmpty ? DateTime.parse(finishDateValue) : null,
+        finishDate: finishDateValue.isNotEmpty && finishDateValue != 'null' ? DateTime.parse(finishDateValue) : null,
         status: FeedbackStatus.fromString(status: messageInfoFolder.child(DatabaseConstants.status).value.toString()),
         topic: FeedbackTopic.fromString(topic: messageInfoFolder.child(DatabaseConstants.topic).value.toString()),
         messages: FeedbackCustom.empty().getMessagesFromSnapshotOrJson(snapshot: messagesFolder)
@@ -177,21 +179,92 @@ class FeedbackCustom implements IEntity{
     return result;
   }
 
-  Widget getFeedbackWidget(){
+  FeedbackMessage getLastMessage() {
+    if (messages.isEmpty) return FeedbackMessage.empty();
 
+    return messages.reduce((latest, message) =>
+    message.sendTime.isAfter(latest.sendTime) ? message : latest
+    );
+  }
+
+  Widget getFeedbackWidget({required BuildContext context}){
+
+    SystemMethodsClass sm = SystemMethodsClass();
     SimpleUsersList simpleUsersList = SimpleUsersList();
     SimpleUser client = simpleUsersList.getEntityFromList(userId);
 
+    FeedbackMessage lastMessage = getLastMessage();
+    SimpleUser sender = simpleUsersList.getEntityFromList(lastMessage.senderId);
+
+    Widget avatar = client.getAvatar(size: 40);
+
     return Card(
+      color: AppColors.greyOnBackground,
       child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ElementsOfDesign.getAvatar(url: client.avatar),
+            if (Platform.isMacOS || Platform.isWindows) avatar,
+            if (Platform.isMacOS || Platform.isWindows)  const SizedBox(width: 20,),
             Expanded(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(client.getFullName()),
+                  if (Platform.isAndroid || Platform.isIOS) avatar,
+                  if (Platform.isAndroid || Platform.isIOS) const SizedBox(height: 20,),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: Text(
+                              topic.toString(translate: true),
+                              softWrap: false,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis
+                          )
+                      ),
+
+                      const SizedBox(width: 20,),
+                      ElementsOfDesign.getTag(context: context, text: status.toString(translate: true)),
+
+                    ],
+                  ),
+
+                  Text(client.getFullName(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+                  Text(id, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+
+                  Card(
+                    color: AppColors.greyForCards,
+                    margin: EdgeInsets.symmetric(vertical: 20),
+                    child: Padding(
+                        padding: EdgeInsets.all(20),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                                lastMessage.id.isNotEmpty ? lastMessage.messageText : 'Сообщений нет',
+                                style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                                    color: AppColors.greyText,
+                                ),
+                                textAlign: TextAlign.start,
+                                softWrap: false,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 10,),
+                            Text(
+                              '${sender.getFullName()}, ${sm.formatDateTimeToHumanViewWithClock(lastMessage.sendTime)}',
+                              style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                              textAlign: TextAlign.end,
+                            ),
+
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
                 ],
 
               ),

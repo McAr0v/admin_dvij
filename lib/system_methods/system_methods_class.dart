@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:admin_dvij/constants/date_constants.dart';
+import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/buttons_constants.dart';
@@ -31,6 +32,18 @@ class SystemMethodsClass {
 
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
+
+  String formatDateTimeToHumanViewWithClock(DateTime date) {
+    const List<String> months = [
+      "января", "февраля", "марта", "апреля", "мая", "июня",
+      "июля", "августа", "сентября", "октября", "ноября", "декабря"
+    ];
+
+    DateMethods dm = DateMethods();
+
+    return '${date.day} ${months[date.month - 1]} ${date.year}, ${dm.formatTimeOrDateWithZero(date.hour)}:${dm.formatTimeOrDateWithZero(date.minute)}';
+  }
+
 
   String formatTimeToHumanView(TimeOfDay time){
     return "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";

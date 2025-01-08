@@ -143,7 +143,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                                 children: [
                                   for (FeedbackCustom feedback in feedbackList) Column(
                                     children: [
-                                      feedback.getFeedbackWidget()
+                                      feedback.getFeedbackWidget(context: context)
                                     ],
                                   )
                                 ],

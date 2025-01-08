@@ -13,7 +13,7 @@ class FeedbackMessage implements IEntity{
   DateTime sendTime;
   String feedbackId;
   String userId;
-  String adminId;
+  String senderId;
   String messageText;
   String imageUrl;
 
@@ -22,7 +22,7 @@ class FeedbackMessage implements IEntity{
     required this.sendTime,
     required this.feedbackId,
     required this.userId,
-    required this.adminId,
+    required this.senderId,
     required this.messageText,
     required this.imageUrl
   });
@@ -33,7 +33,7 @@ class FeedbackMessage implements IEntity{
         sendTime: DateTime.now(),
         feedbackId: '',
         userId: '',
-        adminId: '',
+        senderId: '',
         messageText: '',
         imageUrl: ''
     );
@@ -45,7 +45,7 @@ class FeedbackMessage implements IEntity{
         sendTime: DateTime.parse(snapshot.child(DatabaseConstants.sendTime).value.toString()),
         feedbackId: snapshot.child(DatabaseConstants.feedbackId).value.toString(),
         userId: snapshot.child(DatabaseConstants.userId).value.toString(),
-        adminId: snapshot.child(DatabaseConstants.adminId).value.toString(),
+        senderId: snapshot.child(DatabaseConstants.senderId).value.toString(),
         messageText: snapshot.child(DatabaseConstants.messageText).value.toString(),
         imageUrl: snapshot.child(DatabaseConstants.imageUrl).value.toString()
     );
@@ -58,7 +58,7 @@ class FeedbackMessage implements IEntity{
         sendTime: DateTime.parse(json[DatabaseConstants.sendTime] ?? ''),
         feedbackId: json[DatabaseConstants.feedbackId] ?? '',
         userId: json[DatabaseConstants.userId] ?? '',
-        adminId: json[DatabaseConstants.adminId] ?? '',
+        senderId: json[DatabaseConstants.senderId] ?? '',
         messageText: json[DatabaseConstants.messageText] ?? '',
         imageUrl: json[DatabaseConstants.imageUrl] ?? ''
     );
@@ -101,7 +101,7 @@ class FeedbackMessage implements IEntity{
       DatabaseConstants.sendTime: sendTime.toString(),
       DatabaseConstants.feedbackId: feedbackId,
       DatabaseConstants.userId: userId,
-      DatabaseConstants.adminId: adminId,
+      DatabaseConstants.senderId: senderId,
       DatabaseConstants.messageText: messageText,
       DatabaseConstants.imageUrl: imageUrl,
     };
