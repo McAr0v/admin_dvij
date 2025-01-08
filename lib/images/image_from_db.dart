@@ -105,6 +105,14 @@ class ImageFromDb {
           return tempPromo.headline;
         }
       }
+
+      case ImageLocationEnum.feedback: {
+        /*Promo tempPromo = PromosListClass().getEntityFromList(id);
+        if (tempPromo.id.isNotEmpty) {
+          return tempPromo.headline;
+        }*/
+        return ImagesConstants.entityNotFind;
+      }
     }
     return ImagesConstants.entityNotFind;
   }
@@ -148,6 +156,15 @@ class ImageFromDb {
           return PromoCreateViewEditScreen(indexTabPage: indexTabPage, promo: tempPromo,);
         }
       }
+
+      case ImageLocationEnum.feedback: {
+        /*Promo tempPromo = PromosListClass().getEntityFromList(id);
+        if (tempPromo.id.isNotEmpty) {
+          return PromoCreateViewEditScreen(indexTabPage: indexTabPage, promo: tempPromo,);
+        }*/
+        return null;
+      }
+
     }
     return null;
   }

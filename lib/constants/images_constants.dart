@@ -13,7 +13,9 @@ class ImagesConstants {
   static const String promosLocationHeadline = 'Акции';
   static const String promosLocationPath = 'promos';
   static const String usersLocationHeadline = 'Пользователи';
+  static const String feedbackLocationHeadline = 'Обратная связь';
   static const String usersLocationPath = 'users';
+  static const String feedbackLocationPath = 'feedback';
   static const String notChosenLocationHeadline = 'Не выбрано';
   static const String notChosenLocationPath = '';
   static const String allImagesTab = 'Все изображения';

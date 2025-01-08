@@ -9,10 +9,12 @@ class DatabaseConstants {
   static const String registrationDate = 'registrationDate';
   static const String publishDate = 'publishDate';
   static const String createDate = 'createDate';
+  static const String finishDate = 'finishDate';
   static const String id = 'id';
   static const String category = 'category';
   static const String creatorId = 'creatorId';
   static const String adminRole = 'adminRole';
+  static const String adminId = 'adminId';
   static const String city = 'city';
   static const String house = 'house';
   static const String street = 'street';
@@ -55,6 +57,12 @@ class DatabaseConstants {
   static const String contacts = 'contacts';
   static const String status = 'status';
   static const String items = 'items';
+  static const String topic = 'topic';
+  static const String messages = 'messages';
+  static const String messageInfo = 'message_info';
+  static const String messageText = 'messageText';
+  static const String sendTime = 'sendTime';
+  static const String feedbackId = 'feedbackId';
 
 
 }

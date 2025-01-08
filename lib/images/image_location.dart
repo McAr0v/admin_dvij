@@ -7,6 +7,7 @@ enum ImageLocationEnum {
   places,
   promos,
   users,
+  feedback,
   notChosen
 }
 
@@ -24,6 +25,7 @@ class ImageLocation {
       case ImageLocationEnum.places: return ImagesConstants.placesLocationHeadline;
       case ImageLocationEnum.promos: return ImagesConstants.promosLocationHeadline;
       case ImageLocationEnum.users: return ImagesConstants.usersLocationHeadline;
+      case ImageLocationEnum.feedback: return ImagesConstants.feedbackLocationHeadline;
       case ImageLocationEnum.notChosen: return ImagesConstants.notChosenLocationHeadline;
     }
   }
@@ -36,6 +38,7 @@ class ImageLocation {
       case 'places' : return ImageLocation(location: ImageLocationEnum.places);
       case 'promos' : return ImageLocation(location: ImageLocationEnum.promos);
       case 'users' : return ImageLocation(location: ImageLocationEnum.users);
+      case 'feedback' : return ImageLocation(location: ImageLocationEnum.feedback);
       default: return ImageLocation();
     }
   }
@@ -49,6 +52,7 @@ class ImageLocation {
       ImageLocation(location: ImageLocationEnum.places),
       ImageLocation(location: ImageLocationEnum.promos),
       ImageLocation(location: ImageLocationEnum.ads),
+      ImageLocation(location: ImageLocationEnum.feedback),
     ];
   }
 
@@ -60,6 +64,7 @@ class ImageLocation {
       case ImageLocationEnum.places: return ImagesConstants.placesLocationPath;
       case ImageLocationEnum.promos: return ImagesConstants.promosLocationPath;
       case ImageLocationEnum.users: return ImagesConstants.usersLocationPath;
+      case ImageLocationEnum.feedback: return ImagesConstants.feedbackLocationPath;
       case ImageLocationEnum.notChosen: return ImagesConstants.notChosenLocationPath;
     }
   }
