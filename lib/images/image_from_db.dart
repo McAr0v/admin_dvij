@@ -2,6 +2,9 @@ import 'dart:io';
 import 'package:admin_dvij/constants/images_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/database/image_uploader.dart';
+import 'package:admin_dvij/feedback/feedback_class.dart';
+import 'package:admin_dvij/feedback/feedback_list_class.dart';
+import 'package:admin_dvij/feedback/feedback_view_chat_screen.dart';
 import 'package:admin_dvij/images/image_location.dart';
 import 'package:admin_dvij/images/images_list_class.dart';
 import 'package:flutter/material.dart';
@@ -107,11 +110,10 @@ class ImageFromDb {
       }
 
       case ImageLocationEnum.feedback: {
-        /*Promo tempPromo = PromosListClass().getEntityFromList(id);
-        if (tempPromo.id.isNotEmpty) {
-          return tempPromo.headline;
-        }*/
-        return ImagesConstants.entityNotFind;
+        FeedbackCustom tempFeedback = FeedbackListClass().getEntityFromListByMessageId(id);
+        if (tempFeedback.id.isNotEmpty) {
+          return tempFeedback.topic.toString(translate: true);
+        }
       }
     }
     return ImagesConstants.entityNotFind;
@@ -158,11 +160,10 @@ class ImageFromDb {
       }
 
       case ImageLocationEnum.feedback: {
-        /*Promo tempPromo = PromosListClass().getEntityFromList(id);
-        if (tempPromo.id.isNotEmpty) {
-          return PromoCreateViewEditScreen(indexTabPage: indexTabPage, promo: tempPromo,);
-        }*/
-        return null;
+        FeedbackCustom tempFeedback = FeedbackListClass().getEntityFromListByMessageId(id);
+        if (tempFeedback.id.isNotEmpty) {
+          return FeedbackViewChatScreen(feedback: tempFeedback);
+        }
       }
 
     }

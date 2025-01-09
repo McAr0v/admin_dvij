@@ -1,3 +1,8 @@
+import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../design_elements/elements_of_design.dart';
+
 enum FeedbackStatusEnum {
   received,       // Сообщение получено
   inProgress,     // Сообщение обрабатывается
@@ -5,7 +10,7 @@ enum FeedbackStatusEnum {
   dismissed,      // Сообщение отклонено
   awaitingResponse, // Ожидается ответ от пользователя
   escalated,      // Сообщение передано на более высокий уровень
-  closed          // Обработка завершена
+  closed,          // Обработка завершена
 }
 
 class FeedbackStatus {
@@ -26,6 +31,27 @@ class FeedbackStatus {
     }
   }
 
+  bool isFinishStatus(){
+    switch (status) {
+      case FeedbackStatusEnum.resolved: return true;
+      case FeedbackStatusEnum.dismissed: return true;
+      case FeedbackStatusEnum.closed: return true;
+      default: return false;
+    }
+  }
+
+  List<FeedbackStatus> getStatusList(){
+    return [
+      FeedbackStatus(status: FeedbackStatusEnum.received),
+      FeedbackStatus(status: FeedbackStatusEnum.inProgress),
+      FeedbackStatus(status: FeedbackStatusEnum.resolved),
+      FeedbackStatus(status: FeedbackStatusEnum.dismissed),
+      FeedbackStatus(status: FeedbackStatusEnum.awaitingResponse),
+      FeedbackStatus(status: FeedbackStatusEnum.escalated),
+      FeedbackStatus(status: FeedbackStatusEnum.closed),
+    ];
+  }
+
   @override
   String toString({bool translate = false}) {
     switch (status) {
@@ -37,6 +63,26 @@ class FeedbackStatus {
       case FeedbackStatusEnum.escalated: return !translate ? 'escalated' : 'Сообщение передано на более высокий уровень';
       case FeedbackStatusEnum.closed: return !translate ? 'closed' : 'Обработка завершена';
     }
+  }
+
+  Widget getStatusFieldWidget({
+    required bool canEdit,
+    required BuildContext context,
+    required VoidCallback onTap
+  }){
+
+    TextEditingController textController = TextEditingController();
+    textController.text = toString(translate: true);
+
+    return ElementsOfDesign.buildTextField(
+        controller: textController,
+        labelText: 'Статус',
+        canEdit: canEdit,
+        icon: FontAwesomeIcons.mapLocation,
+        context: context,
+        readOnly: true,
+        onTap: onTap
+    );
   }
 
 }

@@ -1,12 +1,19 @@
 import 'dart:io';
 import 'package:admin_dvij/constants/feedback_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
 import 'package:admin_dvij/feedback/feedback_list_class.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
+import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
+import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
 import '../constants/database_constants.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
+import '../design/app_colors.dart';
+import '../users/simple_users/simple_user.dart';
 
 class FeedbackMessage implements IEntity{
   String id;
@@ -62,6 +69,16 @@ class FeedbackMessage implements IEntity{
         messageText: json[DatabaseConstants.messageText] ?? '',
         imageUrl: json[DatabaseConstants.imageUrl] ?? ''
     );
+  }
+
+  bool checkMessageBeforeSending(){
+    bool result = false;
+
+    if (feedbackId.isNotEmpty && userId.isNotEmpty && senderId.isNotEmpty && messageText.isNotEmpty){
+      return true;
+    }
+
+    return result;
   }
 
   @override
@@ -161,6 +178,83 @@ class FeedbackMessage implements IEntity{
 
     return result;
 
+  }
+
+  Widget getMessageWidget ({
+    required SimpleUser client,
+    required BuildContext context,
+    required VoidCallback onProfileTap,
+
+  }){
+    AdminUsersListClass adminUsersList = AdminUsersListClass();
+    SystemMethodsClass sm = SystemMethodsClass();
+    AdminUserClass admin = AdminUserClass.empty();
+
+    bool isClient = senderId == client.uid;
+
+    if (!isClient) {
+      admin = adminUsersList.getEntityFromList(senderId);
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      child: Column(
+        crossAxisAlignment: isClient ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+        mainAxisAlignment: isClient ? MainAxisAlignment.start : MainAxisAlignment.end,
+        children: [
+          IntrinsicWidth(
+            child: Card(
+              margin: isClient ? const EdgeInsets.only(top: 10, right: 40, bottom: 10) : const EdgeInsets.only(top: 10, left: 40, bottom: 10),
+              color: isClient ? AppColors.greyForCards : AppColors.greyBackground,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+
+                    if (imageUrl.isNotEmpty) ElementsOfDesign.getImageFromUrl(imageUrl: imageUrl),
+
+                    if (imageUrl.isNotEmpty) const SizedBox(height: 20,),
+
+                    Text(
+                        messageText,
+                    ),
+                    const SizedBox(height: 10,),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: isClient ? MainAxisAlignment.start : MainAxisAlignment.end,
+                      children: [
+                        if (isClient) client.getAvatar(size: 20),
+                        if (isClient) const SizedBox(width: 10,),
+                        Column(
+                          crossAxisAlignment: isClient ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: onProfileTap,
+                              child: Text(
+                                isClient ? client.getFullName() : admin.getFullName(),
+                                style: Theme.of(context).textTheme.labelMedium!.copyWith(decoration: TextDecoration.underline),
+                              ),
+                            ),
+
+                            Text(
+                              sm.formatDateTimeToHumanViewWithClock(sendTime),
+                              style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                            ),
+                          ],
+                        ),
+                        if (!isClient) const SizedBox(width: 10,),
+                        if (!isClient) admin.getAvatar(size: 20),
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
 }

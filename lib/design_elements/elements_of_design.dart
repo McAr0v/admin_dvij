@@ -194,6 +194,44 @@ class ElementsOfDesign {
     );
   }
 
+  static Widget getImageFromFileWithXButton({ 
+    required File image,
+    required VoidCallback onTap
+  }){
+    return SizedBox(
+      width: 100,
+      height: 100,
+      child: Stack(
+        children: [
+          Image.file(
+            image,
+            fit: BoxFit.cover,
+            width: 100,
+            height: 100,
+          ),
+
+          Positioned(
+            top: 5.0,
+            left: 5.0,
+            child: GestureDetector(
+              onTap: onTap,
+              child: const Card(
+                margin: EdgeInsets.zero,
+                color: AppColors.greyOnBackground,
+                  child: Padding(
+                    padding: EdgeInsets.all(5.0),
+                    child: Icon(FontAwesomeIcons.x, size: 8,),
+                  )
+              ),
+            ),
+          ),
+          
+        ],
+      ),
+    );
+  }
+  
+
   static getAvatar({required String url, double size = 40}) {
     return CircleAvatar(
       radius: size,
@@ -320,10 +358,11 @@ class ElementsOfDesign {
     required TextEditingController controller,
     required String labelText,
     required bool canEdit,
-    required IconData icon,
+    required IconData? icon,
     required BuildContext context,
     int? maxLines = 1,
     VoidCallback? onTap,
+    VoidCallback? onIconTap,
     bool readOnly = false,
   }) {
     return TextField(
@@ -331,7 +370,15 @@ class ElementsOfDesign {
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,
-        prefixIcon: Icon(icon, size: 18,),
+        prefixIcon: icon != null
+            ? GestureDetector(
+              onTap: onIconTap,
+              child: Icon(
+                        icon,
+                        size: 18,
+                      ),
+            )
+            : null,
       ),
       enabled: canEdit,
       readOnly: readOnly,

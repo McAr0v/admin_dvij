@@ -9,7 +9,6 @@ import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../constants/database_constants.dart';
 import '../constants/feedback_constants.dart';
@@ -45,6 +44,44 @@ class FeedbackCustom implements IEntity{
         topic: FeedbackTopic(),
         messages: []
     );
+  }
+
+  bool checkBeforeSaving(){
+
+    bool result = true;
+
+    if (id.isEmpty || userId.isEmpty || topic.topic == FeedbackTopicEnum.notChosen) {
+      result = false;
+    }
+
+    return result;
+
+  }
+
+  bool checkMessagesOnSearchingText(String text){
+    bool result = false;
+    for (FeedbackMessage message in messages){
+      if (message.messageText.toLowerCase().contains(text)) {
+        result = true;
+        break;
+      }
+    }
+    return result;
+  }
+
+  bool checkUserFullNameOnSearchingText(String text){
+    SimpleUsersList simpleUsersList = SimpleUsersList();
+    bool result = false;
+    for (FeedbackMessage message in messages){
+
+      SimpleUser tempUser = simpleUsersList.getEntityFromList(message.userId);
+
+      if (tempUser.getFullName().toLowerCase().contains(text)) {
+        result = true;
+        break;
+      }
+    }
+    return result;
   }
 
   factory FeedbackCustom.fromSnapshot({required DataSnapshot snapshot}){
@@ -112,6 +149,10 @@ class FeedbackCustom implements IEntity{
       result =  await db.deleteFromDb(path);
     } else {
       result = await db.deleteFromDbForWindows(path);
+    }
+
+    for (FeedbackMessage message in messages){
+      await message.deleteFromDb();
     }
 
     if (result == SystemConstants.successConst) {
@@ -187,7 +228,10 @@ class FeedbackCustom implements IEntity{
     );
   }
 
-  Widget getFeedbackWidget({required BuildContext context}){
+  Widget getFeedbackWidget({
+    required BuildContext context,
+    required VoidCallback onTap,
+  }){
 
     SystemMethodsClass sm = SystemMethodsClass();
     SimpleUsersList simpleUsersList = SimpleUsersList();
@@ -198,76 +242,79 @@ class FeedbackCustom implements IEntity{
 
     Widget avatar = client.getAvatar(size: 40);
 
-    return Card(
-      color: AppColors.greyOnBackground,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                avatar,
-                const SizedBox(width: 20,),
+    return GestureDetector(
+      onTap: onTap,
+      child: Card(
+        color: AppColors.greyOnBackground,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  avatar,
+                  const SizedBox(width: 20,),
 
-                Expanded(
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ElementsOfDesign.getTag(context: context, text: status.toString(translate: true)),
+
+                        const SizedBox(height: 10,),
+
+                        Text(
+                            topic.toString(translate: true),
+                            softWrap: false,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis
+                        ),
+
+                        const SizedBox(height: 5,),
+
+                        Text(id, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+
+
+
+
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+
+              Card(
+                color: AppColors.greyForCards,
+                margin: EdgeInsets.symmetric(vertical: 20),
+                child: Padding(
+                  padding: EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ElementsOfDesign.getTag(context: context, text: status.toString(translate: true)),
-
-                      const SizedBox(height: 10,),
-
                       Text(
-                          topic.toString(translate: true),
-                          softWrap: false,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis
+                        lastMessage.id.isNotEmpty ? lastMessage.messageText : 'Сообщений нет',
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                          color: AppColors.greyText,
+                        ),
+                        textAlign: TextAlign.start,
+                        softWrap: false,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
-
-                      const SizedBox(height: 5,),
-
-                      Text(id, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
-
-
-
+                      const SizedBox(height: 10,),
+                      Text(
+                        '${sender.getFullName()}, ${sm.formatDateTimeToHumanViewWithClock(lastMessage.sendTime)}',
+                        style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                        textAlign: TextAlign.end,
+                      ),
 
                     ],
                   ),
                 ),
-              ],
-            ),
-
-            Card(
-              color: AppColors.greyForCards,
-              margin: EdgeInsets.symmetric(vertical: 20),
-              child: Padding(
-                padding: EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      lastMessage.id.isNotEmpty ? lastMessage.messageText : 'Сообщений нет',
-                      style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        color: AppColors.greyText,
-                      ),
-                      textAlign: TextAlign.start,
-                      softWrap: false,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 10,),
-                    Text(
-                      '${sender.getFullName()}, ${sm.formatDateTimeToHumanViewWithClock(lastMessage.sendTime)}',
-                      style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                      textAlign: TextAlign.end,
-                    ),
-
-                  ],
-                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -103,7 +103,7 @@ class _ImagesPageState extends State<ImagesPage> {
 
                       IconButton(
                         onPressed: () async {
-                          await filterPromos();
+                          await filterImages();
                         },
                         icon: Icon(
                           FontAwesomeIcons.filter,
@@ -259,7 +259,7 @@ class _ImagesPageState extends State<ImagesPage> {
     await initialization(fromDb: false);
   }
 
-  Future<void> filterPromos() async{
+  Future<void> filterImages() async{
 
     final result = await sm.getPopup(
         context: context,

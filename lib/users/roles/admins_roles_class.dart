@@ -91,6 +91,24 @@ class AdminRoleClass {
     }
   }
 
+  /// Метод выдачи доступа на редактирование сообщений обратной связи
+  bool accessToEditFeedback(){
+    if (adminRole == AdminRole.notChosen || adminRole == AdminRole.viewer || adminRole == AdminRole.advertiser) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
+  /// Метод выдачи доступа на удаление сообщений обратной связи
+  bool accessToDeleteFeedback(){
+    if (adminRole == AdminRole.creator || adminRole == AdminRole.superAdmin) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   bool accessToEditPrivacyPolicy(){
     if (adminRole == AdminRole.notChosen || adminRole == AdminRole.viewer || adminRole == AdminRole.advertiser) {
       return false;

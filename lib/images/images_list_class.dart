@@ -1,6 +1,7 @@
 import 'package:admin_dvij/ads/ads_list_class.dart';
 import 'package:admin_dvij/database/image_uploader.dart';
 import 'package:admin_dvij/events/events_list_class.dart';
+import 'package:admin_dvij/feedback/feedback_list_class.dart';
 import 'package:admin_dvij/images/image_from_db.dart';
 import 'package:admin_dvij/images/image_location.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
@@ -137,6 +138,7 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
     PlacesList placesListClass = PlacesList();
     PromosListClass promosListClass = PromosListClass();
     SimpleUsersList simpleUsersList = SimpleUsersList();
+    FeedbackListClass feedbackListClass = FeedbackListClass();
 
 
     if (_currentImagesList.isEmpty || fromDb) {
@@ -150,6 +152,7 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
       returnedList.addAll(await placesListClass.searchUnusedImages(imagesList: _currentImagesList));
       returnedList.addAll(await promosListClass.searchUnusedImages(imagesList: _currentImagesList));
       returnedList.addAll(await simpleUsersList.searchUnusedImages(imagesList: _currentImagesList));
+      returnedList.addAll(await feedbackListClass.searchUnusedImages(imagesList: _currentImagesList));
     }
 
     return returnedList;
@@ -182,6 +185,7 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
     List<ImageFromDb> placesImagesList = await im.getImageInPath(ImageLocation(location: ImageLocationEnum.places));
     List<ImageFromDb> promosImagesList = await im.getImageInPath(ImageLocation(location: ImageLocationEnum.promos));
     List<ImageFromDb> usersImagesList = await im.getImageInPath(ImageLocation(location: ImageLocationEnum.users));
+    List<ImageFromDb> feedbackImagesList = await im.getImageInPath(ImageLocation(location: ImageLocationEnum.feedback));
 
     returnedImages.addAll(adminsImagesList);
     returnedImages.addAll(adsImagesList);
@@ -189,6 +193,7 @@ class ImagesList implements IEntitiesList<ImageFromDb> {
     returnedImages.addAll(placesImagesList);
     returnedImages.addAll(promosImagesList);
     returnedImages.addAll(usersImagesList);
+    returnedImages.addAll(feedbackImagesList);
 
     // Устанавливаем подгруженный список в нашу доступную переменную
     setDownloadedList(returnedImages);

@@ -1,18 +1,19 @@
 import 'package:admin_dvij/feedback/feedback_class.dart';
 import 'package:admin_dvij/feedback/feedback_list_class.dart';
-import 'package:admin_dvij/feedback/feedback_message.dart';
+import 'package:admin_dvij/feedback/feedback_list_screen.dart';
+import 'package:admin_dvij/feedback/feedback_tab_enum.dart';
+import 'package:admin_dvij/feedback/feedback_topic.dart';
+import 'package:admin_dvij/feedback/feedback_topic_picker.dart';
+import 'package:admin_dvij/feedback/feedback_view_chat_screen.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
-import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
-import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
-import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import '../constants/buttons_constants.dart';
 import '../constants/screen_constants.dart';
 import '../design/app_colors.dart';
 import '../design/loading_screen.dart';
 import '../design_elements/elements_of_design.dart';
 import '../navigation/drawer_custom.dart';
-import '../users/simple_users/simple_user.dart';
 
 class FeedbackPage extends StatefulWidget {
   final int initialIndex;
@@ -28,7 +29,13 @@ class _FeedbackPageState extends State<FeedbackPage> {
   FeedbackListClass feedbackListClass = FeedbackListClass();
   SystemMethodsClass sm = SystemMethodsClass();
 
-  List<FeedbackCustom> feedbackList = [];
+  TextEditingController searchingController = TextEditingController();
+
+  FeedbackTopic filterTopic = FeedbackTopic();
+
+  List<FeedbackCustom> receivedFeedbackList = [];
+  List<FeedbackCustom> inWorkFeedbackList = [];
+  List<FeedbackCustom> completedFeedbackList = [];
 
   @override
   void initState() {
@@ -42,7 +49,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
       loading = true;
     });
 
-    feedbackList = await feedbackListClass.getDownloadedList(fromDb: fromDb);
+    receivedFeedbackList = await feedbackListClass.getNeededList(topic: filterTopic, tab: FeedbackTabEnum.received, searchingText: searchingController.text, fromDb: fromDb);
+    inWorkFeedbackList = await feedbackListClass.getNeededList(topic: filterTopic, tab: FeedbackTabEnum.inWork, searchingText: searchingController.text, fromDb: fromDb);
+    completedFeedbackList = await feedbackListClass.getNeededList(topic: filterTopic, tab: FeedbackTabEnum.completed, searchingText: searchingController.text, fromDb: fromDb);
 
     setState(() {
       loading = false;
@@ -53,12 +62,11 @@ class _FeedbackPageState extends State<FeedbackPage> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-        //initialIndex: widget.initialIndex,
+        initialIndex: widget.initialIndex,
         length: 3,
         child: Stack(
           children: [
             if (loading) const LoadingScreen()
-            //else if (deleting) const LoadingScreen(loadingText: SystemConstants.deleting)
             else Scaffold(
                 appBar: AppBar(
                   title: const Text(ScreenConstants.feedbackPage),
@@ -66,12 +74,12 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
                     // КНОПКИ В AppBar
 
-                    /*Row(
+                    Row(
                       children: [
 
                         // Кнопка сброса фильтра
 
-                        if (chosenLocation.location != ImageLocationEnum.notChosen)
+                        if (filterTopic.topic != FeedbackTopicEnum.notChosen)
                           ElementsOfDesign.linkButton(
                               method: () async {
                                 await resetFilter();
@@ -80,22 +88,22 @@ class _FeedbackPageState extends State<FeedbackPage> {
                               context: context
                           ),
 
-                        if (chosenLocation.location != ImageLocationEnum.notChosen)
+                        if (filterTopic.topic != FeedbackTopicEnum.notChosen)
                           const SizedBox(width: 10,),
 
                         // Кнопка "Фильтр"
 
                         IconButton(
                           onPressed: () async {
-                            await filterPromos();
+                            await filterFeedback();
                           },
                           icon: Icon(
                             FontAwesomeIcons.filter,
                             size: 15,
-                            color: chosenLocation.location != ImageLocationEnum.notChosen ? AppColors.brandColor : AppColors.white,),
+                            color: filterTopic.topic != FeedbackTopicEnum.notChosen ? AppColors.brandColor : AppColors.white,),
                         ),
                       ],
-                    ),*/
+                    ),
 
                     // Кнопка "Обновить"
                     IconButton(
@@ -111,9 +119,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
                   bottom: TabBar(
                     tabs: [
-                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.images, text: 'Поступившие'),
-                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.solidFileImage, text: 'В работе'),
-                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.solidFileImage, text: 'Завершенные'),
+                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.envelopeOpenText, text: 'Поступившие'),
+                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.spinner, text: 'В работе'),
+                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.flagCheckered, text: 'Завершенные'),
                     ],
                   ),
                 ),
@@ -122,10 +130,10 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
                 body: Column(
                   children: [
-                    /*ElementsOfDesign.getSearchBar(
+                    ElementsOfDesign.getSearchBar(
                         context: context,
                         textController: searchingController,
-                        labelText: ImagesConstants.searchFieldHint,
+                        labelText: 'Тема, имя, описание...',
                         icon: FontAwesomeIcons.searchengin,
                         onChanged: (value) async {
                           await searchingAction(text: value);
@@ -133,81 +141,31 @@ class _FeedbackPageState extends State<FeedbackPage> {
                         onClean: () async{
                           await searchingAction(text: '');
                         }
-                    ),*/
+                    ),
                     Expanded(
                       child: TabBarView(
                           children: [
 
-                            SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  for (FeedbackCustom feedback in feedbackList) Column(
-                                    children: [
-                                      feedback.getFeedbackWidget(context: context)
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-
-                            SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  for (FeedbackCustom feedback in feedbackList) Column(
-                                    children: [
-                                      Text(feedback.id),
-                                      Text(feedback.status.toString(translate: true)),
-                                      for (FeedbackMessage message in feedback.messages) Column(
-                                        children: [
-                                          Text(message.messageText),
-                                          ElementsOfDesign.imageWithTags(imageUrl: message.imageUrl, width: 100, height: 100)
-                                        ],
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-
-                            SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  for (FeedbackCustom feedback in feedbackList) Column(
-                                    children: [
-                                      Text(feedback.id),
-                                      Text(feedback.status.toString(translate: true)),
-                                      for (FeedbackMessage message in feedback.messages) Column(
-                                        children: [
-                                          Text(message.messageText),
-                                          ElementsOfDesign.imageWithTags(imageUrl: message.imageUrl, width: 100, height: 100)
-                                        ],
-                                      )
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-
-                            /*ImagesListScreen(
-                                imagesList: allImagesList,
-                                deleteImage: (index) async {
-                                  await deleteImage(allImagesList[index]);
-                                },
-                                onTapImage: (index) async {
-                                  await goToEntity(image: allImagesList[index], indexTabPage: 0);
+                            FeedbackListScreen(
+                                feedbackList: receivedFeedbackList,
+                                onTapFeedback: (index) async {
+                                  await goToEntity(feedback: receivedFeedbackList[index], indexTabPage: 0);
                                 }
                             ),
 
-                            ImagesListScreen(
-                                imagesList: unusedImagesList,
-                                deleteImage: (index) async {
-                                  await deleteImage(unusedImagesList[index]);
-                                },
-                                onTapImage: (index) async {
-                                  await goToEntity(image: unusedImagesList[index], indexTabPage: 1);
+                            FeedbackListScreen(
+                                feedbackList: inWorkFeedbackList,
+                                onTapFeedback: (index) async {
+                                  await goToEntity(feedback: inWorkFeedbackList[index], indexTabPage: 1);
                                 }
-                            ),*/
+                            ),
 
+                            FeedbackListScreen(
+                                feedbackList: completedFeedbackList,
+                                onTapFeedback: (index) async {
+                                  await goToEntity(feedback: completedFeedbackList[index], indexTabPage: 2);
+                                }
+                            ),
                           ]
                       ),
                     ),
@@ -219,4 +177,55 @@ class _FeedbackPageState extends State<FeedbackPage> {
         )
     );
   }
+
+  Future<void> goToEntity({required FeedbackCustom feedback, required int indexTabPage}) async {
+
+    final result = await sm.pushToPageWithResult(context: context, page: FeedbackViewChatScreen(feedback: feedback));
+
+    if (result != null) {
+      await initialization();
+    }
+
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> searchingAction({required String text}) async {
+    searchingController.text = text;
+
+    await initialization(
+        fromDb: false
+    );
+  }
+
+  Future<void> resetFilter() async{
+
+    filterTopic = FeedbackTopic();
+    searchingController.text = '';
+
+    await initialization(fromDb: false);
+  }
+
+  Future<void> filterFeedback() async{
+
+    final result = await sm.getPopup(
+        context: context,
+        page: const FeedbackTopicPicker()
+    );
+
+    if (result != null){
+
+      filterTopic = result;
+      await initialization(fromDb: false);
+
+    }
+  }
+
 }

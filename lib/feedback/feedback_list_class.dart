@@ -2,9 +2,13 @@ import 'dart:io';
 import 'package:admin_dvij/constants/feedback_constants.dart';
 import 'package:admin_dvij/feedback/feedback_class.dart';
 import 'package:admin_dvij/feedback/feedback_message.dart';
+import 'package:admin_dvij/feedback/feedback_tab_enum.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../database/database_class.dart';
+import '../images/image_from_db.dart';
+import '../images/image_location.dart';
+import 'feedback_topic.dart';
 
 class FeedbackListClass implements IEntitiesList<FeedbackCustom>{
   static List<FeedbackCustom> _currentFeedbackList = [];
@@ -33,6 +37,29 @@ class FeedbackListClass implements IEntitiesList<FeedbackCustom>{
     }
 
     _currentFeedbackList.sortFeedback(true);
+
+  }
+
+  Future<List<ImageFromDb>> searchUnusedImages({required List<ImageFromDb> imagesList}) async {
+
+    if (_currentFeedbackList.isEmpty) {
+      await getListFromDb();
+    }
+
+    List<String> imagesId = [];
+
+    // Создаем Set с ID всех изображений, привязанных к мероприятиям
+
+    for(FeedbackCustom feedback in _currentFeedbackList){
+      for (FeedbackMessage message in feedback.messages){
+        if (message.imageUrl.isNotEmpty){
+          imagesId.add(message.id);
+        }
+      }
+    }
+
+    // Фильтруем список картинок, оставляя только те, которых нет в Set
+    return imagesList.where((image) => !imagesId.contains(image.id) && image.location.location == ImageLocationEnum.feedback).toList();
 
   }
 
@@ -109,6 +136,50 @@ class FeedbackListClass implements IEntitiesList<FeedbackCustom>{
     return _currentFeedbackList;
   }
 
+  Future<List<FeedbackCustom>> getNeededList({
+    bool fromDb = false,
+    required FeedbackTopic topic,
+    required FeedbackTabEnum tab,
+    required String searchingText,
+  }) async {
+
+    FeedbackTabClass feedbackTabClass = FeedbackTabClass();
+    List<FeedbackCustom> returnedList = [];
+
+    if (_currentFeedbackList.isEmpty || fromDb) {
+      await getListFromDb();
+    }
+
+    for (FeedbackCustom feedback in _currentFeedbackList){
+
+      if (topic.topic == FeedbackTopicEnum.notChosen){
+        if (feedbackTabClass.checkFeedbackToPage(tab: tab, feedback: feedback)){
+          returnedList.add(feedback);
+        }
+      } else {
+        if (feedbackTabClass.checkFeedbackToPage(tab: tab, feedback: feedback) && topic.topic == feedback.topic.topic){
+          returnedList.add(feedback);
+        }
+      }
+
+    }
+
+    if (searchingText.isNotEmpty){
+      returnedList = returnedList
+          .where((feedback) =>
+          feedback.id.toLowerCase().contains(searchingText.toLowerCase()) ||
+          feedback.topic.toString(translate: true).toLowerCase().contains(searchingText.toLowerCase()) ||
+          feedback.status.toString(translate: true).toLowerCase().contains(searchingText.toLowerCase()) ||
+          feedback.checkMessagesOnSearchingText(searchingText.toLowerCase()) ||
+          feedback.checkUserFullNameOnSearchingText(searchingText.toLowerCase())
+      ).toList();
+    }
+
+    returnedList.sortFeedback(true);
+
+    return returnedList;
+  }
+
   @override
   FeedbackCustom getEntityFromList(String id) {
     FeedbackCustom returnedFeedback = FeedbackCustom.empty();
@@ -118,6 +189,21 @@ class FeedbackListClass implements IEntitiesList<FeedbackCustom>{
         if (feedback.id == id) {
           returnedFeedback = feedback;
           break;
+        }
+      }
+    }
+    return returnedFeedback;
+  }
+
+  FeedbackCustom getEntityFromListByMessageId(String id) {
+    FeedbackCustom returnedFeedback = FeedbackCustom.empty();
+
+    if (_currentFeedbackList.isNotEmpty) {
+      for (FeedbackCustom feedback in _currentFeedbackList) {
+        for (FeedbackMessage message in feedback.messages){
+          if (message.id == id) {
+            return feedback;
+          }
         }
       }
     }
