@@ -133,6 +133,9 @@ class FeedbackCustom implements IEntity{
         returnedList.add(FeedbackMessage.fromJson(json: idFolders));
       });
     }
+
+    returnedList.sortFeedbackMessages(false);
+
     return returnedList;
   }
 
@@ -318,6 +321,18 @@ class FeedbackCustom implements IEntity{
         ),
       ),
     );
+  }
+
+}
+
+extension SortFeedbackMessageListExtension on List<FeedbackMessage> {
+
+  void sortFeedbackMessages(bool order) {
+    if (order) {
+      sort((a, b) => a.sendTime.compareTo(b.sendTime));
+    } else {
+      sort((a, b) => b.sendTime.compareTo(a.sendTime));
+    }
   }
 
 }

@@ -544,4 +544,50 @@ class ElementsOfDesign {
       ),
     );
   }
+
+  static void showImagePopup(BuildContext context, String imageUrl) {
+    showDialog(
+      context: context,
+      barrierDismissible: true, // Закрытие при нажатии вне окна
+      builder: (BuildContext context) {
+        return Dialog(
+          insetPadding: EdgeInsets.zero, // Убираем отступы
+          backgroundColor: Colors.black.withOpacity(0.8), // Затемнение фона
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: InteractiveViewer(
+                  maxScale: 3.0, // Позволяет увеличивать изображение
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain, // Подгоняем изображение
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(
+                        child: Text(
+                          "Ошибка загрузки",
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+              Positioned(
+                top: Platform.isMacOS || Platform.isWindows ? 40 : 50,
+                right: 10,
+                child: IconButton(
+                  icon: Icon(Icons.close, color: Colors.white, size: Platform.isMacOS || Platform.isWindows ? 20 : 20),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }

@@ -9,6 +9,7 @@ import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/database_constants.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
@@ -184,6 +185,7 @@ class FeedbackMessage implements IEntity{
     required SimpleUser client,
     required BuildContext context,
     required VoidCallback onProfileTap,
+    required VoidCallback onImageTap,
 
   }){
     AdminUsersListClass adminUsersList = AdminUsersListClass();
@@ -212,7 +214,10 @@ class FeedbackMessage implements IEntity{
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    if (imageUrl.isNotEmpty) ElementsOfDesign.getImageFromUrl(imageUrl: imageUrl),
+                    if (imageUrl.isNotEmpty) GestureDetector(
+                        onTap: onImageTap,
+                        child: ElementsOfDesign.getImageFromUrl(imageUrl: imageUrl),
+                    ),
 
                     if (imageUrl.isNotEmpty) const SizedBox(height: 20,),
 
@@ -237,10 +242,18 @@ class FeedbackMessage implements IEntity{
                               ),
                             ),
 
-                            Text(
-                              sm.formatDateTimeToHumanViewWithClock(sendTime),
-                              style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
-                            ),
+                            Row(
+                              children: [
+                                Icon(FontAwesomeIcons.circleCheck, size: 10,),
+                                SizedBox(width: 10,),
+                                Text(
+                                  sm.formatDateTimeToHumanViewWithClock(sendTime),
+                                  style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                ),
+                              ],
+                            )
+
+
                           ],
                         ),
                         if (!isClient) const SizedBox(width: 10,),

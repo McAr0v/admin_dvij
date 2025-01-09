@@ -44,6 +44,8 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
 
   TextEditingController answerController = TextEditingController();
 
+  final ScrollController _scrollController = ScrollController();
+
   bool loading = false;
   bool saving = false;
   bool deleting = false;
@@ -78,6 +80,8 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
     chosenStatus = editFeedback.status;
     client = simpleUsersList.getEntityFromList(editFeedback.userId);
     finishDate = editFeedback.finishDate;
+
+    editFeedback.messages.sortFeedbackMessages(true);
 
     imageFile = null;
 
@@ -141,7 +145,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
         width: sm.getScreenWidth(neededWidth: 1000),
         color: AppColors.greyOnBackground,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+          padding: Platform.isWindows || Platform.isMacOS ? const EdgeInsets.symmetric(vertical: 10, horizontal: 20) : const EdgeInsets.fromLTRB(20, 10, 20, 30),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -157,31 +161,48 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
               if (imageFile != null) const SizedBox(width: 20),
 
               Expanded(
-                child: ElementsOfDesign.buildTextField(
-                    controller: answerController,
-                    labelText: 'Введите сообщение...',
-                    canEdit: !canEdit,
-                    icon: FontAwesomeIcons.paperclip,
-                    context: context,
-                    onIconTap: !canEdit ? () async {
-                      await _pickImage();
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: ElementsOfDesign.buildTextField(
+                          controller: answerController,
+                          labelText: 'Введите сообщение...',
+                          canEdit: !canEdit,
+                          icon: FontAwesomeIcons.paperclip,
+                          context: context,
+                          onIconTap: !canEdit ? () async {
+                            await _pickImage();
 
-                  } : null
+                          } : null
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+
+                    SizedBox(
+                      width: 40, // Задаем ширину
+                      height: 40, // Задаем высоту
+                      child: sendingMessage
+                          ? const Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: CircularProgressIndicator(),
+                          )
+                          : IconButton(
+                        icon: Icon(Icons.send, color: Theme.of(context).primaryColor),
+                        onPressed: () async {
+                          if (!canEdit && answerController.text.isNotEmpty){
+                            await sendMessage();
+                          } else if (answerController.text.isEmpty) {
+                            _showSnackBar('Напиши сообщение!');
+                          } else if (canEdit){
+                            _showSnackBar('Нельзя отправлять сообщение в режиме редактирования');
+                          }
+                        },
+                      ),
+                    )
+                  ],
                 ),
-              ),
-              const SizedBox(width: 10),
-              IconButton(
-                icon: Icon(Icons.send, color: Theme.of(context).primaryColor),
-                onPressed: () async {
-                  if (!canEdit && answerController.text.isNotEmpty){
-                    await sendMessage();
-                  } else if (answerController.text.isEmpty) {
-                    _showSnackBar('Напиши сообщение!');
-                  } else if (canEdit){
-                    _showSnackBar('Нельзя отправлять сообщение в режиме редактирования');
-                  }
-                },
-              ),
+              )
             ],
           ),
         ),
@@ -193,6 +214,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
           else if (saving) const LoadingScreen(loadingText: SystemConstants.saving)
           else if (deleting) const LoadingScreen(loadingText: SystemConstants.deleting)
             else SingleChildScrollView(
+                controller: _scrollController,
               child: Center(
                 child: Container(
                   width: sm.getScreenWidth(neededWidth: 1000),
@@ -289,22 +311,26 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
                       ),
                       const SizedBox(height: 20,),
 
-                      if (!sendingMessage) Column(
+                      // if (!sendingMessage)
+                      Column(
                         children: [
                           for (FeedbackMessage message in editFeedback.messages) message.getMessageWidget(
                               client: client,
                               context: context,
                               onProfileTap: (){
                                 _showSnackBar('Кликнули на ${message.senderId}');
+                            },
+                            onImageTap: (){
+                                ElementsOfDesign.showImagePopup(context, message.imageUrl);
                             }
                           )
                         ],
                       ),
 
-                      if (sendingMessage) const SizedBox(
+                      /*if (sendingMessage) const SizedBox(
                         height: 200,
                         child: LoadingScreen(loadingText: 'Отправка сообщения',),
-                      ),
+                      ),*/
                     ],
                   ),
                 ),
@@ -349,8 +375,8 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
       String result = await tempMessage.publishToDb(imageFile);
 
       if (result == SystemConstants.successConst){
-        _showSnackBar('Сообщение отправлено');
         await initialization();
+        WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottomSmoothly());
       } else {
         _showSnackBar(result);
       }
@@ -363,6 +389,18 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
       sendingMessage = false;
     });
 
+  }
+
+  void _scrollToBottom() {
+    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+  }
+
+  void _scrollToBottomSmoothly() {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   Future<void> chooseTopic() async{
@@ -438,5 +476,8 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
     });
 
   }
+
+
+
 
 }
