@@ -1,3 +1,5 @@
+import 'package:admin_dvij/constants/feedback_constants.dart';
+import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
@@ -20,13 +22,13 @@ class FeedbackStatus {
 
   factory FeedbackStatus.fromString({required String status}){
     switch (status) {
-      case 'received': return FeedbackStatus(status: FeedbackStatusEnum.received);
-      case 'inProgress': return FeedbackStatus(status: FeedbackStatusEnum.inProgress);
-      case 'resolved': return FeedbackStatus(status: FeedbackStatusEnum.resolved);
-      case 'dismissed': return FeedbackStatus(status: FeedbackStatusEnum.dismissed);
-      case 'awaitingResponse': return FeedbackStatus(status: FeedbackStatusEnum.awaitingResponse);
-      case 'escalated': return FeedbackStatus(status: FeedbackStatusEnum.escalated);
-      case 'closed': return FeedbackStatus(status: FeedbackStatusEnum.closed);
+      case FeedbackConstants.statusReceived: return FeedbackStatus(status: FeedbackStatusEnum.received);
+      case FeedbackConstants.statusInProgress: return FeedbackStatus(status: FeedbackStatusEnum.inProgress);
+      case FeedbackConstants.statusResolved: return FeedbackStatus(status: FeedbackStatusEnum.resolved);
+      case FeedbackConstants.statusDismissed: return FeedbackStatus(status: FeedbackStatusEnum.dismissed);
+      case FeedbackConstants.statusAwaitingResponse: return FeedbackStatus(status: FeedbackStatusEnum.awaitingResponse);
+      case FeedbackConstants.statusEscalated: return FeedbackStatus(status: FeedbackStatusEnum.escalated);
+      case FeedbackConstants.statusClosed: return FeedbackStatus(status: FeedbackStatusEnum.closed);
       default: return FeedbackStatus(status: FeedbackStatusEnum.received);
     }
   }
@@ -55,13 +57,13 @@ class FeedbackStatus {
   @override
   String toString({bool translate = false}) {
     switch (status) {
-      case FeedbackStatusEnum.received: return !translate ? 'received' : 'Сообщение получено';
-      case FeedbackStatusEnum.inProgress: return !translate ? 'inProgress' : 'Сообщение обрабатывается';
-      case FeedbackStatusEnum.resolved: return !translate ? 'resolved' : 'Проблема решена';
-      case FeedbackStatusEnum.dismissed: return !translate ? 'dismissed' : 'Сообщение отклонено';
-      case FeedbackStatusEnum.awaitingResponse: return !translate ? 'awaitingResponse' : 'Ожидается ответ от пользователя';
-      case FeedbackStatusEnum.escalated: return !translate ? 'escalated' : 'Сообщение передано на более высокий уровень';
-      case FeedbackStatusEnum.closed: return !translate ? 'closed' : 'Обработка завершена';
+      case FeedbackStatusEnum.received: return !translate ? FeedbackConstants.statusReceived : FeedbackConstants.statusReceivedTranslateText;
+      case FeedbackStatusEnum.inProgress: return !translate ? FeedbackConstants.statusInProgress : FeedbackConstants.statusInProgressTranslateText;
+      case FeedbackStatusEnum.resolved: return !translate ? FeedbackConstants.statusResolved : FeedbackConstants.statusResolvedTranslateText;
+      case FeedbackStatusEnum.dismissed: return !translate ? FeedbackConstants.statusDismissed : FeedbackConstants.statusDismissedTranslateText;
+      case FeedbackStatusEnum.awaitingResponse: return !translate ? FeedbackConstants.statusAwaitingResponse : FeedbackConstants.statusAwaitingResponseTranslateText;
+      case FeedbackStatusEnum.escalated: return !translate ? FeedbackConstants.statusEscalated : FeedbackConstants.statusEscalatedTranslateText;
+      case FeedbackStatusEnum.closed: return !translate ? FeedbackConstants.statusClosed : FeedbackConstants.statusClosedTranslateText;
     }
   }
 
@@ -76,9 +78,9 @@ class FeedbackStatus {
 
     return ElementsOfDesign.buildTextField(
         controller: textController,
-        labelText: 'Статус',
+        labelText: FieldsConstants.statusField,
         canEdit: canEdit,
-        icon: FontAwesomeIcons.mapLocation,
+        icon: FontAwesomeIcons.spinner,
         context: context,
         readOnly: true,
         onTap: onTap

@@ -9,4 +9,8 @@ class SimpleUsersConstants {
   static const String myEvents = 'Моих мероприятий';
   static const String myPlaces = 'Моих заведений';
   static const String myPromos = 'Моих акций';
+  static const String userNotLoadedError = 'Пользователь не загружен по какой то причине';
+  static const String deletingUserProcess = 'Удаление пользователя';
+  static const String deleteUserQuestion = 'Удалить администратора';
+  static const String cantRemoveDataDesc = 'Восстановить данные администратора нельзя';
 }

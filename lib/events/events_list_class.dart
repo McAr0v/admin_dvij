@@ -3,7 +3,6 @@ import 'package:admin_dvij/constants/events_constants.dart';
 import 'package:admin_dvij/events/event_class.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../categories/event_categories/event_category.dart';

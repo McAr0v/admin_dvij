@@ -1,5 +1,7 @@
 import 'dart:io';
-
+import 'package:admin_dvij/constants/date_constants.dart';
+import 'package:admin_dvij/constants/feedback_constants.dart';
+import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/database/image_picker.dart';
 import 'package:admin_dvij/feedback/feedback_class.dart';
 import 'package:admin_dvij/feedback/feedback_list_class.dart';
@@ -15,7 +17,6 @@ import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
-
 import '../constants/buttons_constants.dart';
 import '../constants/system_constants.dart';
 import '../design/app_colors.dart';
@@ -95,8 +96,6 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
   Widget build(BuildContext context) {
     final isMobile = MediaQuery.of(context).size.width < 600; // Условие для мобильной версии
 
-    // 'Обращение от ${sm.formatDateTimeToHumanViewWithClock(editFeedback.createDate)}'
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -168,7 +167,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
                     Expanded(
                       child: ElementsOfDesign.buildTextField(
                           controller: answerController,
-                          labelText: 'Введите сообщение...',
+                          labelText: SystemConstants.enterTextMessage,
                           canEdit: !canEdit,
                           maxLines: null,
                           icon: FontAwesomeIcons.paperclip,
@@ -195,9 +194,9 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
                           if (!canEdit && answerController.text.isNotEmpty){
                             await sendMessage();
                           } else if (answerController.text.isEmpty) {
-                            _showSnackBar('Напиши сообщение!');
+                            _showSnackBar(SystemConstants.enterTextMessage);
                           } else if (canEdit){
-                            _showSnackBar('Нельзя отправлять сообщение в режиме редактирования');
+                            _showSnackBar(FeedbackConstants.feedbackSendMessageOnCanEditError);
                           }
                         },
                       ),
@@ -261,8 +260,8 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
 
 
                             ElementsOfDesign.buildTextFieldWithoutController(
-                                controllerText: finishDate != null ? sm.formatDateTimeToHumanView(finishDate!) : 'Не завершено',
-                                labelText: 'Дата закрытия обращения',
+                                controllerText: finishDate != null ? sm.formatDateTimeToHumanView(finishDate!) : DateConstants.noFinish,
+                                labelText: DateConstants.finishDateFeedback,
                                 canEdit: false,
                                 icon: FontAwesomeIcons.flagCheckered,
                                 context: context,
@@ -350,7 +349,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
       }
 
     } else {
-      _showSnackBar('Пользователь не загружен по какой то причине');
+      _showSnackBar(SimpleUsersConstants.userNotLoadedError);
     }
 
 
@@ -396,7 +395,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
       }
 
     } else {
-      _showSnackBar('Сообщение не полностью заполнено');
+      _showSnackBar(FeedbackConstants.feedbackNotFillError);
     }
 
     setState(() {
@@ -455,10 +454,10 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
 
     final confirmed = await ElementsOfDesign.exitDialog(
         context,
-        'Восстановить данные будет нельзя',
+        FeedbackConstants.feedbackNoRemoveDesc,
         ButtonsConstants.delete,
         ButtonsConstants.cancel,
-        'Удалить заявку №${editFeedback.id}?'
+        FeedbackConstants.feedbackDeleteQuestion(editFeedback.id)
     );
 
     if (confirmed != null && confirmed){
@@ -469,7 +468,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
       String result = await editFeedback.deleteFromDb();
 
       if (result == SystemConstants.successConst){
-        _showSnackBar('Успешно удалено!');
+        _showSnackBar(SystemConstants.deletingSuccess);
         navigateToFeedbackListScreen();
       } else {
         _showSnackBar(result);
@@ -501,13 +500,13 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
       String result = await tempFeedback.publishToDb(null);
 
       if (result == SystemConstants.successConst){
-        _showSnackBar('Успешно сохранено!');
+        _showSnackBar(SystemConstants.savingSuccess);
         await initialization(fromDb: false);
       } else {
         _showSnackBar(result);
       }
     } else {
-      _showSnackBar('Сообщение не заполнено полностью');
+      _showSnackBar(FeedbackConstants.feedbackNotFillError);
     }
 
     setState(() {

@@ -94,7 +94,7 @@ class FeedbackCustom implements IEntity{
         id: messageInfoFolder.child(DatabaseConstants.id).value.toString(),
         userId: messageInfoFolder.child(DatabaseConstants.userId).value.toString(),
         createDate: DateTime.parse(messageInfoFolder.child(DatabaseConstants.createDate).value.toString()),
-        finishDate: finishDateValue.isNotEmpty && finishDateValue != 'null' ? DateTime.parse(finishDateValue) : null,
+        finishDate: finishDateValue.isNotEmpty && finishDateValue != SystemConstants.nullConst ? DateTime.parse(finishDateValue) : null,
         status: FeedbackStatus.fromString(status: messageInfoFolder.child(DatabaseConstants.status).value.toString()),
         topic: FeedbackTopic.fromString(topic: messageInfoFolder.child(DatabaseConstants.topic).value.toString()),
         messages: FeedbackCustom.empty().getMessagesFromSnapshotOrJson(snapshot: messagesFolder)
@@ -181,9 +181,6 @@ class FeedbackCustom implements IEntity{
 
   @override
   Future<String> publishToDb(File? imageFile) async{
-
-    // Todo - если это создание фидбака, то нужно чтобы помимо публикации тела было публикация первого сообщения в основном приложении
-    // Так как первое сообщение будет всегда писать пользователь
 
     DatabaseClass db = DatabaseClass();
 
@@ -297,7 +294,7 @@ class FeedbackCustom implements IEntity{
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        lastMessage.id.isNotEmpty ? lastMessage.messageText : 'Сообщений нет',
+                        lastMessage.id.isNotEmpty ? lastMessage.messageText : SystemConstants.noMessages,
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                           color: AppColors.greyText,
                         ),

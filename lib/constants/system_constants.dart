@@ -9,6 +9,7 @@ class SystemConstants {
 
   // Ответы из БД
   static const String successConst = 'ok';
+  static const String nullConst = 'null';
   static const String noDataConst = 'Данные не найдены';
   static const String noIdToken = 'Токен не найден';
 
@@ -37,6 +38,10 @@ class SystemConstants {
   static const String activeStatus = 'Активно';
   static const String finishedStatus = 'Завершено';
   static const String deletingSuccess = 'Успешно удалено';
+  static const String savingSuccess = 'Успешно сохранено!';
+
+  static const String noMessages = 'Сообщений нет';
+  static const String enterTextMessage = 'Напишите текст сообщения...';
 
   static String requestAnswerNegative(String message){
     return 'По запросу $message ничего не найдено';

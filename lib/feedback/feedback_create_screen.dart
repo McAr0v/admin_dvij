@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:admin_dvij/constants/feedback_constants.dart';
 import 'package:admin_dvij/feedback/feedback_class.dart';
 import 'package:admin_dvij/feedback/feedback_message.dart';
 import 'package:flutter/material.dart';
@@ -76,7 +77,7 @@ class _FeedbackCreateScreenState extends State<FeedbackCreateScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-            'Создание заявки'
+            FeedbackConstants.feedbackPathCreatePageHeadline
         ),
 
         leading: IconButton(
@@ -109,7 +110,7 @@ class _FeedbackCreateScreenState extends State<FeedbackCreateScreen> {
                       children: [
 
                         Text(
-                          'Создание обращения',
+                          FeedbackConstants.feedbackPathCreatePageHeadline,
                           style: Theme.of(context).textTheme.titleLarge,
                           textAlign: TextAlign.start,
                         ),
@@ -157,7 +158,7 @@ class _FeedbackCreateScreenState extends State<FeedbackCreateScreen> {
 
                         ElementsOfDesign.buildTextField(
                             controller: answerController,
-                            labelText: 'Введите сообщение...',
+                            labelText: SystemConstants.enterTextMessage,
                             maxLines: null,
                             canEdit: true,
                             icon: FontAwesomeIcons.paperclip,
@@ -235,14 +236,14 @@ class _FeedbackCreateScreenState extends State<FeedbackCreateScreen> {
       String result = await tempMessage.publishToDb(imageFile);
 
       if (result == SystemConstants.successConst){
-        _showSnackBar('Ваша заявка успешно опубликована!');
+        _showSnackBar(FeedbackConstants.feedbackPublishSuccess);
         navigateToFeedbackListScreen();
       } else {
         _showSnackBar(result);
       }
 
     } else {
-      _showSnackBar('Сообщение не полностью заполнено');
+      _showSnackBar(FeedbackConstants.feedbackNotFillError);
     }
 
   }
@@ -286,7 +287,7 @@ class _FeedbackCreateScreenState extends State<FeedbackCreateScreen> {
         _showSnackBar(result);
       }
     } else {
-      _showSnackBar('Сообщение не заполнено полностью');
+      _showSnackBar(FeedbackConstants.feedbackNotFillError);
     }
 
     setState(() {

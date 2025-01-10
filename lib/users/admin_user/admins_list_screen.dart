@@ -1,5 +1,6 @@
 import 'package:admin_dvij/constants/admins_constants.dart';
 import 'package:admin_dvij/constants/buttons_constants.dart';
+import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_users_list.dart';
 import 'package:admin_dvij/users/admin_user/profile_screen.dart';
@@ -96,7 +97,7 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
       body: Stack(
         children: [
           if (loading) const LoadingScreen(loadingText: AdminConstants.adminsLoading)
-          else if (deleting) const LoadingScreen(loadingText: 'Удаление пользователя')
+          else if (deleting) const LoadingScreen(loadingText: SimpleUsersConstants.deletingUserProcess)
           else Column(
             children: [
 
@@ -168,10 +169,10 @@ class _AdminsListScreenState extends State<AdminsListScreen> {
   Future<void> deleteAdmin ({required AdminUserClass admin}) async {
     bool? confirmed = await ElementsOfDesign.exitDialog(
         context,
-        'Восстановить данные администратора нельзя',
+        SimpleUsersConstants.cantRemoveDataDesc,
         ButtonsConstants.delete,
         ButtonsConstants.cancel,
-        'Удалить администратора ${admin.getFullName()}?'
+        '${SimpleUsersConstants.deleteUserQuestion} ${admin.getFullName()}?'
     );
 
     if (confirmed != null && confirmed){

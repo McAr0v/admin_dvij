@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:admin_dvij/categories/promo_categories/promo_categories_list.dart';
 import 'package:admin_dvij/categories/promo_categories/promo_category.dart';
 import 'package:admin_dvij/constants/promo_constants.dart';
@@ -9,7 +8,6 @@ import 'package:admin_dvij/promos/promos_list_class.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../cities/cities_list_class.dart';
 import '../cities/city_class.dart';
 import '../constants/database_constants.dart';

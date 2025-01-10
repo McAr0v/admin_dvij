@@ -32,13 +32,13 @@ class ImageLocation {
 
   factory ImageLocation.fromString({required String folderName}){
     switch (folderName){
-      case 'admins' : return ImageLocation(location: ImageLocationEnum.admins);
-      case 'ads' : return ImageLocation(location: ImageLocationEnum.ads);
-      case 'events' : return ImageLocation(location: ImageLocationEnum.events);
-      case 'places' : return ImageLocation(location: ImageLocationEnum.places);
-      case 'promos' : return ImageLocation(location: ImageLocationEnum.promos);
-      case 'users' : return ImageLocation(location: ImageLocationEnum.users);
-      case 'feedback' : return ImageLocation(location: ImageLocationEnum.feedback);
+      case ImagesConstants.adminsLocationPath : return ImageLocation(location: ImageLocationEnum.admins);
+      case ImagesConstants.adsLocationPath : return ImageLocation(location: ImageLocationEnum.ads);
+      case ImagesConstants.eventsLocationPath : return ImageLocation(location: ImageLocationEnum.events);
+      case ImagesConstants.placesLocationPath : return ImageLocation(location: ImageLocationEnum.places);
+      case ImagesConstants.promosLocationPath : return ImageLocation(location: ImageLocationEnum.promos);
+      case ImagesConstants.usersLocationPath : return ImageLocation(location: ImageLocationEnum.users);
+      case ImagesConstants.feedbackLocationPath : return ImageLocation(location: ImageLocationEnum.feedback);
       default: return ImageLocation();
     }
   }

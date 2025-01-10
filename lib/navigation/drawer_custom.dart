@@ -167,7 +167,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
 
             ElementsOfDesign.drawerListElement(
                 ScreenConstants.feedbackPage,
-                FontAwesomeIcons.image,
+                FontAwesomeIcons.comments,
                 const FeedbackPage(initialIndex: 0),
                 context
             ),

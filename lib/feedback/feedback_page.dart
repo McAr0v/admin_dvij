@@ -1,3 +1,4 @@
+import 'package:admin_dvij/constants/feedback_constants.dart';
 import 'package:admin_dvij/feedback/feedback_class.dart';
 import 'package:admin_dvij/feedback/feedback_create_screen.dart';
 import 'package:admin_dvij/feedback/feedback_list_class.dart';
@@ -114,7 +115,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                       icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
                     ),
 
-                    // Кнопка "Cоздать"
+                    // Кнопка "Создать"
                     IconButton(
                       onPressed: () async {
                         await createFeedback();
@@ -128,9 +129,9 @@ class _FeedbackPageState extends State<FeedbackPage> {
 
                   bottom: TabBar(
                     tabs: [
-                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.envelopeOpenText, text: 'Поступившие'),
-                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.spinner, text: 'В работе'),
-                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.flagCheckered, text: 'Завершенные'),
+                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.envelopeOpenText, text: FeedbackConstants.feedbackReceivedTab),
+                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.spinner, text: FeedbackConstants.feedbackReceivedTab),
+                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.flagCheckered, text: FeedbackConstants.feedbackCompletedTab),
                     ],
                   ),
                 ),
@@ -142,7 +143,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                     ElementsOfDesign.getSearchBar(
                         context: context,
                         textController: searchingController,
-                        labelText: 'Тема, имя, описание...',
+                        labelText: FeedbackConstants.feedbackSearchBarText,
                         icon: FontAwesomeIcons.searchengin,
                         onChanged: (value) async {
                           await searchingAction(text: value);
@@ -204,15 +205,6 @@ class _FeedbackPageState extends State<FeedbackPage> {
     if (result != null) {
       await initialization();
     }
-  }
-
-  void _showSnackBar(String message){
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   Future<void> searchingAction({required String text}) async {

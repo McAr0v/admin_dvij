@@ -2,7 +2,6 @@ import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:admin_dvij/constants/price_type_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../design_elements/elements_of_design.dart';
 
 enum PriceTypeEnum {

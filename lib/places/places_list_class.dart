@@ -1,15 +1,12 @@
 import 'dart:io';
-
 import 'package:admin_dvij/categories/place_categories/place_category.dart';
 import 'package:admin_dvij/constants/places_constants.dart';
 import 'package:admin_dvij/interfaces/list_entities_interface.dart';
 import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
 import 'package:admin_dvij/places/place_class.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../database/database_class.dart';
 import '../design/app_colors.dart';
 import '../design_elements/elements_of_design.dart';

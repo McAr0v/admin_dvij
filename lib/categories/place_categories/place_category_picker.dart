@@ -1,9 +1,8 @@
 import 'package:admin_dvij/categories/place_categories/place_categories_list.dart';
 import 'package:admin_dvij/categories/place_categories/place_category.dart';
 import 'package:admin_dvij/design/app_colors.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import '../../constants/fields_constants.dart';
 import '../../constants/system_constants.dart';
 import '../../design/loading_screen.dart';
 
@@ -69,7 +68,7 @@ class _PlaceCategoryPickerState extends State<PlaceCategoryPicker> {
                 child: TextField(
                   controller: searchController,
                   decoration: const InputDecoration(
-                    hintText: 'Название категории',
+                    hintText: FieldsConstants.categoryNameHintField,
                   ),
                   onChanged: (value) {
                     updateFilteredCategories(value);

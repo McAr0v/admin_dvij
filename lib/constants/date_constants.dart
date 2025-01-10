@@ -40,6 +40,8 @@ class DateConstants{
   static const yourBirthdayDate = 'Ваша дата рождения';
   static const chosenDate = 'Выбранная дата';
   static const noDate = 'Дата не выбрана';
+  static const noFinish = 'Не завершено';
+  static const finishDateFeedback = 'Дата закрытия обращения';
   static const noBirthDate = 'Дата рождения не выбрана';
 
 

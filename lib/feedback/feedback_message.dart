@@ -103,11 +103,6 @@ class FeedbackMessage implements IEntity{
       result = await db.deleteFromDbForWindows(path);
     }
 
-    /*if (result == SystemConstants.successConst){
-      FeedbackListClass feedbackListClass = FeedbackListClass();
-      feedbackListClass.deleteMessageFromDownloadedList(message: this);
-    }*/
-
     return result;
 
   }
@@ -244,8 +239,8 @@ class FeedbackMessage implements IEntity{
 
                             Row(
                               children: [
-                                Icon(FontAwesomeIcons.circleCheck, size: 10,),
-                                SizedBox(width: 10,),
+                                const Icon(FontAwesomeIcons.circleCheck, size: 10,),
+                                const SizedBox(width: 10,),
                                 Text(
                                   sm.formatDateTimeToHumanViewWithClock(sendTime),
                                   style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),

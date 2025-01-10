@@ -1,6 +1,6 @@
+import 'package:admin_dvij/constants/feedback_constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../design_elements/elements_of_design.dart';
 
 enum FeedbackTopicEnum {
@@ -23,14 +23,14 @@ class FeedbackTopic {
 
   factory FeedbackTopic.fromString({required String topic}){
     switch (topic) {
-      case 'bugReport': return FeedbackTopic(topic: FeedbackTopicEnum.bugReport);
-      case 'featureRequest': return FeedbackTopic(topic: FeedbackTopicEnum.featureRequest);
-      case 'uiUx': return FeedbackTopic(topic: FeedbackTopicEnum.uiUx);
-      case 'performance': return FeedbackTopic(topic: FeedbackTopicEnum.performance);
-      case 'accountIssues': return FeedbackTopic(topic: FeedbackTopicEnum.accountIssues);
-      case 'paymentIssues': return FeedbackTopic(topic: FeedbackTopicEnum.paymentIssues);
-      case 'generalFeedback': return FeedbackTopic(topic: FeedbackTopicEnum.generalFeedback);
-      case 'other': return FeedbackTopic(topic: FeedbackTopicEnum.other);
+      case FeedbackConstants.topicBugReport: return FeedbackTopic(topic: FeedbackTopicEnum.bugReport);
+      case FeedbackConstants.topicFeatureRequest: return FeedbackTopic(topic: FeedbackTopicEnum.featureRequest);
+      case FeedbackConstants.topicUiUx: return FeedbackTopic(topic: FeedbackTopicEnum.uiUx);
+      case FeedbackConstants.topicPerformance: return FeedbackTopic(topic: FeedbackTopicEnum.performance);
+      case FeedbackConstants.topicAccountIssues: return FeedbackTopic(topic: FeedbackTopicEnum.accountIssues);
+      case FeedbackConstants.topicPaymentIssues: return FeedbackTopic(topic: FeedbackTopicEnum.paymentIssues);
+      case FeedbackConstants.topicGeneralFeedback: return FeedbackTopic(topic: FeedbackTopicEnum.generalFeedback);
+      case FeedbackConstants.topicOther: return FeedbackTopic(topic: FeedbackTopicEnum.other);
 
       default: return FeedbackTopic(topic: FeedbackTopicEnum.notChosen);
     }
@@ -39,15 +39,15 @@ class FeedbackTopic {
   @override
   String toString({bool translate = false}) {
     switch (topic) {
-      case FeedbackTopicEnum.bugReport: return !translate ? 'bugReport' : 'Сообщение о баге или ошибке в приложении';
-      case FeedbackTopicEnum.featureRequest: return !translate ? 'featureRequest' : 'Запрос на добавление новой функции';
-      case FeedbackTopicEnum.uiUx: return !translate ? 'uiUx' : 'Вопросы, связанные с пользовательским интерфейсом и удобством использования';
-      case FeedbackTopicEnum.performance: return !translate ? 'performance' : 'Вопросы, связанные с производительностью приложения';
-      case FeedbackTopicEnum.accountIssues: return !translate ? 'accountIssues' : 'Проблемы, связанные с учетной записью пользователя';
-      case FeedbackTopicEnum.paymentIssues: return !translate ? 'paymentIssues' : 'Проблемы с оплатой или подпиской';
-      case FeedbackTopicEnum.generalFeedback: return !translate ? 'generalFeedback' : 'Общие отзывы или предложения';
-      case FeedbackTopicEnum.other: return !translate ? 'other' : 'Другое';
-      case FeedbackTopicEnum.notChosen: return !translate ? 'notChosen' : 'Не выбрано';
+      case FeedbackTopicEnum.bugReport: return !translate ? FeedbackConstants.topicBugReport : FeedbackConstants.topicBugReportTranslateText;
+      case FeedbackTopicEnum.featureRequest: return !translate ? FeedbackConstants.topicFeatureRequest : FeedbackConstants.topicFeatureRequestTranslateText;
+      case FeedbackTopicEnum.uiUx: return !translate ? FeedbackConstants.topicUiUx : FeedbackConstants.topicUiUxTranslateText;
+      case FeedbackTopicEnum.performance: return !translate ? FeedbackConstants.topicPerformance : FeedbackConstants.topicPerformanceTranslateText;
+      case FeedbackTopicEnum.accountIssues: return !translate ? FeedbackConstants.topicAccountIssues : FeedbackConstants.topicAccountIssuesTranslateText;
+      case FeedbackTopicEnum.paymentIssues: return !translate ? FeedbackConstants.topicPaymentIssues : FeedbackConstants.topicPaymentIssuesTranslateText;
+      case FeedbackTopicEnum.generalFeedback: return !translate ? FeedbackConstants.topicGeneralFeedback : FeedbackConstants.topicGeneralFeedbackTranslateText;
+      case FeedbackTopicEnum.other: return !translate ? FeedbackConstants.topicOther : FeedbackConstants.topicOtherTranslateText;
+      case FeedbackTopicEnum.notChosen: return !translate ? FeedbackConstants.topicNotChosen : FeedbackConstants.topicNotChosenTranslateText;
     }
   }
 
@@ -75,9 +75,9 @@ class FeedbackTopic {
 
     return ElementsOfDesign.buildTextField(
         controller: textController,
-        labelText: 'Тема обращения',
+        labelText:  FeedbackConstants.topicHeadline,
         canEdit: canEdit,
-        icon: FontAwesomeIcons.mapLocation,
+        icon: FontAwesomeIcons.tag,
         context: context,
         readOnly: true,
         onTap: onTap

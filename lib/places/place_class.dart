@@ -12,6 +12,7 @@ import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/places/place_admin/place_admin_class.dart';
 import 'package:admin_dvij/places/place_admin/place_role_class.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
+import 'package:admin_dvij/promos/promos_list_class.dart';
 import 'package:admin_dvij/system_methods/methods_for_database.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
@@ -24,6 +25,7 @@ import '../cities/city_class.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
 import '../dates/regular_date_class.dart';
+import '../promos/promo_class.dart';
 
 class Place implements IEntity{
   String id;
@@ -180,6 +182,7 @@ class Place implements IEntity{
     SimpleUsersList usersList = SimpleUsersList();
     final ImageUploader imageUploader = ImageUploader();
     EventsListClass eventsListClass = EventsListClass();
+    PromosListClass promosListClass = PromosListClass();
 
     DatabaseClass db = DatabaseClass();
 
@@ -220,7 +223,14 @@ class Place implements IEntity{
     }
 
     if (promosList.isNotEmpty){
-      // TODO Сделать удаление акций этого заведения
+      for (String promoId in promosList){
+        if (promoId.isNotEmpty){
+          Promo promo = promosListClass.getEntityFromList(promoId);
+          if (promo.id.isNotEmpty){
+            await promo.deleteFromDb();
+          }
+        }
+      }
     }
 
     return result;
