@@ -10,6 +10,7 @@ import 'package:admin_dvij/feedback/feedback_topic_picker.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/admin_user/admin_user_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
+import 'package:admin_dvij/users/simple_users/simple_user_screen.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -131,9 +132,9 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
             icon: const Icon(FontAwesomeIcons.penToSquare, size: 15, color: AppColors.white,),
           ),
 
-          if (currentAdmin.adminRole.accessToDeleteFeedback()) IconButton(
+          if (currentAdmin.adminRole.accessToDeleteFeedback() && !canEdit) IconButton(
             onPressed: () async {
-              //await deletePromo();
+              await deleteFeedback();
             },
             icon: const Icon(FontAwesomeIcons.trash, size: 15, color: AppColors.white,),
           ),
@@ -157,7 +158,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
                     });
                   }
               ),
-              //if (imageFile != null) ElementsOfDesign.getImageFromFile(image: imageFile!),
+
               if (imageFile != null) const SizedBox(width: 20),
 
               Expanded(
@@ -169,6 +170,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
                           controller: answerController,
                           labelText: 'Введите сообщение...',
                           canEdit: !canEdit,
+                          maxLines: null,
                           icon: FontAwesomeIcons.paperclip,
                           context: context,
                           onIconTap: !canEdit ? () async {
@@ -276,8 +278,6 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
                           }
                       ),
 
-                      Text(answerController.text),
-
                       if (canEdit) const SizedBox(height: 20,),
 
                       if (canEdit) ElementsOfDesign.buildAdaptiveRow(
@@ -317,8 +317,8 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
                           for (FeedbackMessage message in editFeedback.messages) message.getMessageWidget(
                               client: client,
                               context: context,
-                              onProfileTap: (){
-                                _showSnackBar('Кликнули на ${message.senderId}');
+                              onProfileTap: () async {
+                                await goToClientPage(id: message.senderId);
                             },
                             onImageTap: (){
                                 ElementsOfDesign.showImagePopup(context, message.imageUrl);
@@ -326,11 +326,6 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
                           )
                         ],
                       ),
-
-                      /*if (sendingMessage) const SizedBox(
-                        height: 200,
-                        child: LoadingScreen(loadingText: 'Отправка сообщения',),
-                      ),*/
                     ],
                   ),
                 ),
@@ -340,6 +335,25 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
       ),
 
     );
+  }
+
+  Future<void> goToClientPage({required String id}) async {
+
+    SimpleUser tempUser = simpleUsersList.getEntityFromList(id);
+
+    if (tempUser.uid.isNotEmpty){
+
+      final result = await sm.pushToPageWithResult(context: context, page: SimpleUserScreen(simpleUser: tempUser));
+
+      if (result != null) {
+        await initialization();
+      }
+
+    } else {
+      _showSnackBar('Пользователь не загружен по какой то причине');
+    }
+
+
   }
 
   Future<void> _pickImage() async {
@@ -391,10 +405,6 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
 
   }
 
-  void _scrollToBottom() {
-    _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
-  }
-
   void _scrollToBottomSmoothly() {
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
@@ -441,6 +451,37 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
     sm.popBackToPreviousPageWithResult(context: context, result: editFeedback);
   }
 
+  Future<void> deleteFeedback() async {
+
+    final confirmed = await ElementsOfDesign.exitDialog(
+        context,
+        'Восстановить данные будет нельзя',
+        ButtonsConstants.delete,
+        ButtonsConstants.cancel,
+        'Удалить заявку №${editFeedback.id}?'
+    );
+
+    if (confirmed != null && confirmed){
+      setState(() {
+        deleting = true;
+      });
+
+      String result = await editFeedback.deleteFromDb();
+
+      if (result == SystemConstants.successConst){
+        _showSnackBar('Успешно удалено!');
+        navigateToFeedbackListScreen();
+      } else {
+        _showSnackBar(result);
+      }
+
+      setState(() {
+        deleting = false;
+      });
+    }
+
+  }
+
   Future<void> saveFeedback() async {
     FeedbackCustom tempFeedback = FeedbackCustom(
         id: editFeedback.id,
@@ -469,15 +510,9 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
       _showSnackBar('Сообщение не заполнено полностью');
     }
 
-
-
     setState(() {
       saving = false;
     });
 
   }
-
-
-
-
 }

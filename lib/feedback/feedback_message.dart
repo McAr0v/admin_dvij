@@ -103,10 +103,10 @@ class FeedbackMessage implements IEntity{
       result = await db.deleteFromDbForWindows(path);
     }
 
-    if (result == SystemConstants.successConst){
+    /*if (result == SystemConstants.successConst){
       FeedbackListClass feedbackListClass = FeedbackListClass();
       feedbackListClass.deleteMessageFromDownloadedList(message: this);
-    }
+    }*/
 
     return result;
 

@@ -59,7 +59,7 @@ class ImageFromDb {
     result = await ip.removeImage(entityId: id, folder: location.getPath());
 
     if (result == SystemConstants.successConst){
-      imagesListClass.deleteEntityFromDownloadedList(id);
+      imagesListClass.deleteEntityFromDownloadedList('${id}_${location.toString()}');
     }
 
     return result;

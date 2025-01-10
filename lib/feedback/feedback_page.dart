@@ -1,4 +1,5 @@
 import 'package:admin_dvij/feedback/feedback_class.dart';
+import 'package:admin_dvij/feedback/feedback_create_screen.dart';
 import 'package:admin_dvij/feedback/feedback_list_class.dart';
 import 'package:admin_dvij/feedback/feedback_list_screen.dart';
 import 'package:admin_dvij/feedback/feedback_tab_enum.dart';
@@ -113,6 +114,14 @@ class _FeedbackPageState extends State<FeedbackPage> {
                       icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
                     ),
 
+                    // Кнопка "Cоздать"
+                    IconButton(
+                      onPressed: () async {
+                        await createFeedback();
+                      },
+                      icon: const Icon(FontAwesomeIcons.plus, size: 15, color: AppColors.white,),
+                    ),
+
                   ],
 
                   // ТАБЫ
@@ -186,6 +195,15 @@ class _FeedbackPageState extends State<FeedbackPage> {
       await initialization();
     }
 
+  }
+
+  Future<void> createFeedback() async {
+
+    final result = await sm.pushToPageWithResult(context: context, page: const FeedbackCreateScreen());
+
+    if (result != null) {
+      await initialization();
+    }
   }
 
   void _showSnackBar(String message){

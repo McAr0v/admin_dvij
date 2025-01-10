@@ -148,14 +148,14 @@ class FeedbackCustom implements IEntity{
 
     String result = '';
 
+    for (FeedbackMessage message in messages){
+      await message.deleteFromDb();
+    }
+
     if (!Platform.isWindows){
       result =  await db.deleteFromDb(path);
     } else {
       result = await db.deleteFromDbForWindows(path);
-    }
-
-    for (FeedbackMessage message in messages){
-      await message.deleteFromDb();
     }
 
     if (result == SystemConstants.successConst) {
@@ -278,8 +278,9 @@ class FeedbackCustom implements IEntity{
 
                         Text(id, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
 
+                        const SizedBox(height: 5,),
 
-
+                        Text(client.getFullName(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
 
                       ],
                     ),

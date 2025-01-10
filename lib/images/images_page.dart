@@ -73,9 +73,7 @@ class _ImagesPageState extends State<ImagesPage> {
         length: 2,
         child: Stack(
           children: [
-            if (loading) const LoadingScreen()
-            else if (deleting) const LoadingScreen(loadingText: SystemConstants.deleting)
-            else Scaffold(
+            Scaffold(
               appBar: AppBar(
                 title: const Text(ScreenConstants.imagesPage),
                 actions: [
@@ -135,7 +133,9 @@ class _ImagesPageState extends State<ImagesPage> {
 
               // СОДЕРЖИМОЕ СТРАНИЦЫ
 
-              body: Column(
+              body: loading ? const LoadingScreen() :
+              deleting ? const LoadingScreen(loadingText: SystemConstants.deleting)
+              : Column(
                 children: [
                   ElementsOfDesign.getSearchBar(
                       context: context,
@@ -157,6 +157,7 @@ class _ImagesPageState extends State<ImagesPage> {
                               imagesList: allImagesList,
                               deleteImage: (index) async {
                                 await deleteImage(allImagesList[index]);
+
                               },
                               onTapImage: (index) async {
                                 await goToEntity(image: allImagesList[index], indexTabPage: 0);
@@ -224,6 +225,7 @@ class _ImagesPageState extends State<ImagesPage> {
       if (result == SystemConstants.successConst) {
         _showSnackBar(SystemConstants.deletingSuccess);
         await initialization();
+
       } else {
         _showSnackBar(result);
       }
@@ -241,6 +243,14 @@ class _ImagesPageState extends State<ImagesPage> {
         duration: const Duration(seconds: 2),
       ),
     );
+  }
+
+  void _showSnackBarTwo(String message) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message)),
+      );
+    });
   }
 
   Future<void> searchingAction({required String text}) async {
