@@ -25,6 +25,9 @@ import '../cities/city_class.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
 import '../dates/regular_date_class.dart';
+import '../logs/action_class.dart';
+import '../logs/entity_enum.dart';
+import '../logs/log_class.dart';
 import '../promos/promo_class.dart';
 
 class Place implements IEntity{
@@ -63,9 +66,9 @@ class Place implements IEntity{
     required this.instagram,
     required this.imageUrl,
     required this.openingHours,
-    this.favUsersIds = const [],
-    this.eventsList = const [],
-    this.promosList = const [],
+    required this.favUsersIds,
+    required this.eventsList,
+    required this.promosList,
   });
 
   factory Place.empty(){
@@ -84,7 +87,10 @@ class Place implements IEntity{
         telegram: '',
         instagram: '',
         imageUrl: SystemConstants.noImagePath,
-        openingHours: RegularDate()
+        openingHours: RegularDate(),
+      eventsList: [],
+      promosList: [],
+      favUsersIds: []
     );
   }
 
@@ -274,6 +280,15 @@ class Place implements IEntity{
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       id = idPlace ?? 'noId_$name';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: id,
+          entityEnum: EntityEnum.place,
+          actionEnum: ActionEnum.create,
+          creatorId: ''
+      );
+
     }
 
     if (imageFile != null){

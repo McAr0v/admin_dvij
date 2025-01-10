@@ -6,6 +6,7 @@ import 'package:admin_dvij/categories/promo_categories/promo_categories_list_scr
 import 'package:admin_dvij/events/events_page.dart';
 import 'package:admin_dvij/feedback/feedback_page.dart';
 import 'package:admin_dvij/images/images_page.dart';
+import 'package:admin_dvij/logs/logs_list_screen.dart';
 import 'package:admin_dvij/places/places_list_screen.dart';
 import 'package:admin_dvij/privacy_policy/privacy_policy_list_screen.dart';
 import 'package:admin_dvij/promos/promos_page.dart';
@@ -169,6 +170,12 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 ScreenConstants.feedbackPage,
                 FontAwesomeIcons.comments,
                 const FeedbackPage(initialIndex: 0),
+                context
+            ),
+            ElementsOfDesign.drawerListElement(
+                ScreenConstants.logs,
+                FontAwesomeIcons.comments,
+                const LogsListScreen(),
                 context
             ),
           ],

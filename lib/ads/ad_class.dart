@@ -7,6 +7,7 @@ import 'package:admin_dvij/ads/ads_list_class.dart';
 import 'package:admin_dvij/constants/ads_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/logs/log_class.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -14,6 +15,8 @@ import '../constants/database_constants.dart';
 import '../database/database_class.dart';
 import '../database/image_uploader.dart';
 import '../design/app_colors.dart';
+import '../logs/action_class.dart';
+import '../logs/entity_enum.dart';
 import '../system_methods/system_methods_class.dart';
 
 class AdClass implements IEntity{
@@ -191,6 +194,14 @@ class AdClass implements IEntity{
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       id = adId ?? 'noID_$headline';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: id,
+          entityEnum: EntityEnum.ad,
+          actionEnum: ActionEnum.create,
+          creatorId: ''
+      );
     }
 
     String path = '${AdsConstants.adsFolder}/$id/';

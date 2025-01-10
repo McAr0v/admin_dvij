@@ -182,6 +182,8 @@ class FeedbackCustom implements IEntity{
   @override
   Future<String> publishToDb(File? imageFile) async{
 
+
+
     DatabaseClass db = DatabaseClass();
 
     // Если Id не задан
@@ -192,6 +194,7 @@ class FeedbackCustom implements IEntity{
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       id = idFeedback ?? 'noId_$createDate';
+
     }
 
     String path = '${FeedbackConstants.feedbackPath}/$userId/$id/${DatabaseConstants.messageInfo}';
@@ -287,9 +290,9 @@ class FeedbackCustom implements IEntity{
 
               Card(
                 color: AppColors.greyForCards,
-                margin: EdgeInsets.symmetric(vertical: 20),
+                margin: const EdgeInsets.symmetric(vertical: 20),
                 child: Padding(
-                  padding: EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

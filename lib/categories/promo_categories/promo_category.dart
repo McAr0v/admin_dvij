@@ -11,6 +11,9 @@ import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 import '../../design/app_colors.dart';
 import '../../design_elements/elements_of_design.dart';
+import '../../logs/action_class.dart';
+import '../../logs/entity_enum.dart';
+import '../../logs/log_class.dart';
 
 class PromoCategory implements IEntity{
   String id;
@@ -79,6 +82,15 @@ class PromoCategory implements IEntity{
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       id = idCategory ?? 'noId_$name';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: id,
+          entityEnum: EntityEnum.promoCategory,
+          actionEnum: ActionEnum.create,
+          creatorId: ''
+      );
+
     }
 
     String path = '${CategoriesConstants.promoCategoryPath}/$id';

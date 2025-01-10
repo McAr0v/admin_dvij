@@ -33,6 +33,19 @@ class SystemMethodsClass {
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
+  String formatMonthToEnglish(DateTime date) {
+    const List<String> months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+
+    return months[date.month - 1];
+  }
+
+  String formatDayWithDashes(DateTime date) {
+    return '-${date.day}-';
+  }
+
   String formatDateTimeToHumanViewWithClock(DateTime date) {
     const List<String> months = [
       "января", "февраля", "марта", "апреля", "мая", "июня",

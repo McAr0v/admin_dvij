@@ -11,6 +11,9 @@ import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 import '../../design/app_colors.dart';
 import '../../interfaces/entity_interface.dart';
+import '../../logs/action_class.dart';
+import '../../logs/entity_enum.dart';
+import '../../logs/log_class.dart';
 
 class PlaceCategory implements IEntity {
   String id;
@@ -84,6 +87,15 @@ class PlaceCategory implements IEntity {
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       id = idCategory ?? 'noId_$name';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: id,
+          entityEnum: EntityEnum.placeCategory,
+          actionEnum: ActionEnum.create,
+          creatorId: ''
+      );
+
     }
 
     String path = '${CategoriesConstants.placeCategoryPath}/$id';

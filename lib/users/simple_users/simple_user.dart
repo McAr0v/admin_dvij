@@ -21,6 +21,9 @@ import '../../database/database_class.dart';
 import '../../database/image_uploader.dart';
 import '../../design/app_colors.dart';
 import '../../design_elements/elements_of_design.dart';
+import '../../logs/action_class.dart';
+import '../../logs/entity_enum.dart';
+import '../../logs/log_class.dart';
 import '../../system_methods/methods_for_database.dart';
 import '../../system_methods/system_methods_class.dart';
 import '../genders/gender_class.dart';
@@ -266,6 +269,15 @@ class SimpleUser extends IEntity{
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       uid = adminUid ?? 'noUID_$email';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: uid,
+          entityEnum: EntityEnum.user,
+          actionEnum: ActionEnum.create,
+          creatorId: ''
+      );
+
     }
 
     String path = '${SimpleUsersConstants.usersPath}/$uid/${SimpleUsersConstants.usersFolderInfo}';

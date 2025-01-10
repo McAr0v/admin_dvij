@@ -15,6 +15,7 @@ class ScreenConstants {
   static const String privacyPage = 'Политика конфиденциальности';
   static const String imagesPage = 'Изображения';
   static const String feedbackPage = 'Обратная связь';
+  static const String logs = 'Логи';
 
 
 }

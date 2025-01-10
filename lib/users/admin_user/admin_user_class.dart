@@ -18,6 +18,9 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../../database/database_class.dart';
 import '../../database/image_uploader.dart';
 import '../../design/app_colors.dart';
+import '../../logs/action_class.dart';
+import '../../logs/entity_enum.dart';
+import '../../logs/log_class.dart';
 
 class AdminUserClass implements IEntity<AdminUserClass> {
   String uid;
@@ -256,6 +259,15 @@ class AdminUserClass implements IEntity<AdminUserClass> {
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       uid = adminUid ?? 'noUID_$email';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: uid,
+          entityEnum: EntityEnum.admin,
+          actionEnum: ActionEnum.create,
+          creatorId: ''
+      );
+
     }
 
     String path = '${AdminConstants.adminsPath}/$uid/${AdminConstants.adminFolderInfo}';

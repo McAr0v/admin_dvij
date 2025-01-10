@@ -38,6 +38,7 @@ class SystemConstants {
   static const String activeStatus = 'Активно';
   static const String finishedStatus = 'Завершено';
   static const String deletingSuccess = 'Успешно удалено';
+  static const String deletingImpossible = 'Удаление невозможно';
   static const String savingSuccess = 'Успешно сохранено!';
 
   static const String noMessages = 'Сообщений нет';

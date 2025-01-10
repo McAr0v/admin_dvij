@@ -28,6 +28,9 @@ import '../dates/once_date.dart';
 import '../dates/regular_date_class.dart';
 import '../design/app_colors.dart';
 import '../design_elements/elements_of_design.dart';
+import '../logs/action_class.dart';
+import '../logs/entity_enum.dart';
+import '../logs/log_class.dart';
 import '../places/place_class.dart';
 import '../system_methods/methods_for_database.dart';
 
@@ -289,6 +292,15 @@ class EventClass implements IEntity{
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       id = idEvent ?? 'noId_$headline';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: id,
+          entityEnum: EntityEnum.event,
+          actionEnum: ActionEnum.create,
+          creatorId: creatorId
+      );
+
     }
 
     if (imageFile != null){
@@ -323,8 +335,11 @@ class EventClass implements IEntity{
     if (placeId.isNotEmpty){
       // Добавляем в заведении нашe мероприятие
       Place place = placesList.getEntityFromList(placeId);
-      await place.addEventToPlace(eventId: id);
-      placesList.addToCurrentDownloadedList(place);
+      if (place.id.isNotEmpty){
+        await place.addEventToPlace(eventId: id);
+        placesList.addToCurrentDownloadedList(place);
+      }
+
     }
 
     if (creator.uid.isNotEmpty){

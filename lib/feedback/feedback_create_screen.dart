@@ -13,6 +13,9 @@ import '../design/app_colors.dart';
 import '../design/loading_screen.dart';
 import '../design_elements/button_state_enum.dart';
 import '../design_elements/elements_of_design.dart';
+import '../logs/action_class.dart';
+import '../logs/entity_enum.dart';
+import '../logs/log_class.dart';
 import '../system_methods/system_methods_class.dart';
 import '../users/admin_user/admin_user_class.dart';
 import 'feedback_list_class.dart';
@@ -274,6 +277,14 @@ class _FeedbackCreateScreenState extends State<FeedbackCreateScreen> {
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       tempFeedback.id = idFeedback ?? 'noId_${tempFeedback.createDate.toString()}';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: tempFeedback.id,
+          entityEnum: EntityEnum.feedback,
+          actionEnum: ActionEnum.create,
+          creatorId: currentAdmin.uid
+      );
     }
 
     if (tempFeedback.checkBeforeSaving() && answerController.text.isNotEmpty){

@@ -8,6 +8,9 @@ import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../constants/system_constants.dart';
 import '../database/database_class.dart';
+import '../logs/action_class.dart';
+import '../logs/entity_enum.dart';
+import '../logs/log_class.dart';
 
 class PrivacyPolicyClass implements IEntity{
 
@@ -216,6 +219,15 @@ class PrivacyPolicyClass implements IEntity{
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       id = idPrivacy ?? 'noId_${getFolderId()}';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: id,
+          entityEnum: EntityEnum.policy,
+          actionEnum: ActionEnum.create,
+          creatorId: ''
+      );
+
     }
 
     String activePath = PrivacyConstants.privacyPolicyActivePath;

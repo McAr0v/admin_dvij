@@ -4,12 +4,15 @@ import 'package:admin_dvij/constants/city_constants.dart';
 import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/database/database_class.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
+import 'package:admin_dvij/logs/action_class.dart';
+import 'package:admin_dvij/logs/entity_enum.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../constants/database_constants.dart';
 import '../constants/users_constants.dart';
 import '../design_elements/elements_of_design.dart';
+import '../logs/log_class.dart';
 
 
 class City implements IEntity<City>{
@@ -73,6 +76,15 @@ class City implements IEntity<City>{
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       id = idCity ?? 'noId_$name';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: id,
+          entityEnum: EntityEnum.city,
+          actionEnum: ActionEnum.create,
+          creatorId: ''
+      );
+
     }
 
     String path = '${CityConstants.citiesPath}/$id';

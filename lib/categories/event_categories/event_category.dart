@@ -11,6 +11,9 @@ import '../../constants/system_constants.dart';
 import '../../database/database_class.dart';
 import '../../design/app_colors.dart';
 import '../../design_elements/elements_of_design.dart';
+import '../../logs/action_class.dart';
+import '../../logs/entity_enum.dart';
+import '../../logs/log_class.dart';
 
 class EventCategory implements IEntity {
   String id;
@@ -104,6 +107,14 @@ class EventCategory implements IEntity {
       // Если ID по какой то причине не сгенерировался
       // генерируем вручную
       id = idCategory ?? 'noId_$name';
+
+      // Публикуем запись в логе, если создание
+      await LogCustom.empty().createAndPublishLog(
+          entityId: id,
+          entityEnum: EntityEnum.eventCategory,
+          actionEnum: ActionEnum.create,
+          creatorId: ''
+      );
     }
 
     String path = '${CategoriesConstants.eventCategoryPath}/$id';
