@@ -174,7 +174,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
             ),
             ElementsOfDesign.drawerListElement(
                 ScreenConstants.logs,
-                FontAwesomeIcons.comments,
+                FontAwesomeIcons.clockRotateLeft,
                 const LogsListScreen(),
                 context
             ),

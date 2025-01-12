@@ -5,6 +5,7 @@ import 'package:admin_dvij/logs/action_class.dart';
 import 'package:admin_dvij/logs/entity_enum.dart';
 import 'package:admin_dvij/logs/log_list_class.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
+import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
 import '../constants/database_constants.dart';
 import '../database/database_class.dart';
@@ -33,6 +34,11 @@ class LogCustom implements IEntity{
         entity: LogEntity(entity: EntityEnum.notChosen),
         action: LogAction(action: ActionEnum.create)
     );
+  }
+
+  String getCreatorName(){
+    String name = SimpleUsersList().getEntityFromList(creatorId).getFullName();
+    return name.isNotEmpty ? name : 'Удалено';
   }
 
   Future<String> createAndPublishLog({
@@ -137,6 +143,10 @@ class LogCustom implements IEntity{
     }
 
     return result;
+  }
+  
+  dynamic getEntityPage(){
+    return entity.getPageFromEntity(entityId: id);
   }
 
 }

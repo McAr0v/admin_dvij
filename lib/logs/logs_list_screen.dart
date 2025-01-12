@@ -1,14 +1,20 @@
+import 'package:admin_dvij/design_elements/elements_of_design.dart';
+import 'package:admin_dvij/logs/entity_enum.dart';
 import 'package:admin_dvij/logs/log_class.dart';
+import 'package:admin_dvij/logs/log_entity_picker.dart';
 import 'package:admin_dvij/logs/log_list_class.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
+import 'package:admin_dvij/users/simple_users/simple_user_screen.dart';
+import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
+import '../constants/buttons_constants.dart';
 import '../constants/screen_constants.dart';
 import '../constants/system_constants.dart';
 import '../design/app_colors.dart';
 import '../design/loading_screen.dart';
 import '../navigation/drawer_custom.dart';
+import '../users/simple_users/simple_user.dart';
 
 class LogsListScreen extends StatefulWidget {
   const LogsListScreen({Key? key}) : super(key: key);
@@ -22,9 +28,14 @@ class _LogsListScreenState extends State<LogsListScreen> {
   LogListClass logListClass = LogListClass();
   SystemMethodsClass sm = SystemMethodsClass();
 
+  TextEditingController searchingText = TextEditingController();
+  LogEntity filterEntity = LogEntity(entity: EntityEnum.notChosen);
+
   @override
   void initState() {
 
+
+    // TODO Когда переходишь на  страницу города, категорий акций и тд, при попытке вернуться назад возвращаемся на страницу списка акций допустим. Надо сделать чтобы возвращалось туда, откуда пришли
     initialization();
     super.initState();
   }
@@ -37,7 +48,7 @@ class _LogsListScreenState extends State<LogsListScreen> {
       loading = true;
     });
 
-    logsList = await logListClass.getDownloadedList(fromDb: fromDb);
+    logsList = await logListClass.getNeededPromos(fromDb: fromDb, entity: filterEntity, searchingText: searchingText.text);
 
     setState(() {
       loading = false;
@@ -54,6 +65,37 @@ class _LogsListScreenState extends State<LogsListScreen> {
 
           // КНОПКИ В AppBar
 
+          Row(
+            children: [
+
+              // Кнопка сброса фильтра
+
+              if (filterEntity.entity != EntityEnum.notChosen)
+                ElementsOfDesign.linkButton(
+                    method: () async {
+                      await resetFilter();
+                    },
+                    text: ButtonsConstants.reset,
+                    context: context
+                ),
+
+              if (filterEntity.entity != EntityEnum.notChosen)
+                const SizedBox(width: 10,),
+
+              // Кнопка "Фильтр"
+
+              IconButton(
+                onPressed: () async {
+                  await filterLogs();
+                },
+                icon: Icon(
+                  FontAwesomeIcons.filter,
+                  size: 15,
+                  color: filterEntity.entity != EntityEnum.notChosen ? AppColors.brandColor : AppColors.white,),
+              ),
+            ],
+          ),
+
           // Кнопка "Обновить"
           IconButton(
             onPressed: () async {
@@ -61,6 +103,8 @@ class _LogsListScreenState extends State<LogsListScreen> {
             },
             icon: const Icon(FontAwesomeIcons.arrowsRotate, size: 15, color: AppColors.white,),
           ),
+
+
 
         ],
       ),
@@ -73,6 +117,19 @@ class _LogsListScreenState extends State<LogsListScreen> {
           if (!loading) Column(
             children: [
               // СПИСОК
+
+              ElementsOfDesign.getSearchBar(
+                  context: context,
+                  textController: searchingText,
+                  labelText: 'Название, id, создатель, имя сущности...',
+                  icon: FontAwesomeIcons.searchengin,
+                  onChanged: (value) async {
+                    await searchingAction(text: value);
+                  },
+                  onClean: () async{
+                    await searchingAction(text: '');
+                  }
+              ),
 
               Expanded(
                 child: Column(
@@ -93,16 +150,52 @@ class _LogsListScreenState extends State<LogsListScreen> {
                               LogCustom tempLog = logsList[index];
 
                               return Card(
+                                color: AppColors.greyOnBackground,
                                 child: Padding(
                                   padding: const EdgeInsets.all(20.0),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
-                                      Text(tempLog.id),
-                                      Text(tempLog.creatorId),
-                                      Text(tempLog.action.toString(translate: true)),
-                                      Text(tempLog.entity.toString(translate: true)),
-                                      Text(sm.formatDateTimeToHumanViewWithClock(tempLog.date)),
+
+                                      ElementsOfDesign.getTag(
+                                          context: context,
+                                          text: tempLog.action.toString(translate: true)
+                                      ),
+
+                                      const SizedBox(height: 10,),
+
+                                      GestureDetector(
+                                          onTap: () async {
+                                            await goToEntityPage(log: tempLog);
+                                            //await goToCreatorPage(creatorId: tempLog.creatorId);
+                                          },
+                                          child: Text(
+                                            '${tempLog.entity.toString(translate: true)} - ${tempLog.entity.getEntityName(id: tempLog.id)}',
+                                            style: Theme.of(context).textTheme.bodyMedium!.copyWith(decoration: TextDecoration.underline),
+                                          )
+                                      ),
+
+                                      Text(
+                                        tempLog.id,
+                                        style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                      ),
+
+                                      const SizedBox(height: 10,),
+
+                                      GestureDetector(
+                                        onTap: () async {
+                                          await goToCreatorPage(creatorId: tempLog.creatorId);
+                                        },
+                                          child: Text(
+                                              tempLog.getCreatorName(),
+                                            style: Theme.of(context).textTheme.bodyMedium!.copyWith(decoration: TextDecoration.underline),
+                                          )
+                                      ),
+
+                                      Text(
+                                          sm.formatDateTimeToHumanViewWithClock(tempLog.date),
+                                          style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
+                                      ),
                                     ],
                                   ),
                                 ),
@@ -120,5 +213,80 @@ class _LogsListScreenState extends State<LogsListScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> goToEntityPage({required LogCustom log}) async {
+    dynamic page = log.getEntityPage();
+
+    if (page != null) {
+      final result = await sm.pushToPageWithResult(context: context, page: page);
+
+      if (result != null) {
+        await initialization();
+      }
+    } else {
+      _showSnackBar('Сущность не найдена');
+    }
+  }
+
+  Future<void> goToCreatorPage({required String creatorId}) async {
+
+    SimpleUsersList simpleUsersList = SimpleUsersList();
+
+    SimpleUser user = simpleUsersList.getEntityFromList(creatorId);
+
+    if (user.uid.isNotEmpty) {
+      final result = await sm.pushToPageWithResult(context: context, page: SimpleUserScreen(simpleUser: user));
+
+      if (result != null) {
+        await initialization();
+      }
+
+    } else {
+      _showSnackBar('Пользователь не найден');
+    }
+
+  }
+
+  void _showSnackBar(String message){
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> filterLogs() async{
+
+    final result = await sm.getPopup(
+        context: context,
+        page: const LogEntityPicker()
+    );
+
+    if (result != null){
+      filterEntity = result;
+
+      await initialization(fromDb: false);
+
+    }
+  }
+
+  Future<void> searchingAction({required String text}) async {
+    searchingText.text = text;
+
+    await initialization(
+        fromDb: false
+    );
+  }
+
+  Future<void> resetFilter () async {
+    setState(() {
+      filterEntity = LogEntity(entity: EntityEnum.notChosen);
+      searchingText.text = '';
+    });
+
+    await initialization(fromDb: false);
+
   }
 }

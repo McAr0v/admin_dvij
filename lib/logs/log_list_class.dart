@@ -16,6 +16,8 @@ class LogListClass {
     _currentLogList = list;
   }
 
+
+
   Future<List<LogCustom>> getDownloadedList({bool fromDb = false}) async {
     if (_currentLogList.isEmpty || fromDb) {
       await getListFromDb();
@@ -23,6 +25,43 @@ class LogListClass {
     return _currentLogList;
   }
 
+  Future<List<LogCustom>> getNeededPromos({
+    bool fromDb = false,
+    required LogEntity entity,
+    required String searchingText,
+  }) async {
+
+    List<LogCustom> returnedList = [];
+
+    if (_currentLogList.isEmpty || fromDb){
+      await getListFromDb();
+    }
+
+    for (LogCustom log in _currentLogList){
+      if (entity.entity == EntityEnum.notChosen) {
+        returnedList.add(log);
+      } else {
+        if (entity.entity == log.entity.entity){
+          returnedList.add(log);
+        }
+      }
+    }
+
+    if (searchingText.isNotEmpty){
+      returnedList = returnedList
+          .where((log) =>
+      log.id.toLowerCase().contains(searchingText.toLowerCase()) ||
+          log.creatorId.toLowerCase().contains(searchingText.toLowerCase()) ||
+          log.getCreatorName().toLowerCase().contains(searchingText.toLowerCase()) ||
+          log.entity.getEntityName(id: log.id).toLowerCase().contains(searchingText.toLowerCase()) ||
+          log.action.toString(translate: true).toLowerCase().contains(searchingText.toLowerCase()) ||
+          log.entity.toString(translate: true).toLowerCase().contains(searchingText.toLowerCase())
+      ).toList();
+    }
+
+    return returnedList;
+
+  }
 
 
   Future<List<LogCustom>> getListFromDb() async {
