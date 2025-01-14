@@ -33,9 +33,6 @@ class _LogsListScreenState extends State<LogsListScreen> {
 
   @override
   void initState() {
-
-
-    // TODO Когда переходишь на  страницу города, категорий акций и тд, при попытке вернуться назад возвращаемся на страницу списка акций допустим. Надо сделать чтобы возвращалось туда, откуда пришли
     initialization();
     super.initState();
   }
@@ -48,7 +45,7 @@ class _LogsListScreenState extends State<LogsListScreen> {
       loading = true;
     });
 
-    logsList = await logListClass.getNeededPromos(fromDb: fromDb, entity: filterEntity, searchingText: searchingText.text);
+    logsList = await logListClass.getNeededLogs(fromDb: fromDb, entity: filterEntity, searchingText: searchingText.text);
 
     setState(() {
       loading = false;
@@ -167,7 +164,6 @@ class _LogsListScreenState extends State<LogsListScreen> {
                                       GestureDetector(
                                           onTap: () async {
                                             await goToEntityPage(log: tempLog);
-                                            //await goToCreatorPage(creatorId: tempLog.creatorId);
                                           },
                                           child: Text(
                                             '${tempLog.entity.toString(translate: true)} - ${tempLog.entity.getEntityName(id: tempLog.id)}',

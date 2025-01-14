@@ -66,9 +66,11 @@ class PrivacyPolicyList implements IEntitiesList<PrivacyPolicyClass>{
   PrivacyPolicyClass getEntityFromList(String id) {
     PrivacyPolicyClass returnedPolicy = PrivacyPolicyClass.empty();
 
+
+
     if (_currentPrivacyPoliciesList.isNotEmpty) {
       for (PrivacyPolicyClass policy in _currentPrivacyPoliciesList) {
-        if (policy.getFolderId() == id) {
+        if (policy.id == id) {
           returnedPolicy = policy;
           break;
         }

@@ -25,7 +25,7 @@ class LogListClass {
     return _currentLogList;
   }
 
-  Future<List<LogCustom>> getNeededPromos({
+  Future<List<LogCustom>> getNeededLogs({
     bool fromDb = false,
     required LogEntity entity,
     required String searchingText,

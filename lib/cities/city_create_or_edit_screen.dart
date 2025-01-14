@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:admin_dvij/cities/cities_list_class.dart';
-import 'package:admin_dvij/cities/cities_list_screen.dart';
 import 'package:admin_dvij/cities/city_class.dart';
 import 'package:admin_dvij/constants/buttons_constants.dart';
 import 'package:admin_dvij/constants/city_constants.dart';
@@ -51,10 +50,10 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
     );
   }
 
-  void navigateToCitiesListScreen() {
+  /*void navigateToCitiesListScreen() {
     // Метод возвращения на экран списка без результата
     sm.pushAndDeletePreviousPages(context: context, page: const CitiesListScreen());
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +71,7 @@ class _CityCreateOrEditScreenState extends State<CityCreateOrEditScreen> {
 
         leading: IconButton(
           icon: const Icon(Icons.chevron_left),
-          onPressed: navigateToCitiesListScreen,
+          onPressed: navigateToPreviousScreen,
         ),
       ),
 

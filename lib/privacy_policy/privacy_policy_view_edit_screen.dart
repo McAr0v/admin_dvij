@@ -5,7 +5,6 @@ import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/privacy_policy/privacy_enum.dart';
 import 'package:admin_dvij/privacy_policy/privacy_policy_class.dart';
-import 'package:admin_dvij/privacy_policy/privacy_policy_list_screen.dart';
 import 'package:admin_dvij/privacy_policy/privacy_status_picker.dart';
 import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
@@ -111,7 +110,7 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
 
         leading: IconButton(
           icon: const Icon(Icons.chevron_left),
-          onPressed: navigateToPrivacyListScreen,
+          onPressed: goBackWithResult,
         ),
 
         actions: [
@@ -353,8 +352,8 @@ class _PrivacyPolicyViewEditScreenState extends State<PrivacyPolicyViewEditScree
      sm.popBackToPreviousPageWithResult(context: context, result: true);
   }
 
-  void navigateToPrivacyListScreen() {
+  /*void navigateToPrivacyListScreen() {
     // Метод возвращения на экран списка без результата
     sm.pushAndDeletePreviousPages(context: context, page: const PrivacyPolicyListScreen());
-  }
+  }*/
 }

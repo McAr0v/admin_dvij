@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:admin_dvij/categories/promo_categories/promo_categories_list.dart';
-import 'package:admin_dvij/categories/promo_categories/promo_categories_list_screen.dart';
 import 'package:admin_dvij/categories/promo_categories/promo_category.dart';
 import 'package:admin_dvij/constants/categories_constants.dart';
 import 'package:flutter/material.dart';
@@ -51,12 +50,6 @@ class _PromoCategoryCreateOrEditScreenState extends State<PromoCategoryCreateOrE
     );
   }
 
-  void navigateToCategoriesListScreen() {
-    // Метод возвращения на экран списка без результата
-    sm.pushAndDeletePreviousPages(
-        context: context, page: const PromoCategoriesListScreen());
-  }
-
   // Возвращение на экран списка с результатом
   void navigateToPreviousScreen(){
     List<dynamic> result = [true];
@@ -78,7 +71,7 @@ class _PromoCategoryCreateOrEditScreenState extends State<PromoCategoryCreateOrE
 
         leading: IconButton(
           icon: const Icon(Icons.chevron_left),
-          onPressed: navigateToCategoriesListScreen,
+          onPressed: navigateToPreviousScreen,
         ),
       ),
 
