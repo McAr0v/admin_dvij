@@ -59,7 +59,7 @@ class SystemMethodsClass {
   }
 
   String formatTimeAgo(DateTime date) {
-    final now = DateTime.now().toUtc().copyWith(microsecond: 0, millisecond: 0).add(const Duration(hours: 5));
+    final now = DateTime.now().toUtc().copyWith(microsecond: 0, millisecond: 0);
     final correctedDate = date.toUtc().copyWith(microsecond: 0, millisecond: 0);
     final difference = now.difference(correctedDate);
 

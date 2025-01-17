@@ -657,7 +657,7 @@ class SimpleUser extends IEntity{
     if (sm.formatTimeAgo(lastSignIn) == SystemConstants.awaitingConfirmEmail){
       return SystemConstants.awaitingConfirmEmail;
     } else {
-      return '${gender.getWasStringOnGender()} онлайн ${sm.formatTimeAgo(lastSignIn)}';
+      return '${gender.getWasStringOnGender()} ${sm.formatTimeAgo(lastSignIn)}';
     }
   }
 

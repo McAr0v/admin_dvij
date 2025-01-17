@@ -30,9 +30,11 @@ class Gender {
 
   String getWasStringOnGender(){
     if (gender == GenderEnum.woman){
-      return 'Была';
+      return 'Была онлайн';
+    } else if (gender == GenderEnum.man) {
+      return 'Был онлайн';
     } else {
-      return 'Был';
+      return 'Последний раз онлайн';
     }
   }
 

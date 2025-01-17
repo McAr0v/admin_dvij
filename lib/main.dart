@@ -27,7 +27,12 @@ Future<void> main() async {
 
   AuthClass authClass = AuthClass();
 
-  var currentUser = authClass.auth.currentUser;
+  User? currentUser;
+
+  // Ожидаем, пока загрузится пользователь
+  authClass.auth.authStateChanges().firstWhere((user) => user != null).then((user) async {
+    currentUser = authClass.auth.currentUser;
+  });
 
   // Если Windows или MacOs, устанавливаем ограничение
   // минимального размера экрана приложения
