@@ -83,6 +83,7 @@ class DatabaseConstants {
   static const String feedbackId = 'feedbackId';
   static const String notChosen = 'notChosen';
   static const String date = 'date';
+  static const String lastLogIn = 'lastLogIn';
 
 
 }

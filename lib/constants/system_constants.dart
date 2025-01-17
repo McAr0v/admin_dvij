@@ -23,6 +23,8 @@ class SystemConstants {
   static const String deleting = 'Идет удаление';
   static const String errorLoad = 'Ошибка загрузки';
 
+  static const String awaitingConfirmEmail = 'Ожидаем подтверждения Email';
+
   // Изображения по умолчанию
   static const String defaultAvatar = 'https://www.shutterstock.com/image-vector/default-avatar-profile-icon-vector-600nw-1745180411.jpg';
   static const String defaultAdImagePath = 'https://firebasestorage.googleapis.com/v0/b/dvij-flutter.appspot.com/o/ad_no_image.jpg?alt=media';

@@ -28,6 +28,14 @@ class Gender {
     ];
   }
 
+  String getWasStringOnGender(){
+    if (gender == GenderEnum.woman){
+      return 'Была';
+    } else {
+      return 'Был';
+    }
+  }
+
   @override
   String toString({bool needTranslate = false}) {
     switch (gender){

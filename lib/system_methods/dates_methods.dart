@@ -31,4 +31,34 @@ class DateMethods{
     }
   }
 
+  String formatTimeAgo(DateTime date) {
+    final now = DateTime.now();
+    final difference = now.difference(date);
+
+    if (date.year == 2100){
+      return 'Еще не выполнил вход';
+    } else {
+      if (difference.inSeconds < 60) {
+        return 'только что';
+      } else if (difference.inMinutes < 60) {
+        return '${difference.inMinutes} минуту назад';
+      } else if (difference.inHours < 24) {
+        final hours = difference.inHours;
+        return '$hours час${hours == 1 ? '' : 'а'} назад';
+      } else if (difference.inDays < 7) {
+        final days = difference.inDays;
+        return '$days день${days == 1 ? '' : 'я'} назад';
+      } else if (difference.inDays < 30) {
+        final weeks = (difference.inDays / 7).floor();
+        return '$weeks недел${weeks == 1 ? 'ю' : 'и'} назад';
+      } else if (difference.inDays < 365) {
+        final months = (difference.inDays / 30).floor();
+        return '$months месяц${months == 1 ? '' : 'а'} назад';
+      } else {
+        final years = (difference.inDays / 365).floor();
+        return '$years год${years == 1 ? '' : 'а'} назад';
+      }
+    }
+  }
+
 }

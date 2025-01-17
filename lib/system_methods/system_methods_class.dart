@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:admin_dvij/constants/date_constants.dart';
+import 'package:admin_dvij/constants/system_constants.dart';
 import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:flutter/material.dart';
 
@@ -55,6 +56,36 @@ class SystemMethodsClass {
     DateMethods dm = DateMethods();
 
     return '${date.day} ${months[date.month - 1]} ${date.year}, ${dm.formatTimeOrDateWithZero(date.hour)}:${dm.formatTimeOrDateWithZero(date.minute)}';
+  }
+
+  String formatTimeAgo(DateTime date) {
+    final now = DateTime.now().toUtc().copyWith(microsecond: 0, millisecond: 0).add(const Duration(hours: 5));
+    final correctedDate = date.toUtc().copyWith(microsecond: 0, millisecond: 0);
+    final difference = now.difference(correctedDate);
+
+    if (date.year == 2100) {
+      return SystemConstants.awaitingConfirmEmail;
+    } else if (difference.inSeconds < 60) {
+      return 'только что';
+    } else if (difference.inMinutes < 60) {
+      final min = difference.inMinutes;
+      return '$min ${_pluralize(min, 'минуту', 'минуты', 'минут')} назад';
+    } else if (difference.inHours < 24) {
+      final hrs = difference.inHours;
+      return '$hrs ${_pluralize(hrs, 'час', 'часа', 'часов')} назад';
+    } else if (difference.inDays < 7) {
+      final days = difference.inDays;
+      return '$days ${_pluralize(days, 'день', 'дня', 'дней')} назад';
+    } else if (difference.inDays < 30) {
+      final weeks = (difference.inDays / 7).floor();
+      return '$weeks ${_pluralize(weeks, 'неделю', 'недели', 'недель')} назад';
+    } else if (difference.inDays < 365) {
+      final months = (difference.inDays / 30).floor();
+      return '$months ${_pluralize(months, 'месяц', 'месяца', 'месяцев')} назад';
+    } else {
+      final years = (difference.inDays / 365).floor();
+      return '$years ${_pluralize(years, 'год', 'года', 'лет')} назад';
+    }
   }
 
 

@@ -42,6 +42,7 @@ class SimpleUser extends IEntity{
   Gender gender;
   String avatar;
   DateTime registrationDate;
+  DateTime lastSignIn;
   List<PlaceAdmin> placesList;
   List<String> myEvents;
   List<String> myPromos;
@@ -61,6 +62,7 @@ class SimpleUser extends IEntity{
     required this.avatar,
     required this.registrationDate,
     required this.placesList,
+    required this.lastSignIn,
     this.myEvents = const [],
     this.myPromos = const [],
   });
@@ -73,6 +75,7 @@ class SimpleUser extends IEntity{
         phone: '',
         email: '',
         birthDate: DateTime(2100),
+        lastSignIn: DateTime(2100),
         avatar: SystemConstants.defaultAvatar,
         registrationDate: DateTime(2100),
         city: City.empty(),
@@ -99,6 +102,7 @@ class SimpleUser extends IEntity{
         instagram: creator.instagram,
         city: creator.city,
         birthDate: creator.birthDate,
+        lastSignIn: creator.lastSignIn,
         gender: creator.gender,
         avatar: creator.avatar,
         registrationDate: creator.registrationDate,
@@ -134,12 +138,14 @@ class SimpleUser extends IEntity{
 
     DataSnapshot eventsFolder = snapshot.child(DatabaseConstants.myEvents);
     DataSnapshot promosFolder = snapshot.child(DatabaseConstants.myPromos);
+    DataSnapshot singInTimeFolder = snapshot.child(DatabaseConstants.lastLogIn);
 
     DataSnapshot infoFolder = snapshot.child(SimpleUsersConstants.usersFolderInfo);
     DataSnapshot myPlacesFolder = snapshot.child(SimpleUsersConstants.usersMyPlacesFolder);
 
     DateTime birthDate = DateTime.parse(infoFolder.child(DatabaseConstants.birthDate).value.toString());
     DateTime regDate = DateTime.parse(infoFolder.child(DatabaseConstants.registrationDate).value.toString());
+    DateTime logInDate = DateTime.parse(singInTimeFolder.child(DatabaseConstants.date).value.toString());
 
     List<PlaceAdmin> myPlaces = PlaceAdmin.empty().getPlacesListFromSnapshot(myPlacesFolder);
 
@@ -161,6 +167,7 @@ class SimpleUser extends IEntity{
         telegram: infoFolder.child(DatabaseConstants.telegram).value.toString(),
         instagram: infoFolder.child(DatabaseConstants.instagram).value.toString(),
         placesList: myPlaces,
+        lastSignIn: logInDate,
         myEvents: methodsForDatabase.getStringFromKeyFromSnapshot(snapshot: eventsFolder, key: DatabaseConstants.eventId),
         myPromos: methodsForDatabase.getStringFromKeyFromSnapshot(snapshot: promosFolder, key: DatabaseConstants.promoId)
     );
@@ -172,11 +179,12 @@ class SimpleUser extends IEntity{
 
     Map<String, dynamic>? eventsFolder = json[DatabaseConstants.myEvents];
     Map<String, dynamic>? promosFolder = json[DatabaseConstants.myPromos];
+    Map<String, dynamic>? singInTimeFolder = json[DatabaseConstants.lastLogIn];
 
     Map<String, dynamic> infoFolder = json[SimpleUsersConstants.usersFolderInfo];
-    Map<String, dynamic> myPlacesFolder = json[SimpleUsersConstants.usersMyPlacesFolder];
+    Map<String, dynamic>? myPlacesFolder = json[SimpleUsersConstants.usersMyPlacesFolder];
 
-    List<PlaceAdmin> myPlaces = PlaceAdmin.empty().getPlacesListFromJson(myPlacesFolder);
+    List<PlaceAdmin> myPlaces = myPlacesFolder != null ? PlaceAdmin.empty().getPlacesListFromJson(myPlacesFolder) : [];
 
     CitiesList cityList = CitiesList();
     City city = cityList.getEntityFromList(infoFolder[DatabaseConstants.city] ?? '');
@@ -196,6 +204,7 @@ class SimpleUser extends IEntity{
         telegram: infoFolder[DatabaseConstants.telegram] ?? '',
         instagram: infoFolder[DatabaseConstants.instagram] ?? '',
         placesList: myPlaces,
+        lastSignIn: DateTime.parse(singInTimeFolder?[DatabaseConstants.date] ?? '2100-01-01'),
         myEvents: eventsFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: eventsFolder, inputKey: DatabaseConstants.eventId) : [],
         myPromos: promosFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: promosFolder, inputKey: DatabaseConstants.promoId) : [],
     );
@@ -642,6 +651,17 @@ class SimpleUser extends IEntity{
     );
   }
 
+  String getLastOnline(){
+    SystemMethodsClass sm = SystemMethodsClass();
+
+    if (sm.formatTimeAgo(lastSignIn) == SystemConstants.awaitingConfirmEmail){
+      return SystemConstants.awaitingConfirmEmail;
+    } else {
+      return '${gender.getWasStringOnGender()} онлайн ${sm.formatTimeAgo(lastSignIn)}';
+    }
+  }
+
+
   Widget getUserCardInList ({
     required BuildContext context,
     required VoidCallback onTap,
@@ -680,6 +700,11 @@ class SimpleUser extends IEntity{
                       getAdminRole().getNameOrDescOfRole(true),
                       style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),
                     ),
+
+                    const SizedBox(height: 5,),
+
+                    Text(getLastOnline(), style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
+
                     const SizedBox(height: 10,),
                     Wrap(
                       children: [
