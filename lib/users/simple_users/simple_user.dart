@@ -289,6 +289,9 @@ class SimpleUser extends IEntity{
 
     }
 
+
+    // TODO Сделать исправление instagram, телефона и тд в нужный формат, как в основном приложении
+
     String path = '${SimpleUsersConstants.usersPath}/$uid/${SimpleUsersConstants.usersFolderInfo}';
 
     if (imageFile != null){
