@@ -24,6 +24,7 @@ import '../../design_elements/elements_of_design.dart';
 import '../../logs/action_class.dart';
 import '../../logs/entity_enum.dart';
 import '../../logs/log_class.dart';
+import '../../system_methods/link_methods.dart';
 import '../../system_methods/methods_for_database.dart';
 import '../../system_methods/system_methods_class.dart';
 import '../genders/gender_class.dart';
@@ -263,6 +264,7 @@ class SimpleUser extends IEntity{
 
   @override
   Future<String> publishToDb(File? imageFile) async{
+    LinkMethods lk = LinkMethods();
     DatabaseClass db = DatabaseClass();
     final ImageUploader imageUploader = ImageUploader();
 
@@ -305,6 +307,10 @@ class SimpleUser extends IEntity{
     }
 
     avatar = postedImageUrl ?? avatar;
+
+    instagram = lk.extractInstagramUsername(instagram);
+    telegram = lk.extractTelegramUsername(telegram);
+    whatsapp = lk.extractWhatsAppNumber(whatsapp);
 
     Map <String, dynamic> userData = getMap();
 

@@ -268,13 +268,24 @@ class FeedbackCustom implements IEntity{
                         const SizedBox(height: 10,),
 
                         Text(
+                          getFirstMessageByDate(messages).messageText,
+                          style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: AppColors.white),
+                          softWrap: false,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+
+                        const SizedBox(height: 10,),
+
+                        Text(
                             topic.toString(translate: true),
                             softWrap: false,
                             maxLines: 1,
-                            overflow: TextOverflow.ellipsis
+                            overflow: TextOverflow.ellipsis,
+                          style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: AppColors.greyText),
                         ),
 
-                        const SizedBox(height: 5,),
+                        const SizedBox(height: 10,),
 
                         Text(id, style: Theme.of(context).textTheme.labelMedium!.copyWith(color: AppColors.greyText),),
 
@@ -322,6 +333,15 @@ class FeedbackCustom implements IEntity{
         ),
       ),
     );
+  }
+
+  FeedbackMessage getFirstMessageByDate(List<FeedbackMessage> messages) {
+    if (messages.isEmpty) {
+      return FeedbackMessage.empty(); // Если список пустой, возвращаем пустое
+    }
+
+    // Сортируем список по sendTime и возвращаем первый элемент
+    return messages.reduce((a, b) => a.sendTime.isBefore(b.sendTime) ? a : b);
   }
 
 }

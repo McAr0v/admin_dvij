@@ -29,6 +29,7 @@ import '../logs/action_class.dart';
 import '../logs/entity_enum.dart';
 import '../logs/log_class.dart';
 import '../promos/promo_class.dart';
+import '../system_methods/link_methods.dart';
 
 class Place implements IEntity{
   String id;
@@ -265,6 +266,7 @@ class Place implements IEntity{
 
   @override
   Future<String> publishToDb(File? imageFile) async{
+    LinkMethods lk = LinkMethods();
     DatabaseClass db = DatabaseClass();
     SimpleUsersList simpleUsersList = SimpleUsersList();
     final ImageUploader imageUploader = ImageUploader();
@@ -302,6 +304,10 @@ class Place implements IEntity{
     }
 
     imageUrl = postedImageUrl ?? imageUrl;
+
+    instagram = lk.extractInstagramUsername(instagram);
+    telegram = lk.extractTelegramUsername(telegram);
+    whatsapp = lk.extractWhatsAppNumber(whatsapp);
 
     String path = '${PlacesConstants.placesPath}/$id/${PlacesConstants.placeInfoFolder}';
 

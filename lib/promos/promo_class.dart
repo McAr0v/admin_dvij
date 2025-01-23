@@ -28,6 +28,7 @@ import '../logs/entity_enum.dart';
 import '../logs/log_class.dart';
 import '../places/place_class.dart';
 import '../places/places_list_class.dart';
+import '../system_methods/link_methods.dart';
 import '../system_methods/methods_for_database.dart';
 import '../users/simple_users/simple_user.dart';
 import '../users/simple_users/simple_users_list.dart';
@@ -257,6 +258,7 @@ class Promo implements IEntity{
 
   @override
   Future<String> publishToDb(File? imageFile) async {
+    LinkMethods lk = LinkMethods();
     SimpleUsersList simpleUsersList = SimpleUsersList();
     SimpleUser creator = simpleUsersList.getEntityFromList(creatorId);
     PlacesList placesList = PlacesList();
@@ -296,6 +298,10 @@ class Promo implements IEntity{
     }
 
     imageUrl = postedImageUrl ?? imageUrl;
+
+    instagram = lk.extractInstagramUsername(instagram);
+    telegram = lk.extractTelegramUsername(telegram);
+    whatsapp = lk.extractWhatsAppNumber(whatsapp);
 
     String path = '${PromoConstants.promosPath}/$id/${PromoConstants.promoInfoFolder}';
 

@@ -32,6 +32,7 @@ import '../logs/action_class.dart';
 import '../logs/entity_enum.dart';
 import '../logs/log_class.dart';
 import '../places/place_class.dart';
+import '../system_methods/link_methods.dart';
 import '../system_methods/methods_for_database.dart';
 
 class EventClass implements IEntity{
@@ -277,6 +278,7 @@ class EventClass implements IEntity{
     SimpleUsersList simpleUsersList = SimpleUsersList();
     SimpleUser creator = simpleUsersList.getEntityFromList(creatorId);
     PlacesList placesList = PlacesList();
+    LinkMethods lk = LinkMethods();
 
     DatabaseClass db = DatabaseClass();
     final ImageUploader imageUploader = ImageUploader();
@@ -314,6 +316,10 @@ class EventClass implements IEntity{
     }
 
     imageUrl = postedImageUrl ?? imageUrl;
+
+    instagram = lk.extractInstagramUsername(instagram);
+    telegram = lk.extractTelegramUsername(telegram);
+    whatsapp = lk.extractWhatsAppNumber(whatsapp);
 
     String path = '${EventsConstants.eventsPath}/$id/${EventsConstants.eventsInfoFolder}';
 

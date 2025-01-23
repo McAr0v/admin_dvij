@@ -63,5 +63,13 @@ class SystemConstants {
     return "${getStoragePath()}/o/$encodedPath?alt=media&token=$idToken";
   }
 
+  // Social Media
+
+  static const String pathToInstagram = 'https://www.instagram.com/';
+  static const String pathToTelegram = 'https://t.me/';
+  static const String pathToWhatsapp = 'https://wa.me/';
+  static const String pathToTel = 'tel:';
+
+
 }
 
