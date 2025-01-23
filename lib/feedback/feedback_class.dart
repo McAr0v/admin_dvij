@@ -182,8 +182,6 @@ class FeedbackCustom implements IEntity{
   @override
   Future<String> publishToDb(File? imageFile) async{
 
-
-
     DatabaseClass db = DatabaseClass();
 
     // Если Id не задан
