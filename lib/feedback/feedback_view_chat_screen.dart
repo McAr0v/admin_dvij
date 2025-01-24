@@ -76,6 +76,10 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
 
     answerController.text = '';
 
+    if (fromDb) {
+      await fl.getDownloadedList(fromDb: fromDb);
+    }
+
     editFeedback = fl.getEntityFromList(widget.feedback.id);
     currentAdmin = await currentAdmin.getCurrentUser(fromDb: fromDb);
     chosenTopic = editFeedback.topic;
