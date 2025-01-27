@@ -27,6 +27,4 @@ class RegularDateConstants{
   static const startHeadline = 'Начало';
   static const endHeadline = 'Конец';
 
-
-
 }
