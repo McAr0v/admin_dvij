@@ -130,7 +130,7 @@ class _FeedbackPageState extends State<FeedbackPage> {
                   bottom: TabBar(
                     tabs: [
                       ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.envelopeOpenText, text: FeedbackConstants.feedbackReceivedTab),
-                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.spinner, text: FeedbackConstants.feedbackReceivedTab),
+                      ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.spinner, text: FeedbackConstants.feedbackInWorkTab),
                       ElementsOfDesign.getTabWithIcon(icon: FontAwesomeIcons.flagCheckered, text: FeedbackConstants.feedbackCompletedTab),
                     ],
                   ),

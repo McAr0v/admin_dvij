@@ -146,7 +146,7 @@ class SimpleUser extends IEntity{
 
     DateTime birthDate = DateTime.parse(infoFolder.child(DatabaseConstants.birthDate).value.toString());
     DateTime regDate = DateTime.parse(infoFolder.child(DatabaseConstants.registrationDate).value.toString());
-    DateTime logInDate = DateTime.parse(singInTimeFolder.child(DatabaseConstants.date).value.toString());
+    DateTime logInDate = singInTimeFolder.exists ? DateTime.parse(singInTimeFolder.child(DatabaseConstants.date).value.toString()) : DateTime(2100);
 
     List<PlaceAdmin> myPlaces = PlaceAdmin.empty().getPlacesListFromSnapshot(myPlacesFolder);
 

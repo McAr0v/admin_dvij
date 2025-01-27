@@ -364,6 +364,7 @@ class ElementsOfDesign {
     VoidCallback? onTap,
     VoidCallback? onIconTap,
     bool readOnly = false,
+    TextInputType textInputType = TextInputType.text
   }) {
     return TextField(
       style: Theme.of(context).textTheme.bodyMedium,
@@ -384,6 +385,7 @@ class ElementsOfDesign {
       readOnly: readOnly,
       onTap: onTap,
       maxLines: maxLines,
+      keyboardType: textInputType,
     );
   }
 

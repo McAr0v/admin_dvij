@@ -145,11 +145,13 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
         ],
       ),
 
-      bottomNavigationBar: Container(
+      bottomSheet: Container(
         width: sm.getScreenWidth(neededWidth: 1000),
-        color: AppColors.greyOnBackground,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: Padding(
-          padding: Platform.isWindows || Platform.isMacOS ? const EdgeInsets.symmetric(vertical: 10, horizontal: 20) : const EdgeInsets.fromLTRB(20, 10, 20, 30),
+          padding: Platform.isWindows || Platform.isMacOS ? const EdgeInsets.symmetric(vertical: 10, horizontal: 20) : const EdgeInsets.fromLTRB(20, 10, 20, 10),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -175,6 +177,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
                           canEdit: !canEdit,
                           maxLines: null,
                           icon: FontAwesomeIcons.paperclip,
+                          textInputType: TextInputType.multiline,
                           context: context,
                           onIconTap: !canEdit ? () async {
                             await _pickImage();
