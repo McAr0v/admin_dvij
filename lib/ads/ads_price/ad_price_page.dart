@@ -6,10 +6,8 @@ import 'package:admin_dvij/design/loading_screen.dart';
 import 'package:admin_dvij/design_elements/button_state_enum.dart';
 import 'package:admin_dvij/navigation/drawer_custom.dart';
 import 'package:admin_dvij/system_methods/system_methods_class.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 import '../../design/app_colors.dart';
 import '../../design_elements/elements_of_design.dart';
 import '../../users/admin_user/admin_user_class.dart';
@@ -107,104 +105,104 @@ class _AdPricePageState extends State<AdPricePage> {
     promosSecondSlot.text = adPrice.promosSecondSlot.toString();
     promosThirdSlot.text = adPrice.promosThirdSlot.toString();
 
-    mainFirstSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    mainFirstSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(mainFirstSlot.text) ?? 0,
         10
-    ).toString();
-    mainSecondSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    mainSecondSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(mainSecondSlot.text) ?? 0,
         10
-    ).toString();
-    mainThirdSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    mainThirdSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(mainThirdSlot.text) ?? 0,
         10
-    ).toString();
-    eventsFirstSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    eventsFirstSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(eventsFirstSlot.text) ?? 0,
         10
-    ).toString();
-    eventsSecondSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    eventsSecondSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(eventsSecondSlot.text) ?? 0,
         10
-    ).toString();
-    eventsThirdSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    eventsThirdSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(eventsThirdSlot.text) ?? 0,
         10
-    ).toString();
-    placesFirstSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    placesFirstSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(placesFirstSlot.text) ?? 0,
         10
-    ).toString();
-    placesSecondSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    placesSecondSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(placesSecondSlot.text) ?? 0,
         10
-    ).toString();
-    placesThirdSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    placesThirdSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(placesThirdSlot.text) ?? 0,
         10
-    ).toString();
-    promosFirstSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    promosFirstSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(promosFirstSlot.text) ?? 0,
         10
-    ).toString();
-    promosSecondSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    promosSecondSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(promosSecondSlot.text) ?? 0,
         10
-    ).toString();
-    promosThirdSlotTwoWeeks = sm.applyDiscountAndRoundUp(
+    )*2).toString();
+    promosThirdSlotTwoWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(promosThirdSlot.text) ?? 0,
         10
-    ).toString();
+    )*2).toString();
 
 
-    mainFirstSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    mainFirstSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(mainFirstSlot.text) ?? 0,
         20
-    ).toString();
-    mainSecondSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    mainSecondSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(mainSecondSlot.text) ?? 0,
         20
-    ).toString();
-    mainThirdSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    mainThirdSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(mainThirdSlot.text) ?? 0,
         20
-    ).toString();
-    eventsFirstSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    eventsFirstSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(eventsFirstSlot.text) ?? 0,
         20
-    ).toString();
-    eventsSecondSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    eventsSecondSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(eventsSecondSlot.text) ?? 0,
         20
-    ).toString();
-    eventsThirdSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    eventsThirdSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(eventsThirdSlot.text) ?? 0,
         20
-    ).toString();
-    placesFirstSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    placesFirstSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(placesFirstSlot.text) ?? 0,
         20
-    ).toString();
-    placesSecondSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    placesSecondSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(placesSecondSlot.text) ?? 0,
         20
-    ).toString();
-    placesThirdSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    placesThirdSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(placesThirdSlot.text) ?? 0,
         20
-    ).toString();
-    promosFirstSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    promosFirstSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(promosFirstSlot.text) ?? 0,
         20
-    ).toString();
-    promosSecondSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    promosSecondSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(promosSecondSlot.text) ?? 0,
         20
-    ).toString();
-    promosThirdSlotFourWeeks = sm.applyDiscountAndRoundUp(
+    )*4).toString();
+    promosThirdSlotFourWeeks = (sm.applyDiscountAndRoundUp(
         int.tryParse(promosThirdSlot.text) ?? 0,
         20
-    ).toString();
+    )*4).toString();
 
   }
 
