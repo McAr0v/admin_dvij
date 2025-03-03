@@ -93,6 +93,11 @@ class SystemMethodsClass {
     return "${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}";
   }
 
+  int applyDiscountAndRoundUp(int value, double percent) {
+    double discountedValue = value * (1 - percent / 100);
+    return (discountedValue / 5).ceil() * 5;
+  }
+
   bool isSameDay(DateTime date1, DateTime date2) {
     return date1.year == date2.year &&
         date1.month == date2.month &&

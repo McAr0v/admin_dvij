@@ -86,4 +86,46 @@ class DatabaseConstants {
   static const String lastLogIn = 'lastLogIn';
 
 
+  static const String adPriceFolder = 'adPriceFolder';
+
+  static const String mainFirstSlot = 'mainFirstSlot';
+  static const String mainSecondSlot = 'mainSecondSlot';
+  static const String mainThirdSlot = 'mainThirdSlot';
+  static const String eventsFirstSlot = 'eventsFirstSlot';
+  static const String eventsSecondSlot = 'eventsSecondSlot';
+  static const String eventsThirdSlot = 'eventsThirdSlot';
+  static const String placesFirstSlot = 'placesFirstSlot';
+  static const String placesSecondSlot = 'placesSecondSlot';
+  static const String placesThirdSlot = 'placesThirdSlot';
+  static const String promosFirstSlot = 'promosFirstSlot';
+  static const String promosSecondSlot = 'promosSecondSlot';
+  static const String promosThirdSlot = 'promosThirdSlot';
+
+
+  static const String mainFirstSlotTwoWeeks = 'mainFirstSlotTwoWeeks';
+  static const String mainSecondSlotTwoWeeks = 'mainSecondSlotTwoWeeks';
+  static const String mainThirdSlotTwoWeeks = 'mainThirdSlotTwoWeeks';
+  static const String eventsFirstSlotTwoWeeks = 'eventsFirstSlotTwoWeeks';
+  static const String eventsSecondSlotTwoWeeks = 'eventsSecondSlotTwoWeeks';
+  static const String eventsThirdSlotTwoWeeks = 'eventsThirdSlotTwoWeeks';
+  static const String placesFirstSlotTwoWeeks = 'placesFirstSlotTwoWeeks';
+  static const String placesSecondSlotTwoWeeks = 'placesSecondSlotTwoWeeks';
+  static const String placesThirdSlotTwoWeeks = 'placesThirdSlotTwoWeeks';
+  static const String promosFirstSlotTwoWeeks = 'promosFirstSlotTwoWeeks';
+  static const String promosSecondSlotTwoWeeks = 'promosSecondSlotTwoWeeks';
+  static const String promosThirdSlotTwoWeeks = 'promosThirdSlotTwoWeeks';
+
+  static const String mainFirstSlotFourWeeks = 'mainFirstSlotFourWeeks';
+  static const String mainSecondSlotFourWeeks = 'mainSecondSlotFourWeeks';
+  static const String mainThirdSlotFourWeeks = 'mainThirdSlotFourWeeks';
+  static const String eventsFirstSlotFourWeeks = 'eventsFirstSlotFourWeeks';
+  static const String eventsSecondSlotFourWeeks = 'eventsSecondSlotFourWeeks';
+  static const String eventsThirdSlotFourWeeks = 'eventsThirdSlotFourWeeks';
+  static const String placesFirstSlotFourWeeks = 'placesFirstSlotFourWeeks';
+  static const String placesSecondSlotFourWeeks = 'placesSecondSlotFourWeeks';
+  static const String placesThirdSlotFourWeeks = 'placesThirdSlotFourWeeks';
+  static const String promosFirstSlotFourWeeks = 'promosFirstSlotFourWeeks';
+  static const String promosSecondSlotFourWeeks = 'promosSecondSlotFourWeeks';
+  static const String promosThirdSlotFourWeeks = 'promosThirdSlotFourWeeks';
+
 }

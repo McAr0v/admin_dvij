@@ -91,6 +91,15 @@ class AdminRoleClass {
     }
   }
 
+  /// Метод выдачи доступа на редактирование заведений
+  bool accessToEditAdPrice(){
+    if (adminRole == AdminRole.notChosen || adminRole == AdminRole.viewer || adminRole == AdminRole.advertiser) {
+      return false;
+    } else {
+      return true;
+    }
+  }
+
   /// Метод выдачи доступа на редактирование сообщений обратной связи
   bool accessToEditFeedback(){
     if (adminRole == AdminRole.notChosen || adminRole == AdminRole.viewer || adminRole == AdminRole.advertiser) {
