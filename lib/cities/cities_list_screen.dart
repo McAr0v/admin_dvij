@@ -122,7 +122,6 @@ class _CitiesListScreenState extends State<CitiesListScreen> {
                   icon: FontAwesomeIcons.mapLocationDot,
                   onChanged: (value){
                     setState(() {
-                      _cityNameController.text = value;
                       citiesList = CitiesList().searchElementInList(_cityNameController.text);
                     });
                   },

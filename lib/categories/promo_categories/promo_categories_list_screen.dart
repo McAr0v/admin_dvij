@@ -121,7 +121,6 @@ class _PromoCategoriesListScreenState extends State<PromoCategoriesListScreen> {
                   icon: FontAwesomeIcons.tags,
                   onChanged: (value){
                     setState(() {
-                      _categoryNameController.text = value;
                       categoriesList = PromoCategoriesList().searchElementInList(_categoryNameController.text);
                     });
                   },

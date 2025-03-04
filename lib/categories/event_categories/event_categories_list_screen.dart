@@ -121,7 +121,6 @@ class _EventCategoriesListScreenState extends State<EventCategoriesListScreen> {
                   icon: FontAwesomeIcons.tags,
                   onChanged: (value){
                     setState(() {
-                      _categoryNameController.text = value;
                       categoriesList = EventCategoriesList().searchElementInList(_categoryNameController.text);
                     });
                   },

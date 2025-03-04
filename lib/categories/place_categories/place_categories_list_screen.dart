@@ -121,7 +121,6 @@ class _PlaceCategoriesListScreenState extends State<PlaceCategoriesListScreen> {
                   icon: FontAwesomeIcons.tags,
                   onChanged: (value){
                     setState(() {
-                      _categoryNameController.text = value;
                       categoriesList = PlaceCategoriesList().searchElementInList(_categoryNameController.text);
                     });
                   },

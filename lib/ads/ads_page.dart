@@ -252,7 +252,6 @@ class _AdsPageState extends State<AdsPage> {
   }
 
   Future<void> searchingAction({required String text}) async {
-    searchingController.text = text;
 
     await initializationAndFilter(
       fromDb: false,
