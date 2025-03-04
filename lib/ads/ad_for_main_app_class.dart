@@ -13,6 +13,7 @@ class AdForMainApp implements IEntity{
   String desc;
   String url;
   String imageUrl;
+  String buttonHeadline;
   DateTime startDate;
   DateTime endDate;
   AdLocation location;
@@ -28,12 +29,14 @@ class AdForMainApp implements IEntity{
     required this.endDate,
     required this.location,
     required this.adIndex,
+    required this.buttonHeadline,
   });
 
   factory AdForMainApp.fromAdClass({required AdClass adminAd}){
     return AdForMainApp(
         id: adminAd.id,
         headline: adminAd.headline,
+        buttonHeadline: adminAd.buttonHeadline,
         desc: adminAd.desc,
         url: adminAd.url,
         imageUrl: adminAd.imageUrl,
@@ -68,6 +71,7 @@ class AdForMainApp implements IEntity{
       DatabaseConstants.id: id,
       DatabaseConstants.headline: headline,
       DatabaseConstants.desc: desc,
+      DatabaseConstants.buttonHeadline: buttonHeadline,
       DatabaseConstants.url: url,
       DatabaseConstants.imageUrl: imageUrl,
       DatabaseConstants.startDate: startDate.toString(),

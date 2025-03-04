@@ -21,6 +21,7 @@ import '../../design/app_colors.dart';
 import '../../logs/action_class.dart';
 import '../../logs/entity_enum.dart';
 import '../../logs/log_class.dart';
+import '../../system_methods/link_methods.dart';
 
 class AdminUserClass implements IEntity<AdminUserClass> {
   String uid;
@@ -244,6 +245,7 @@ class AdminUserClass implements IEntity<AdminUserClass> {
   @override
   Future<String> publishToDb(File? imageFile) async{
 
+    LinkMethods lk = LinkMethods();
     DatabaseClass db = DatabaseClass();
     final ImageUploader imageUploader = ImageUploader();
 
@@ -285,6 +287,8 @@ class AdminUserClass implements IEntity<AdminUserClass> {
     avatar = postedImageUrl ?? avatar;
 
     Map <String, dynamic> userData = getMap();
+
+    phone = lk.formatPhoneNumber(phone);
 
     String result = '';
 

@@ -27,6 +27,7 @@ class DatabaseConstants {
   static const String telegram = 'telegram';
   static const String instagram = 'instagram';
   static const String headline = 'headline';
+  static const String buttonHeadline = 'buttonHeadline';
   static const String desc = 'desc';
   static const String delete = 'delete';
   static const String edit = 'edit';

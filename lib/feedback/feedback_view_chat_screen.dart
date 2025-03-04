@@ -101,6 +101,7 @@ class _FeedbackViewChatScreenState extends State<FeedbackViewChatScreen> {
     final isMobile = MediaQuery.of(context).size.width < 600; // Условие для мобильной версии
 
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(
             'Обращение №${editFeedback.id}'

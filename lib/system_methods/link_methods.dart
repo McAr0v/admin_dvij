@@ -30,6 +30,23 @@ class LinkMethods {
     return '';
   }
 
+  String formatPhoneNumber(String phone) {
+    // Удаляем все нечисловые символы
+    String cleaned = phone.replaceAll(RegExp(r'\D'), '');
+
+    // Если номер начинается с "8", заменяем на "7"
+    if (cleaned.startsWith('8')) {
+      cleaned = '7${cleaned.substring(1)}';
+    }
+
+    // Если номер начинается с "+7", убираем "+"
+    if (cleaned.startsWith('7')) {
+      return '8${cleaned.substring(1)}';
+    }
+
+    return cleaned;
+  }
+
   String extractTelegramUsername(String input) {
     // Удаляем начальные и конечные пробелы
     input = input.trim();

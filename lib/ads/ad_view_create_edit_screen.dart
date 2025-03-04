@@ -69,6 +69,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
   final TextEditingController _clientPhoneController = TextEditingController();
   final TextEditingController _clientWhatsappController = TextEditingController();
   final TextEditingController _orderDateController = TextEditingController();
+  final TextEditingController _buttonController = TextEditingController();
 
   void resetChosenOptions(){
     setState(() {
@@ -99,6 +100,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
     _clientNameController.text = ad.clientName;
     _clientPhoneController.text = ad.clientPhone;
     _clientWhatsappController.text = ad.clientWhatsapp;
+    _buttonController.text = ad.buttonHeadline;
   }
 
   @override
@@ -343,13 +345,29 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
 
                         const SizedBox(height: 20,),
 
-                        ElementsOfDesign.buildTextField(
-                            controller: _urlController,
-                            labelText: AdsConstants.urlAdField,
-                            canEdit: canEdit,
-                            icon: FontAwesomeIcons.link,
-                            context: context
+                        ElementsOfDesign.buildAdaptiveRow(
+                            isMobile: isMobile,
+                            children: [
+                              ElementsOfDesign.buildTextField(
+                                  controller: _urlController,
+                                  labelText: AdsConstants.urlAdField,
+                                  canEdit: canEdit,
+                                  icon: FontAwesomeIcons.link,
+                                  context: context
+                              ),
+
+                              ElementsOfDesign.buildTextField(
+                                  controller: _buttonController,
+                                  labelText: AdsConstants.buttonAdField,
+                                  canEdit: canEdit,
+                                  icon: FontAwesomeIcons.tabletButton,
+                                  context: context
+                              ),
+
+                            ]
                         ),
+
+
 
                         const SizedBox(height: 20,),
 
@@ -667,6 +685,7 @@ class _AdViewCreateEditScreenState extends State<AdViewCreateEditScreen> {
     tempAd.id = ad.id;
     tempAd.imageUrl = ad.imageUrl;
     tempAd.ordersDate = ad.ordersDate;
+    tempAd.buttonHeadline = _buttonController.text;
 
     return tempAd;
 

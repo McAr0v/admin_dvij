@@ -33,6 +33,7 @@ class AdsConstants{
   static const descAdField = 'Описание';
   static const orderDateAdField = 'Дата обращения по рекламе';
   static const urlAdField = 'Целевая ссылка';
+  static const buttonAdField = 'Надпись на кнопке';
   static const startDateAdField = 'Начало показов';
   static const endDateAdField = 'Завершение показов';
   static const clientNameAdField = 'Имя заказчика';

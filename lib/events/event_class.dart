@@ -324,6 +324,7 @@ class EventClass implements IEntity{
 
     imageUrl = postedImageUrl ?? imageUrl;
 
+    phone = lk.formatPhoneNumber(phone);
     instagram = lk.extractInstagramUsername(instagram);
     telegram = lk.extractTelegramUsername(telegram);
     whatsapp = lk.extractWhatsAppNumber(whatsapp);

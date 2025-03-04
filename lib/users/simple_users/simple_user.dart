@@ -308,6 +308,7 @@ class SimpleUser extends IEntity{
 
     avatar = postedImageUrl ?? avatar;
 
+    phone = lk.formatPhoneNumber(phone);
     instagram = lk.extractInstagramUsername(instagram);
     telegram = lk.extractTelegramUsername(telegram);
     whatsapp = lk.extractWhatsAppNumber(whatsapp);

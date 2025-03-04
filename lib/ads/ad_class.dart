@@ -17,6 +17,7 @@ import '../database/image_uploader.dart';
 import '../design/app_colors.dart';
 import '../logs/action_class.dart';
 import '../logs/entity_enum.dart';
+import '../system_methods/link_methods.dart';
 import '../system_methods/system_methods_class.dart';
 
 class AdClass implements IEntity{
@@ -25,6 +26,7 @@ class AdClass implements IEntity{
   String desc;
   String url;
   String imageUrl;
+  String buttonHeadline;
   DateTime startDate;
   DateTime endDate;
   AdLocation location;
@@ -41,6 +43,7 @@ class AdClass implements IEntity{
     required this.desc,
     required this.url,
     required this.imageUrl,
+    required this.buttonHeadline,
     required this.startDate,
     required this.endDate,
     required this.location,
@@ -61,6 +64,7 @@ class AdClass implements IEntity{
     return AdClass(
         id: snapshot.child(DatabaseConstants.id).value.toString(),
         headline: snapshot.child(DatabaseConstants.headline).value.toString(),
+        buttonHeadline: snapshot.child(DatabaseConstants.buttonHeadline).value.toString(),
         desc: snapshot.child(DatabaseConstants.desc).value.toString(),
         url: snapshot.child(DatabaseConstants.url).value.toString(),
         imageUrl: snapshot.child(DatabaseConstants.imageUrl).value.toString(),
@@ -85,6 +89,7 @@ class AdClass implements IEntity{
     return AdClass(
         id: json[DatabaseConstants.id] ?? '',
         headline: json[DatabaseConstants.headline] ?? '',
+        buttonHeadline: json[DatabaseConstants.buttonHeadline] ?? '',
         desc: json[DatabaseConstants.desc] ?? '',
         url: json[DatabaseConstants.url] ?? '',
         imageUrl: json[DatabaseConstants.imageUrl] ?? '',
@@ -104,6 +109,7 @@ class AdClass implements IEntity{
     return AdClass(
         id: '',
         headline: '',
+        buttonHeadline: '',
         desc: '',
         url: '',
         imageUrl: SystemConstants.defaultAdImagePath,
@@ -163,6 +169,7 @@ class AdClass implements IEntity{
       DatabaseConstants.id: id,
       DatabaseConstants.headline: headline,
       DatabaseConstants.desc: desc,
+      DatabaseConstants.buttonHeadline: buttonHeadline,
       DatabaseConstants.url: url,
       DatabaseConstants.imageUrl: imageUrl,
       DatabaseConstants.startDate: startDate.toString(),
@@ -179,6 +186,8 @@ class AdClass implements IEntity{
 
   @override
   Future<String> publishToDb(File? imageFile) async {
+
+    LinkMethods lk = LinkMethods();
     DatabaseClass db = DatabaseClass();
     final ImageUploader imageUploader = ImageUploader();
 
@@ -215,6 +224,9 @@ class AdClass implements IEntity{
       );
 
     }
+
+    clientPhone = lk.formatPhoneNumber(clientPhone);
+    clientWhatsapp = lk.extractWhatsAppNumber(clientWhatsapp);
 
     imageUrl = postedImageUrl ?? imageUrl;
 
