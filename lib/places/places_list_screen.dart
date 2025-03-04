@@ -273,7 +273,6 @@ class _PlacesListScreenState extends State<PlacesListScreen> {
   }
 
   Future<void> searchingAction({required String text}) async {
-    searchingController.text = text;
 
     await initialization(
       fromDb: false,
