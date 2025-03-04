@@ -101,6 +101,8 @@ class DatabaseConstants {
   static const String promosSecondSlot = 'promosSecondSlot';
   static const String promosThirdSlot = 'promosThirdSlot';
 
+  static const String trueString = 'true';
+  static const String createdByAdmin = 'createdByAdmin';
 
   static const String mainFirstSlotTwoWeeks = 'mainFirstSlotTwoWeeks';
   static const String mainSecondSlotTwoWeeks = 'mainSecondSlotTwoWeeks';

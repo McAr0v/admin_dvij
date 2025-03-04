@@ -12,6 +12,7 @@ import 'package:admin_dvij/events/events_list_class.dart';
 import 'package:admin_dvij/interfaces/entity_interface.dart';
 import 'package:admin_dvij/places/places_list_class.dart';
 import 'package:admin_dvij/price_type/price_type_class.dart';
+import 'package:admin_dvij/system_methods/system_methods_class.dart';
 import 'package:admin_dvij/users/simple_users/simple_user.dart';
 import 'package:admin_dvij/users/simple_users/simple_users_list.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -60,6 +61,7 @@ class EventClass implements IEntity{
   RegularDate regularDays;
   IrregularDate irregularDays;
   List<String> favUsersIds;
+  bool createdByAdmin;
 
   EventClass({
     required this.id,
@@ -84,7 +86,8 @@ class EventClass implements IEntity{
     required this.longDays,
     required this.regularDays,
     required this.irregularDays,
-    this.favUsersIds = const []
+    this.favUsersIds = const [],
+    required this.createdByAdmin
   });
 
   factory EventClass.empty(){
@@ -110,7 +113,8 @@ class EventClass implements IEntity{
         onceDay: OnceDate.empty(),
         longDays: LongDate.empty(),
         regularDays: RegularDate(),
-        irregularDays: IrregularDate.empty()
+        irregularDays: IrregularDate.empty(),
+        createdByAdmin: true
     );
   }
 
@@ -151,6 +155,7 @@ class EventClass implements IEntity{
         regularDays: RegularDate.fromJson(infoFolder.child(DateConstants.regularDaysId).value.toString()),
         irregularDays: irregularDate,
         favUsersIds: methodsForDatabase.getStringFromKeyFromSnapshot(snapshot: favFolder, key: DatabaseConstants.userId),
+        createdByAdmin: SystemMethodsClass().getCreatedByAdmin(data: infoFolder.child(DatabaseConstants.createdByAdmin).value.toString())
     );
   }
 
@@ -190,7 +195,8 @@ class EventClass implements IEntity{
         longDays: LongDate.fromJson(jsonString: infoFolder[DateConstants.longDaysId] ?? ''),
         regularDays: RegularDate.fromJson(infoFolder[DateConstants.regularDaysId] ?? ''),
         irregularDays: irregularDate,
-        favUsersIds: favFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: favFolder, inputKey: DatabaseConstants.userId) : []
+        favUsersIds: favFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: favFolder, inputKey: DatabaseConstants.userId) : [],
+        createdByAdmin: SystemMethodsClass().getCreatedByAdmin(data: infoFolder[DatabaseConstants.createdByAdmin])
     );
   }
 
@@ -269,7 +275,8 @@ class EventClass implements IEntity{
       DateConstants.onceDayId: onceDay.toJsonString(),
       DateConstants.longDaysId: longDays.toJsonString(),
       DateConstants.regularDaysId: regularDays.toJsonString(),
-      DateConstants.irregularDaysId: irregularDays.toJson()
+      DateConstants.irregularDaysId: irregularDays.toJson(),
+      DatabaseConstants.createdByAdmin: createdByAdmin.toString()
     };
   }
 

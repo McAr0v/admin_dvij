@@ -122,13 +122,14 @@ class ElementsOfDesign {
     required String text,
     required bool isChecked,
     required ValueChanged<bool?> onChanged,
-    required BuildContext context
+    required BuildContext context,
+    bool canEdit = true
   }){
     return Row(
       children: [
         Checkbox(
           value: isChecked,
-          onChanged: onChanged,
+          onChanged: canEdit ? onChanged : null,
         ),
         const SizedBox(width: 10,),
         Text(text, style: Theme.of(context).textTheme.bodyMedium,),

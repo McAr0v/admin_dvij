@@ -16,6 +16,7 @@ class ScreenConstants {
   static const String imagesPage = 'Изображения';
   static const String feedbackPage = 'Обратная связь';
   static const String logs = 'Логи';
+  static const String createdByAdminHeadline = 'Создано администратором';
 
 
 }

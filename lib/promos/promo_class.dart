@@ -30,6 +30,7 @@ import '../places/place_class.dart';
 import '../places/places_list_class.dart';
 import '../system_methods/link_methods.dart';
 import '../system_methods/methods_for_database.dart';
+import '../system_methods/system_methods_class.dart';
 import '../users/simple_users/simple_user.dart';
 import '../users/simple_users/simple_users_list.dart';
 
@@ -56,6 +57,7 @@ class Promo implements IEntity{
   RegularDate regularDays;
   IrregularDate irregularDays;
   List<String> favUsersIds;
+  bool createdByAdmin;
 
   Promo({
     required this.id,
@@ -78,7 +80,8 @@ class Promo implements IEntity{
     required this.longDays,
     required this.regularDays,
     required this.irregularDays,
-    this.favUsersIds = const []
+    this.favUsersIds = const [],
+    required this.createdByAdmin
   });
 
   factory Promo.empty(){
@@ -102,7 +105,8 @@ class Promo implements IEntity{
         onceDay: OnceDate.empty(),
         longDays: LongDate.empty(),
         regularDays: RegularDate(),
-        irregularDays: IrregularDate.empty()
+        irregularDays: IrregularDate.empty(),
+        createdByAdmin: true
     );
   }
 
@@ -141,6 +145,7 @@ class Promo implements IEntity{
       regularDays: RegularDate.fromJson(infoFolder.child(DateConstants.regularDaysId).value.toString()),
       irregularDays: irregularDate,
       favUsersIds: methodsForDatabase.getStringFromKeyFromSnapshot(snapshot: favFolder, key: DatabaseConstants.userId),
+        createdByAdmin: SystemMethodsClass().getCreatedByAdmin(data: infoFolder.child(DatabaseConstants.createdByAdmin).value.toString())
     );
   }
 
@@ -178,7 +183,8 @@ class Promo implements IEntity{
         longDays: LongDate.fromJson(jsonString: infoFolder[DateConstants.longDaysId] ?? ''),
         regularDays: RegularDate.fromJson(infoFolder[DateConstants.regularDaysId] ?? ''),
         irregularDays: irregularDate,
-        favUsersIds: favFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: favFolder, inputKey: DatabaseConstants.userId) : []
+        favUsersIds: favFolder != null ? methodsForDatabase.getStringFromKeyFromJson(json: favFolder, inputKey: DatabaseConstants.userId) : [],
+        createdByAdmin: SystemMethodsClass().getCreatedByAdmin(data: infoFolder[DatabaseConstants.createdByAdmin])
     );
   }
 
@@ -252,7 +258,8 @@ class Promo implements IEntity{
       DateConstants.onceDayId: onceDay.toJsonString(),
       DateConstants.longDaysId: longDays.toJsonString(),
       DateConstants.regularDaysId: regularDays.toJsonString(),
-      DateConstants.irregularDaysId: irregularDays.toJson()
+      DateConstants.irregularDaysId: irregularDays.toJson(),
+      DatabaseConstants.createdByAdmin: createdByAdmin.toString()
     };
   }
 

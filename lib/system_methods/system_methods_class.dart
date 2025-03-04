@@ -5,6 +5,7 @@ import 'package:admin_dvij/system_methods/dates_methods.dart';
 import 'package:flutter/material.dart';
 
 import '../constants/buttons_constants.dart';
+import '../constants/database_constants.dart';
 
 class SystemMethodsClass {
   SystemMethodsClass();
@@ -85,6 +86,14 @@ class SystemMethodsClass {
     } else {
       final years = (difference.inDays / 365).floor();
       return '$years ${_pluralize(years, 'год', 'года', 'лет')} назад';
+    }
+  }
+
+  bool getCreatedByAdmin({required String? data}){
+    if (data == DatabaseConstants.trueString){
+      return true;
+    } else {
+      return false;
     }
   }
 

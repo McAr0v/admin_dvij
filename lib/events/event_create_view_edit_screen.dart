@@ -27,6 +27,7 @@ import '../cities/city_picker_page.dart';
 import '../constants/buttons_constants.dart';
 import '../constants/categories_constants.dart';
 import '../constants/date_constants.dart';
+import '../constants/screen_constants.dart';
 import '../constants/system_constants.dart';
 import '../constants/users_constants.dart';
 import '../database/image_picker.dart';
@@ -90,6 +91,8 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
   // Prices
   PriceType chosenPriceType = PriceType();
+
+  bool chosenCreatedByAdmin = false;
 
   final TextEditingController headlineController = TextEditingController();
   final TextEditingController descController = TextEditingController();
@@ -174,6 +177,8 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
 
       chosenPriceType = PriceType.setPriceType(priceType: editEvent.priceType);
       chosenDateType = DateType.setDateType(dateType: editEvent.dateType);
+
+      chosenCreatedByAdmin = editEvent.createdByAdmin;
 
       if (editEvent.placeId.isNotEmpty){
         addressType = AddressType(addressTypeEnum: AddressTypeEnum.place);
@@ -415,6 +420,18 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
                                     await chooseCategory();
                                   }
                               ),
+
+                              ElementsOfDesign.checkBox(
+                                  text: ScreenConstants.createdByAdminHeadline,
+                                  isChecked: chosenCreatedByAdmin,
+                                  canEdit: canEdit,
+                                  onChanged: (result){
+                                    setState(() {
+                                      chosenCreatedByAdmin = !chosenCreatedByAdmin;
+                                    });
+                                  },
+                                  context: context
+                              )
                             ]
                         ),
 
@@ -934,6 +951,7 @@ class _EventCreateViewEditScreenState extends State<EventCreateViewEditScreen> {
     tempEvent.imageUrl = editEvent.imageUrl;
     tempEvent.placeId = chosenPlace.id;
     tempEvent.priceType = chosenPriceType;
+    tempEvent.createdByAdmin = chosenCreatedByAdmin;
 
     tempEvent.price = chosenPriceType.getPriceStringForDb(
         fixedPrice: fixedPriceController.text,

@@ -7,6 +7,7 @@ import 'package:admin_dvij/constants/errors_constants.dart';
 import 'package:admin_dvij/constants/events_constants.dart';
 import 'package:admin_dvij/constants/fields_constants.dart';
 import 'package:admin_dvij/constants/promo_constants.dart';
+import 'package:admin_dvij/constants/screen_constants.dart';
 import 'package:admin_dvij/constants/simple_users_constants.dart';
 import 'package:admin_dvij/dates/date_type.dart';
 import 'package:admin_dvij/dates/date_type_picker.dart';
@@ -86,6 +87,8 @@ class _PromoCreateViewEditScreenState extends State<PromoCreateViewEditScreen> {
   RegularDate schedule = RegularDate();
   IrregularDate irregularDate = IrregularDate.empty();
 
+  bool chosenCreatedByAdmin = false;
+
   final TextEditingController headlineController = TextEditingController();
   final TextEditingController descController = TextEditingController();
   final TextEditingController createDateController = TextEditingController();
@@ -163,6 +166,8 @@ class _PromoCreateViewEditScreenState extends State<PromoCreateViewEditScreen> {
       chosenCity = City.setCity(city: editPromo.city);
 
       chosenDateType = DateType.setDateType(dateType: editPromo.dateType);
+
+      chosenCreatedByAdmin = editPromo.createdByAdmin;
 
       if (editPromo.placeId.isNotEmpty){
         addressType = AddressType(addressTypeEnum: AddressTypeEnum.place);
@@ -381,6 +386,18 @@ class _PromoCreateViewEditScreenState extends State<PromoCreateViewEditScreen> {
                                     await chooseCategory();
                                   }
                               ),
+
+                              ElementsOfDesign.checkBox(
+                                  text: ScreenConstants.createdByAdminHeadline,
+                                  isChecked: chosenCreatedByAdmin,
+                                  canEdit: canEdit,
+                                  onChanged: (result){
+                                    setState(() {
+                                      chosenCreatedByAdmin = !chosenCreatedByAdmin;
+                                    });
+                                  },
+                                  context: context
+                              )
                             ]
                         ),
 
@@ -841,6 +858,7 @@ class _PromoCreateViewEditScreenState extends State<PromoCreateViewEditScreen> {
     tempPromo.telegram = telegramController.text;
     tempPromo.imageUrl = editPromo.imageUrl;
     tempPromo.placeId = chosenPlace.id;
+    tempPromo.createdByAdmin = chosenCreatedByAdmin;
 
     return tempPromo;
 
